@@ -4,4 +4,4 @@
 	export let data: PageData;
 </script>
 
-<AddCoffeeForm {data} class="w-1/2" />
+<AddCoffeeForm {data} class="w-[440px]" />

@@ -5,6 +5,7 @@
 	import { Calendar } from '$lib/components/ui/calendar';
 	import * as Popover from '$lib/components/ui/popover';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { Separator } from '$lib/components/ui/separator';
 	import * as Card from '$lib/components/ui/card';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { countries } from 'countries-list';
@@ -52,126 +53,143 @@
 	});
 </script>
 
-<form method="POST" use:enhance class={cn('space-y-4', $$restProps.class)}>
+<form method="POST" use:enhance class={cn($$restProps.class)}>
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Add a new Coffee</Card.Title>
 			<Card.Description>highly controverse coffees are not desired</Card.Description>
 		</Card.Header>
-		<Card.Content>
-			<Form.Field {form} name="name">
-				<Form.Control let:attrs>
-					<Form.Label>Name</Form.Label>
-					<Input {...attrs} bind:value={$formData.name} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="roaster">
-				<Form.Control let:attrs>
-					<Form.Label>Roaster</Form.Label>
-					<Input {...attrs} bind:value={$formData.roaster} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="varietals">
-				<Form.Control let:attrs>
-					<Form.Label>Varietals</Form.Label>
-					<Input {...attrs} bind:value={$formData.varietals} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="country">
-				<Form.Control let:attrs>
-					<Form.Label>Country</Form.Label>
-					<Select.Root
-						selected={selectedCountry}
-						onSelectedChange={(v) => {
-							v && ($formData.country = v.value);
-						}}
-					>
-						<Select.Trigger {...attrs}>
-							<Select.Value placeholder="Select the origin country" />
-						</Select.Trigger>
-						<Select.Content class="max-h-48 overflow-y-auto">
-							{#each countryNames as countryName}
-								<Select.Item {...countryName} />
-							{/each}
-						</Select.Content>
-					</Select.Root>
-					<input hidden bind:value={$formData.country} name={attrs.name} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="region">
-				<Form.Control let:attrs>
-					<Form.Label>Region</Form.Label>
-					<Input {...attrs} bind:value={$formData.region} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="farm">
-				<Form.Control let:attrs>
-					<Form.Label>Farm</Form.Label>
-					<Input {...attrs} bind:value={$formData.farm} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="process">
-				<Form.Control let:attrs>
-					<Form.Label>Process</Form.Label>
-					<Input {...attrs} bind:value={$formData.process} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="elevation">
-				<Form.Control let:attrs>
-					<Form.Label>Elevation</Form.Label>
-					<Input {...attrs} bind:value={$formData.elevation} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="weight">
-				<Form.Control let:attrs>
-					<Form.Label>Weight</Form.Label>
-					<Input {...attrs} type="number" step=0.5 bind:value={$formData.weight} />
-					<Form.Description>initial bag weight in grams</Form.Description>
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="roastingDate" class="flex flex-col">
-				<Form.Control let:attrs>
-					<Form.Label>Roasting Date</Form.Label>
-					<Popover.Root>
-						<Popover.Trigger
-							{...attrs}
-							class={cn(
-								buttonVariants({ variant: 'outline' }),
-								'w-[280px] justify-start pl-4 text-left font-normal',
-								!selectedRoastingDate && 'text-muted-foreground'
-							)}
-						>
-							{selectedRoastingDate
-								? df.format(selectedRoastingDate.toDate(getLocalTimeZone()))
-								: 'Pick a date'}
-							<CalendarIcon class="ml-auto h-4 w-4 opacity-50" />
-						</Popover.Trigger>
-						<Popover.Content side="bottom">
-							<Calendar
-								bind:value={selectedRoastingDate}
-								minValue={new CalendarDate(1900, 1, 1)}
-								maxValue={today(getLocalTimeZone())}
-								calendarLabel="Roasting date"
-								initialFocus
-								onValueChange={(v) => {
-									$formData.roastingDate = v ? v.toString() : '';
+		<Card.Content class="space-y-4">
+			<div class="flex flex-row space-x-4">
+				<Form.Field {form} name="name">
+					<Form.Control let:attrs>
+						<Form.Label>Name</Form.Label>
+						<Input {...attrs} bind:value={$formData.name} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="roaster">
+					<Form.Control let:attrs>
+						<Form.Label>Roaster</Form.Label>
+						<Input {...attrs} bind:value={$formData.roaster} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+			<Separator />
+			<div class="flex flex-row space-x-4">
+				<Form.Field {form} name="varietals">
+					<Form.Control let:attrs>
+						<Form.Label>Varietals</Form.Label>
+						<Input {...attrs} bind:value={$formData.varietals} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="process">
+					<Form.Control let:attrs>
+						<Form.Label>Process</Form.Label>
+						<Input {...attrs} bind:value={$formData.process} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+			<Separator />
+			<div>
+				<div class="flex flex-row justify-between space-x-4">
+					<Form.Field {form} name="country" class="w-1/2">
+						<Form.Control let:attrs>
+							<Form.Label>Country</Form.Label>
+							<Select.Root
+								selected={selectedCountry}
+								onSelectedChange={(v) => {
+									v && ($formData.country = v.value);
 								}}
-							/>
-						</Popover.Content>
-					</Popover.Root>
-					<input hidden value={$formData.roastingDate} name={attrs.name} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+							>
+								<Select.Trigger {...attrs}>
+									<Select.Value placeholder="Select the origin country" />
+								</Select.Trigger>
+								<Select.Content class="max-h-48 overflow-y-auto">
+									{#each countryNames as countryName}
+										<Select.Item {...countryName} />
+									{/each}
+								</Select.Content>
+							</Select.Root>
+							<input hidden bind:value={$formData.country} name={attrs.name} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="region">
+						<Form.Control let:attrs>
+							<Form.Label>Region</Form.Label>
+							<Input {...attrs} bind:value={$formData.region} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</div>
+				<div class="flex flex-row space-x-4">
+					<Form.Field {form} name="farm">
+						<Form.Control let:attrs>
+							<Form.Label>Farm</Form.Label>
+							<Input {...attrs} bind:value={$formData.farm} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="elevation">
+						<Form.Control let:attrs>
+							<Form.Label>Elevation</Form.Label>
+							<Input {...attrs} bind:value={$formData.elevation} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</div>
+			</div>
+			<Separator />
+			<div class="flex flex-row space-x-4">
+				<Form.Field {form} name="weight">
+					<Form.Control let:attrs>
+						<Form.Label>Weight</Form.Label>
+						<Input {...attrs} type="number" step="0.5" bind:value={$formData.weight} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="roastingDate">
+					<Form.Control let:attrs>
+						<Form.Label>Roasting Date</Form.Label>
+						<Popover.Root>
+							<Popover.Trigger
+								{...attrs}
+								class={cn(
+									buttonVariants({ variant: 'outline' }),
+									'w-full justify-between font-normal',
+									!selectedRoastingDate && 'text-muted-foreground'
+								)}
+							>
+								<div>
+									{selectedRoastingDate
+										? df.format(selectedRoastingDate.toDate(getLocalTimeZone()))
+										: 'Pick a date'}
+								</div>
+								<CalendarIcon class="h-4 w-4 opacity-50" />
+							</Popover.Trigger>
+							<Popover.Content side="bottom">
+								<Calendar
+									bind:value={selectedRoastingDate}
+									minValue={new CalendarDate(1900, 1, 1)}
+									maxValue={today(getLocalTimeZone())}
+									calendarLabel="Roasting date"
+									initialFocus
+									onValueChange={(v) => {
+										$formData.roastingDate = v ? v.toString() : '';
+									}}
+								/>
+							</Popover.Content>
+						</Popover.Root>
+						<input hidden value={$formData.roastingDate} name={attrs.name} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+			<Separator />
 			<Form.Field {form} name="notes">
 				<Form.Control let:attrs>
 					<Form.Label>Notes</Form.Label>
@@ -185,7 +203,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		</Card.Content>
-		<Card.Footer>
+		<Card.Footer class="justify-end">
 			<Form.Button>Submit</Form.Button>
 		</Card.Footer>
 	</Card.Root>
