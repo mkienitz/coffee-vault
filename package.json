@@ -41,6 +41,7 @@
 		"@internationalized/date": "^3.5.2",
 		"bits-ui": "^0.19.7",
 		"clsx": "^2.1.0",
+		"countries-list": "^3.1.0",
 		"formsnap": "^0.5.1",
 		"lucide-svelte": "^0.358.0",
 		"tailwind-merge": "^2.2.2",

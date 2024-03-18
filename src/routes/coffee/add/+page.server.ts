@@ -3,10 +3,18 @@ import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
+import { countries } from 'countries-list';
 
 export const load: PageServerLoad = async () => {
+	const countryNames = Object.values(countries).map((country) => {
+		return {
+			value: country.name,
+			label: country.name
+		};
+	});
 	return {
-		form: await superValidate(zod(formSchema))
+		form: await superValidate(zod(formSchema)),
+		countryNames
 	};
 };
 
