@@ -27,6 +27,7 @@
         devShells.default = pkgs.devshell.mkShell {
           packages = with pkgs; [
             nil
+            sqlite
             nodejs
             nodePackages."@tailwindcss/language-server"
             nodePackages.npm

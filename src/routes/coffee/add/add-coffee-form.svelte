@@ -109,6 +109,13 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<Form.Field {form} name="farm">
+				<Form.Control let:attrs>
+					<Form.Label>Farm</Form.Label>
+					<Input {...attrs} bind:value={$formData.farm} />
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 			<Form.Field {form} name="process">
 				<Form.Control let:attrs>
 					<Form.Label>Process</Form.Label>
@@ -120,6 +127,14 @@
 				<Form.Control let:attrs>
 					<Form.Label>Elevation</Form.Label>
 					<Input {...attrs} bind:value={$formData.elevation} />
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="weight">
+				<Form.Control let:attrs>
+					<Form.Label>Weight</Form.Label>
+					<Input {...attrs} type="number" step=0.5 bind:value={$formData.weight} />
+					<Form.Description>initial bag weight in grams</Form.Description>
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
