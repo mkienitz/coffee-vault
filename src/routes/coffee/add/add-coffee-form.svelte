@@ -20,10 +20,11 @@
 		parseDate,
 		DateFormatter
 	} from '@internationalized/date';
+	import type { PageData } from './$types';
 
-	export let data: SuperValidated<Infer<FormSchema>>;
+	export let data: PageData;
 
-	const form = superForm(data, {
+	const form = superForm(data.form, {
 		validators: zodClient(formSchema)
 	});
 
