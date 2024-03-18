@@ -31,7 +31,7 @@
             nodePackages."@tailwindcss/language-server"
             nodePackages.npm
             nodePackages.tailwindcss
-            # nodePackages.typescript-language-server
+            nodePackages.typescript-language-server
             nodePackages.svelte-language-server
           ];
         };
