@@ -8,9 +8,9 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import * as Card from '$lib/components/ui/card';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { countries } from 'countries-list';
-	import { formSchema, type FormSchema } from './schema';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
+	import { countries, getCountryCode, getEmojiFlag } from 'countries-list';
+	import { formSchema } from './schema';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { CalendarIcon } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
@@ -44,31 +44,36 @@
 				label: $formData.country
 			}
 		: undefined;
-
+	let countryFlag: string;
+	$: {
+		let cc = getCountryCode($formData.country);
+		countryFlag = cc ? getEmojiFlag(cc) : '';
+	}
 	const countryNames = Object.values(countries).map((country) => {
 		return {
 			value: country.name,
 			label: country.name
 		};
 	});
+	$formData.country = '';
 </script>
 
 <form method="POST" use:enhance class={cn($$restProps.class)}>
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Add a new Coffee</Card.Title>
-			<Card.Description>highly controverse coffees are not desired</Card.Description>
+			<Card.Description>highly controversial coffees are not desired</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="name">
+				<Form.Field {form} name="name" class="grow">
 					<Form.Control let:attrs>
 						<Form.Label>Name</Form.Label>
 						<Input {...attrs} bind:value={$formData.name} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="roaster">
+				<Form.Field {form} name="roaster" class="grow">
 					<Form.Control let:attrs>
 						<Form.Label>Roaster</Form.Label>
 						<Input {...attrs} bind:value={$formData.roaster} />
@@ -78,14 +83,14 @@
 			</div>
 			<Separator />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="varietals">
+				<Form.Field {form} name="varietals" class="grow">
 					<Form.Control let:attrs>
 						<Form.Label>Varietals</Form.Label>
 						<Input {...attrs} bind:value={$formData.varietals} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="process">
+				<Form.Field {form} name="process" class="grow">
 					<Form.Control let:attrs>
 						<Form.Label>Process</Form.Label>
 						<Input {...attrs} bind:value={$formData.process} />
@@ -105,10 +110,14 @@
 									v && ($formData.country = v.value);
 								}}
 							>
-								<Select.Trigger {...attrs}>
-									<Select.Value placeholder="Select the origin country" />
+								<Select.Trigger
+									{...attrs}
+									class="justify-between space-x-1 text-ellipsis text-start"
+								>
+									<div>{countryFlag}</div>
+									<Select.Value placeholder="Select the origin country" class="w-full" />
 								</Select.Trigger>
-								<Select.Content class="max-h-48 overflow-y-auto">
+								<Select.Content class="max-h-72 overflow-y-auto">
 									{#each countryNames as countryName}
 										<Select.Item {...countryName} />
 									{/each}
@@ -118,7 +127,7 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="region">
+					<Form.Field {form} name="region" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Region</Form.Label>
 							<Input {...attrs} bind:value={$formData.region} />
@@ -127,14 +136,14 @@
 					</Form.Field>
 				</div>
 				<div class="flex flex-row space-x-4">
-					<Form.Field {form} name="farm">
+					<Form.Field {form} name="farm" class="grow">
 						<Form.Control let:attrs>
 							<Form.Label>Farm</Form.Label>
 							<Input {...attrs} bind:value={$formData.farm} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="elevation">
+					<Form.Field {form} name="elevation" class="grow">
 						<Form.Control let:attrs>
 							<Form.Label>Elevation</Form.Label>
 							<Input {...attrs} bind:value={$formData.elevation} />
@@ -145,14 +154,14 @@
 			</div>
 			<Separator />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="weight">
+				<Form.Field {form} name="weight" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Weight</Form.Label>
 						<Input {...attrs} type="number" step="0.5" bind:value={$formData.weight} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="roastingDate">
+				<Form.Field {form} name="roastingDate" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Roasting Date</Form.Label>
 						<Popover.Root>
