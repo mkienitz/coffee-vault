@@ -18,8 +18,8 @@
 		<Card.Description>Card Description</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<Progress value={33} />
-		<Card.Description>{coffee.weight * 0.33}/{coffee.weight}g</Card.Description>
+		<Progress value={100} />
+		<Card.Description>{coffee.weight}/{coffee.weight}g</Card.Description>
 	</Card.Content>
 	<Card.Footer>
 		<p>Card Footer</p>

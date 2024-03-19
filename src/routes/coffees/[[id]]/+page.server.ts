@@ -39,12 +39,12 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			// CREATE
 			await db.insert(coffees).values(form.data);
-			return message(form, 'Coffee added!');
+			return redirect(303, '/');
 		} else {
 			if (formData.has('delete')) {
 				// DELETE
 				await db.delete(coffees).where(eq(coffees.id, form.data.id));
-				return redirect(303, '/coffees');
+				return redirect(303, '/');
 			} else {
 				// UPDATE
 				await db.update(coffees).set(form.data).where(eq(coffees.id, form.data.id));

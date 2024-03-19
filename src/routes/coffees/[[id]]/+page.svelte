@@ -14,6 +14,7 @@
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { CalendarIcon } from 'lucide-svelte';
+	import { Toaster } from '$lib/components/ui/sonner';
 	import { cn } from '$lib/utils';
 	import {
 		CalendarDate,
@@ -25,7 +26,7 @@
 	import type { PageData } from './$types';
 	import { dev } from '$app/environment';
 	import { page } from '$app/stores';
-	import CoffeeCard from '$lib/components/coffee-card.svelte';
+	import { toast } from 'svelte-sonner';
 
 	export let data: PageData;
 
@@ -34,6 +35,11 @@
 		validators: zodClient(coffeeSchema)
 	});
 	const { form, errors, constraints, enhance, delayed, message } = sForm;
+
+	// Toaster
+	$: {
+		toast.success($message);
+	}
 
 	// Date Picker
 	$: selectedRoastingDate = $form.roastingDate ? parseDate($form.roastingDate) : undefined;
@@ -55,6 +61,7 @@
 	}
 </script>
 
+<Toaster />
 <form id="coffeeForm" method="POST" use:enhance class={cn($$restProps.class, 'w-[540px]')}>
 	{#if $message}
 		<h3 class:invalid={$page.status >= 400}>{$message}</h3>
@@ -241,6 +248,3 @@
 	</Card.Root>
 	<SuperDebug data={$form} display={dev} />
 </form>
-{#each data.coffees as coffee}
-	<CoffeeCard {coffee} />
-{/each}

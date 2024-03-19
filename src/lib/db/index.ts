@@ -2,8 +2,6 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
-import { createInsertSchema } from 'drizzle-zod';
-import { createSelectSchema } from 'drizzle-zod';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
@@ -20,9 +18,6 @@ export const coffees = sqliteTable('coffees', {
 	varietals: text('varietals').notNull(),
 	weight: integer('weight').notNull()
 });
-
-export const insertCoffeeSchema = createInsertSchema(coffees);
-export const selectCoffeeSchema = createSelectSchema(coffees);
 
 const sqlite = new Database('sqlite.db');
 export const db = drizzle(sqlite, { schema: { coffees } });
