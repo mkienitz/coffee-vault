@@ -5,7 +5,6 @@ import { countries } from 'countries-list';
 import { createInsertSchema } from 'drizzle-zod';
 import { createSelectSchema } from 'drizzle-zod';
 
-
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -19,11 +18,11 @@ export const coffees = sqliteTable('coffees', {
 	roaster: text('roaster').notNull(),
 	roastingDate: text('roastingDate').notNull(),
 	varietals: text('varietals').notNull(),
-	weight: integer('weight').notNull(),
+	weight: integer('weight').notNull()
 });
 
-export const insertCoffeeSchema = createInsertSchema(coffees)
-export const selectCoffeeSchema = createSelectSchema(coffees)
+export const insertCoffeeSchema = createInsertSchema(coffees);
+export const selectCoffeeSchema = createSelectSchema(coffees);
 
 const sqlite = new Database('sqlite.db');
 export const db = drizzle(sqlite, { schema: { coffees } });
