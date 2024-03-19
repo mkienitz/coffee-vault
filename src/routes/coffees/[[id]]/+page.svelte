@@ -1,15 +1,10 @@
-<!-- <div> -->
-<!-- 	{#if $message} -->
-<!-- 		<h3 class:invalid={$page.status >= 400}>{$message}</h3> -->
-<!-- 	{/if} -->
-<!-- 	<h2>{!$form.id ? 'Create' : 'Update'} user</h2> -->
-<!-- </div> -->
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import * as Form from '$lib/components/ui/form';
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
-	import { buttonVariants } from '$lib/components/ui/button';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Calendar } from '$lib/components/ui/calendar';
 	import { Input } from '$lib/components/ui/input';
 	import { Separator } from '$lib/components/ui/separator';
@@ -60,7 +55,7 @@
 	}
 </script>
 
-<form method="POST" use:enhance class={cn($$restProps.class)}>
+<form id="coffeeForm" method="POST" use:enhance class={cn($$restProps.class, 'w-[540px]')}>
 	{#if $message}
 		<h3 class:invalid={$page.status >= 400}>{$message}</h3>
 	{/if}
@@ -217,7 +212,31 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button>Submit</Form.Button>
+			<div class="flex flex-row justify-between">
+				<Form.Button variant="secondary">{$form.id ? 'Edit Coffee' : 'Add Coffee'}</Form.Button>
+				{#if $form.id}
+					<AlertDialog.Root>
+						<AlertDialog.Trigger
+							><Button variant="destructive">Delete Coffee</Button></AlertDialog.Trigger
+						>
+						<AlertDialog.Content>
+							<AlertDialog.Header>
+								<AlertDialog.Title>Are you sure?</AlertDialog.Title>
+								<AlertDialog.Description>
+									This action cannot be undone. This will permanently delete the coffee.
+								</AlertDialog.Description>
+							</AlertDialog.Header>
+							<AlertDialog.Footer>
+								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+								<!-- https://github.com/shadcn-ui/ui/issues/709#issuecomment-1662586709 -->
+								<AlertDialog.Action form="coffeeForm" name="delete" type="submit"
+									>Delete</AlertDialog.Action
+								>
+							</AlertDialog.Footer>
+						</AlertDialog.Content>
+					</AlertDialog.Root>
+				{/if}
+			</div>
 		</Card.Content>
 	</Card.Root>
 	<SuperDebug data={$form} display={dev} />
