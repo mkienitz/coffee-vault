@@ -1,15 +1,21 @@
+<!-- <div> -->
+<!-- 	{#if $message} -->
+<!-- 		<h3 class:invalid={$page.status >= 400}>{$message}</h3> -->
+<!-- 	{/if} -->
+<!-- 	<h2>{!$form.id ? 'Create' : 'Update'} user</h2> -->
+<!-- </div> -->
 <script lang="ts">
-	import * as Form from '$lib/components/ui/form';
-	import * as Select from '$lib/components/ui/select';
-	import { Input } from '$lib/components/ui/input';
-	import { Calendar } from '$lib/components/ui/calendar';
-	import * as Popover from '$lib/components/ui/popover';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { Separator } from '$lib/components/ui/separator';
 	import * as Card from '$lib/components/ui/card';
+	import * as Form from '$lib/components/ui/form';
+	import * as Popover from '$lib/components/ui/popover';
+	import * as Select from '$lib/components/ui/select';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import { Calendar } from '$lib/components/ui/calendar';
+	import { Input } from '$lib/components/ui/input';
+	import { Separator } from '$lib/components/ui/separator';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { getCountryCode, getEmojiFlag } from 'countries-list';
-	import { formSchema } from './schema';
+	import { coffeeSchema } from '$lib/schemas';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { CalendarIcon } from 'lucide-svelte';
@@ -22,72 +28,78 @@
 		DateFormatter
 	} from '@internationalized/date';
 	import type { PageData } from './$types';
-	import { browser } from '$app/environment';
+	import { dev } from '$app/environment';
+	import { page } from '$app/stores';
+	import CoffeeCard from '$lib/components/coffee-card.svelte';
 
 	export let data: PageData;
 
-	const form = superForm(data.form, {
-		validators: zodClient(formSchema)
+	const sForm = superForm(data.form, {
+		resetForm: false,
+		validators: zodClient(coffeeSchema)
 	});
-
-	const { form: formData, enhance } = form;
+	const { form, errors, constraints, enhance, delayed, message } = sForm;
 
 	// Date Picker
-	$: selectedRoastingDate = $formData.roastingDate ? parseDate($formData.roastingDate) : undefined;
+	$: selectedRoastingDate = $form.roastingDate ? parseDate($form.roastingDate) : undefined;
 	const df = new DateFormatter('en-DE', {
 		dateStyle: 'long'
 	});
 
 	// Country
-	$: selectedCountry = $formData.country
+	$: selectedCountry = $form.country
 		? {
-				value: $formData.country,
-				label: $formData.country
+				value: $form.country,
+				label: $form.country
 			}
 		: undefined;
 	let countryFlag: string;
 	$: {
-		let cc = getCountryCode($formData.country);
+		let cc = getCountryCode($form.country);
 		countryFlag = cc ? getEmojiFlag(cc) : '';
 	}
 </script>
 
 <form method="POST" use:enhance class={cn($$restProps.class)}>
+	{#if $message}
+		<h3 class:invalid={$page.status >= 400}>{$message}</h3>
+	{/if}
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Add a new Coffee</Card.Title>
+			<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
 			<Card.Description>highly controversial coffees are not desired</Card.Description>
 		</Card.Header>
 		<Card.Content class="space-y-4">
+			<input hidden bind:value={$form.id} name="id" />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="name" class="w-1/2">
+				<Form.Field form={sForm} name="name" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Name</Form.Label>
-						<Input {...attrs} bind:value={$formData.name} />
+						<Input {...attrs} bind:value={$form.name} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="roaster" class="w-1/2">
+				<Form.Field form={sForm} name="roaster" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Roaster</Form.Label>
-						<Input {...attrs} bind:value={$formData.roaster} />
+						<Input {...attrs} bind:value={$form.roaster} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
 			</div>
 			<Separator />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="varietals" class="w-1/2">
+				<Form.Field form={sForm} name="varietals" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Varietals</Form.Label>
-						<Input {...attrs} bind:value={$formData.varietals} />
+						<Input {...attrs} bind:value={$form.varietals} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="process" class="w-1/2">
+				<Form.Field form={sForm} name="process" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Process</Form.Label>
-						<Input {...attrs} bind:value={$formData.process} />
+						<Input {...attrs} bind:value={$form.process} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
@@ -95,13 +107,13 @@
 			<Separator />
 			<div>
 				<div class="flex flex-row justify-between space-x-4">
-					<Form.Field {form} name="country" class="w-1/2">
+					<Form.Field form={sForm} name="country" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Country</Form.Label>
 							<Select.Root
 								selected={selectedCountry}
 								onSelectedChange={(v) => {
-									v && ($formData.country = v.value);
+									v && ($form.country = v.value);
 								}}
 							>
 								<Select.Trigger
@@ -117,30 +129,30 @@
 									{/each}
 								</Select.Content>
 							</Select.Root>
-							<input hidden bind:value={$formData.country} name={attrs.name} />
+							<input hidden bind:value={$form.country} name={attrs.name} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="region" class="w-1/2">
+					<Form.Field form={sForm} name="region" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Region</Form.Label>
-							<Input {...attrs} bind:value={$formData.region} />
+							<Input {...attrs} bind:value={$form.region} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
 				</div>
 				<div class="flex flex-row space-x-4">
-					<Form.Field {form} name="farm" class="w-1/2">
+					<Form.Field form={sForm} name="farm" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Farm</Form.Label>
-							<Input {...attrs} bind:value={$formData.farm} />
+							<Input {...attrs} bind:value={$form.farm} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="elevation" class="w-1/2">
+					<Form.Field form={sForm} name="elevation" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Elevation</Form.Label>
-							<Input {...attrs} bind:value={$formData.elevation} />
+							<Input {...attrs} bind:value={$form.elevation} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
@@ -148,14 +160,14 @@
 			</div>
 			<Separator />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="weight" class="w-1/2">
+				<Form.Field form={sForm} name="weight" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Weight</Form.Label>
-						<Input {...attrs} bind:value={$formData.weight} />
+						<Input {...attrs} bind:value={$form.weight} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="roastingDate" class="w-1/2">
+				<Form.Field form={sForm} name="roastingDate" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Roasting Date</Form.Label>
 						<Popover.Root>
@@ -182,33 +194,34 @@
 									calendarLabel="Roasting date"
 									initialFocus
 									onValueChange={(v) => {
-										$formData.roastingDate = v ? v.toString() : '';
+										$form.roastingDate = v ? v.toString() : '';
 									}}
 								/>
 							</Popover.Content>
 						</Popover.Root>
-						<input hidden value={$formData.roastingDate} name={attrs.name} />
+						<input hidden value={$form.roastingDate} name={attrs.name} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
 			</div>
 			<Separator />
-			<Form.Field {form} name="notes">
+			<Form.Field form={sForm} name="notes">
 				<Form.Control let:attrs>
 					<Form.Label>Notes</Form.Label>
 					<Textarea
 						{...attrs}
 						placeholder="Add some notes"
 						class="resize-none"
-						bind:value={$formData.notes}
+						bind:value={$form.notes}
 					/>
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
 			<Form.Button>Submit</Form.Button>
 		</Card.Content>
-		{#if browser}
-			<SuperDebug data={$formData} />
-		{/if}
 	</Card.Root>
+	<SuperDebug data={$form} display={dev} />
 </form>
+{#each data.coffees as coffee}
+	<CoffeeCard {coffee} />
+{/each}
