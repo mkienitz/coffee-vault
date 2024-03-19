@@ -7,15 +7,14 @@ import { countries } from 'countries-list';
 import { coffees, db } from '$lib/db';
 
 export const load: PageServerLoad = async () => {
-	// const countryNames = Object.values(countries).map((country) => {
-	// 	return {
-	// 		value: country.name,
-	// 		label: country.name
-	// 	};
-	// });
 	return {
 		form: await superValidate(zod(formSchema)),
-		// countryNames
+		countryNames: Object.values(countries).map((country) => {
+			return {
+				value: country.name,
+				label: country.name
+			};
+		})
 	};
 };
 
@@ -27,6 +26,7 @@ export const actions: Actions = {
 				form
 			});
 		}
+		console.log(form.data)
 		await db.insert(coffees).values(form.data);
 		return {
 			form

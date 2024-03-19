@@ -8,9 +8,9 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import * as Card from '$lib/components/ui/card';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { countries, getCountryCode, getEmojiFlag } from 'countries-list';
+	import { getCountryCode, getEmojiFlag } from 'countries-list';
 	import { formSchema } from './schema';
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { CalendarIcon } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
@@ -22,6 +22,7 @@
 		DateFormatter
 	} from '@internationalized/date';
 	import type { PageData } from './$types';
+	import { browser } from '$app/environment';
 
 	export let data: PageData;
 
@@ -49,13 +50,6 @@
 		let cc = getCountryCode($formData.country);
 		countryFlag = cc ? getEmojiFlag(cc) : '';
 	}
-	const countryNames = Object.values(countries).map((country) => {
-		return {
-			value: country.name,
-			label: country.name
-		};
-	});
-	$formData.country = '';
 </script>
 
 <form method="POST" use:enhance class={cn($$restProps.class)}>
@@ -66,14 +60,14 @@
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="name" class="grow">
+				<Form.Field {form} name="name" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Name</Form.Label>
 						<Input {...attrs} bind:value={$formData.name} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="roaster" class="grow">
+				<Form.Field {form} name="roaster" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Roaster</Form.Label>
 						<Input {...attrs} bind:value={$formData.roaster} />
@@ -83,14 +77,14 @@
 			</div>
 			<Separator />
 			<div class="flex flex-row space-x-4">
-				<Form.Field {form} name="varietals" class="grow">
+				<Form.Field {form} name="varietals" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Varietals</Form.Label>
 						<Input {...attrs} bind:value={$formData.varietals} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="process" class="grow">
+				<Form.Field {form} name="process" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Process</Form.Label>
 						<Input {...attrs} bind:value={$formData.process} />
@@ -118,7 +112,7 @@
 									<Select.Value placeholder="Select the origin country" class="w-full" />
 								</Select.Trigger>
 								<Select.Content class="max-h-72 overflow-y-auto">
-									{#each countryNames as countryName}
+									{#each data.countryNames as countryName}
 										<Select.Item {...countryName} />
 									{/each}
 								</Select.Content>
@@ -136,14 +130,14 @@
 					</Form.Field>
 				</div>
 				<div class="flex flex-row space-x-4">
-					<Form.Field {form} name="farm" class="grow">
+					<Form.Field {form} name="farm" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Farm</Form.Label>
 							<Input {...attrs} bind:value={$formData.farm} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="elevation" class="grow">
+					<Form.Field {form} name="elevation" class="w-1/2">
 						<Form.Control let:attrs>
 							<Form.Label>Elevation</Form.Label>
 							<Input {...attrs} bind:value={$formData.elevation} />
@@ -157,7 +151,7 @@
 				<Form.Field {form} name="weight" class="w-1/2">
 					<Form.Control let:attrs>
 						<Form.Label>Weight</Form.Label>
-						<Input {...attrs} type="number" step="0.5" bind:value={$formData.weight} />
+						<Input {...attrs} bind:value={$formData.weight} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
@@ -211,9 +205,10 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-		</Card.Content>
-		<Card.Footer class="justify-end">
 			<Form.Button>Submit</Form.Button>
-		</Card.Footer>
+		</Card.Content>
+		{#if browser}
+			<SuperDebug data={$formData} />
+		{/if}
 	</Card.Root>
 </form>
