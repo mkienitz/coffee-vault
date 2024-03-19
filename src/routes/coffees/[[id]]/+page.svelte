@@ -25,7 +25,6 @@
 	} from '@internationalized/date';
 	import type { PageData } from './$types';
 	import { dev } from '$app/environment';
-	import { page } from '$app/stores';
 	import { toast } from 'svelte-sonner';
 
 	export let data: PageData;
@@ -34,11 +33,13 @@
 		resetForm: false,
 		validators: zodClient(coffeeSchema)
 	});
-	const { form, errors, constraints, enhance, delayed, message } = sForm;
+	const { form, enhance, message } = sForm;
 
 	// Toaster
 	$: {
-		toast.success($message);
+		if ($message) {
+			toast.success($message);
+		}
 	}
 
 	// Date Picker
@@ -61,11 +62,8 @@
 	}
 </script>
 
-<Toaster />
+<Toaster richColors />
 <form id="coffeeForm" method="POST" use:enhance class={cn($$restProps.class, 'w-[540px]')}>
-	{#if $message}
-		<h3 class:invalid={$page.status >= 400}>{$message}</h3>
-	{/if}
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
@@ -236,8 +234,11 @@
 							<AlertDialog.Footer>
 								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 								<!-- https://github.com/shadcn-ui/ui/issues/709#issuecomment-1662586709 -->
-								<AlertDialog.Action form="coffeeForm" name="delete" type="submit"
-									>Delete</AlertDialog.Action
+								<AlertDialog.Action
+									class={cn(buttonVariants({ variant: 'destructive' }))}
+									form="coffeeForm"
+									name="delete"
+									type="submit">Delete</AlertDialog.Action
 								>
 							</AlertDialog.Footer>
 						</AlertDialog.Content>
@@ -246,5 +247,5 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
-	<SuperDebug data={$form} display={dev} />
+	<!-- <SuperDebug data={$form} display={dev} /> -->
 </form>
