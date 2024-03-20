@@ -26,6 +26,8 @@
 	import type { PageData } from './$types';
 	import { dev } from '$app/environment';
 	import { toast } from 'svelte-sonner';
+	import { page } from '$app/stores';
+	import { getFlash } from 'sveltekit-flash-message';
 
 	export let data: PageData;
 
@@ -33,12 +35,13 @@
 		resetForm: false,
 		validators: zodClient(coffeeSchema)
 	});
-	const { form, enhance, message } = sForm;
+	const { form, enhance } = sForm;
 
 	// Toaster
+	const flash = getFlash(page);
 	$: {
-		if ($message) {
-			toast.success($message);
+		if ($flash) {
+			toast.success($flash.message);
 		}
 	}
 
