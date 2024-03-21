@@ -11,10 +11,9 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { getCountryCode, getEmojiFlag } from 'countries-list';
 	import { coffeeSchema } from '$lib/schemas';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { CalendarIcon } from 'lucide-svelte';
-	import { Toaster } from '$lib/components/ui/sonner';
 	import { cn } from '$lib/utils';
 	import {
 		CalendarDate,
@@ -24,7 +23,6 @@
 		DateFormatter
 	} from '@internationalized/date';
 	import type { PageData } from './$types';
-	import { dev } from '$app/environment';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import { getFlash } from 'sveltekit-flash-message';
@@ -65,7 +63,6 @@
 	}
 </script>
 
-<Toaster richColors />
 <form id="coffeeForm" method="POST" use:enhance class={cn($$restProps.class, 'w-[540px]')}>
 	<Card.Root>
 		<Card.Header>
@@ -250,5 +247,4 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
-	<!-- <SuperDebug data={$form} display={dev} /> -->
 </form>

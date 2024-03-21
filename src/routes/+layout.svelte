@@ -1,8 +1,10 @@
 <script>
+	import { Toaster } from '$lib/components/ui/sonner';
 	import '../app.pcss';
 </script>
 
-<div class="flex flex-col items-center">
-	<a href="/"><h1 class="p-10 text-5xl">Coffee Vault</h1></a>
+<Toaster richColors />
+<div class="flex flex-col items-center space-y-10 pb-10 pt-10">
+	<a href="/"><h1 class="text-5xl">CoffeeVault</h1></a>
 	<slot />
 </div>
