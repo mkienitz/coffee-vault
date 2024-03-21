@@ -5,11 +5,11 @@ declare global {
 		// interface Error {}
 		// interface Locals {}
 		interface PageData {
-			flash?: { type: 'success' | 'error'; message: string }
+			flash?: { type: 'success' | 'error'; message: string };
 		}
 		// interface PageState {}
 		// interface Platform {}
 	}
 }
 
-export { };
+export {};

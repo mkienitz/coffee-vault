@@ -40,17 +40,17 @@ export const actions: Actions = {
 		if (!form.data.id) {
 			// CREATE
 			await db.insert(coffees).values(form.data);
-			redirect('/', { type: 'success', message: "Coffee successfully added" }, cookies);
+			redirect('/', { type: 'success', message: 'Coffee successfully added' }, cookies);
 		} else {
 			if (formData.has('delete')) {
 				// DELETE
 				await db.delete(coffees).where(eq(coffees.id, form.data.id));
-				redirect('/', { type: 'success', message: "Coffee successfully deleted" }, cookies);
+				redirect('/', { type: 'success', message: 'Coffee successfully deleted' }, cookies);
 			} else {
 				// UPDATE
 				await db.update(coffees).set(form.data).where(eq(coffees.id, form.data.id));
-				setFlash({ type: 'success', message: "Coffee successfully edited" }, cookies)
-				return { form }
+				setFlash({ type: 'success', message: 'Coffee successfully edited' }, cookies);
+				return { form };
 			}
 		}
 	}
