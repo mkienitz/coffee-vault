@@ -8,12 +8,12 @@
 	import { cn } from '$lib/utils';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
-	export let coffee: z.infer<typeof coffeeSchema>;
+	let { coffee }: { coffee: z.infer<typeof coffeeSchema> } = $props();
 	const flag = getEmojiFlag(getCountryCode(coffee.country) || 'CO');
 	const dummyWeight = Math.floor(Math.random() * coffee.weight);
 </script>
 
-<Card.Root class={cn('flex flex-col ', $$restProps.class)}>
+<Card.Root class={'w-[400px] flex flex-col'}>
 	<Card.Header class="pb-0">
 		<Card.Title class="flex flex-col space-y-1">
 			<div class="flex flex-row items-center justify-between">

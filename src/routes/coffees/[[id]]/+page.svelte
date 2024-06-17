@@ -4,16 +4,16 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import { Calendar } from '$lib/components/ui/calendar';
 	import { Input } from '$lib/components/ui/input';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { getCountryCode, getEmojiFlag } from 'countries-list';
 	import { coffeeSchema } from '$lib/schemas';
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarIcon, ChevronLeft, X } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 	import {
 		CalendarDate,
@@ -26,9 +26,9 @@
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import { getFlash } from 'sveltekit-flash-message';
+	import { Toaster } from '$lib/components/ui/sonner';
 
-	export let data: PageData;
-
+	let { data } = $props();
 	const sForm = superForm(data.form, {
 		resetForm: false,
 		validators: zodClient(coffeeSchema)
@@ -37,37 +37,46 @@
 
 	// Toaster
 	const flash = getFlash(page);
-	$: {
+	$effect(() => {
 		if ($flash) {
 			toast.success($flash.message);
 		}
-	}
+	});
 
 	// Date Picker
-	$: selectedRoastingDate = $form.roastingDate ? parseDate($form.roastingDate) : undefined;
+	let selectedRoastingDate: CalendarDate | undefined = $state(undefined);
+	$effect(() => {
+		selectedRoastingDate = $form.roastingDate ? parseDate($form.roastingDate) : undefined;
+	});
 	const df = new DateFormatter('en-DE', {
 		dateStyle: 'long'
 	});
 
 	// Country
-	$: selectedCountry = $form.country
-		? {
-				value: $form.country,
-				label: $form.country
-			}
-		: undefined;
-	let countryFlag: string;
-	$: {
-		let cc = getCountryCode($form.country);
-		countryFlag = cc ? getEmojiFlag(cc) : '';
-	}
+	let selectedCountry = $derived(
+		$form.country
+			? {
+					value: $form.country,
+					label: $form.country
+				}
+			: undefined
+	);
+	let countryCode = $derived(getCountryCode($form.country));
+	let countryFlag = $derived(countryCode ? getEmojiFlag(countryCode) : '');
 </script>
 
-<form id="coffeeForm" method="POST" use:enhance class={cn($$restProps.class, 'w-[540px]')}>
+<form id="coffeeForm" method="POST" use:enhance class={cn('w-[540px]')}>
+	<Toaster richColors />
 	<Card.Root>
-		<Card.Header>
-			<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
-			<Card.Description>highly controversial coffees are not desired</Card.Description>
+		<Card.Header class="flex flex-row items-center justify-between">
+			<a href="/" class="flex flex-row">
+				<ChevronLeft />Back
+			</a>
+			<div>
+				<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
+				<Card.Description>no bin juice allowed</Card.Description>
+			</div>
+			<div class="aria-hidden w-[60px]"></div>
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			<input hidden bind:value={$form.id} name="id" />
@@ -218,11 +227,11 @@
 				<Form.FieldErrors />
 			</Form.Field>
 			<div class="flex flex-row justify-between">
-				<Form.Button variant="secondary">{$form.id ? 'Edit Coffee' : 'Add Coffee'}</Form.Button>
+				<Form.Button variant="secondary">{$form.id ? 'Save Changes' : 'Add Coffee'}</Form.Button>
 				{#if $form.id}
 					<AlertDialog.Root>
-						<AlertDialog.Trigger
-							><Button variant="destructive">Delete Coffee</Button></AlertDialog.Trigger
+						<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }))}
+							>Delete Coffee</AlertDialog.Trigger
 						>
 						<AlertDialog.Content>
 							<AlertDialog.Header>
