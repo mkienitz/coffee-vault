@@ -13,7 +13,7 @@
 	const dummyWeight = Math.floor(Math.random() * coffee.weight);
 </script>
 
-<Card.Root class={'w-[400px] flex flex-col'}>
+<Card.Root class={'flex w-[400px] flex-col'}>
 	<Card.Header class="pb-0">
 		<Card.Title class="flex flex-col space-y-1">
 			<div class="flex flex-row items-center justify-between">
