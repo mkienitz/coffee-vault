@@ -10,11 +10,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	const beans = bqData.BEANS;
 	for (const bean of beans) {
 		const { farm, farmer, variety, country, elevation, processing, region }: any = bean.bean_information[0];
-		const { weight, note, roastingDate, roaster, name } = bean;
+		const { weight, note, roastingDate, roaster, name, aromatics } = bean;
 		const coffee: any = {
 			country,
 			elevation,
 			farm,
+			flavorProfile: aromatics,
 			name,
 			notes: note,
 			process: processing,

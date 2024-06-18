@@ -11,6 +11,7 @@ export const coffees = sqliteTable('coffees', {
 	country: text('country', { enum: [c, ...cs] }).notNull(),
 	elevation: text('elevation').notNull(),
 	farm: text('farm').notNull(),
+	flavorProfile: text('flavorProfile').notNull(),
 	name: text('name').notNull(),
 	notes: text('notes').notNull(),
 	process: text('process').notNull(),

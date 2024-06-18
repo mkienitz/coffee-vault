@@ -11,6 +11,7 @@ export const coffeeSchema = z.object({
 		}),
 	elevation: z.string(),
 	farm: z.string(),
+	flavorProfile: z.string(),
 	name: z.string().min(1),
 	notes: z.string(),
 	process: z.string(),

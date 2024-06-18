@@ -52,6 +52,10 @@
 				<div class="text-sm">{coffee.notes}</div>
 			</div>
 		{/if}
+		<div class="flex flex-col space-y-1">
+			<div class="font-bold">Flavor Profile</div>
+			<div class="text-sm pl-4">{coffee.flavorProfile}</div>
+		</div>
 	</Card.Content>
 	<Separator class="my-3" />
 	<Card.Footer class="flex w-full flex-row justify-between justify-self-end">
