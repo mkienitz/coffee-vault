@@ -46,6 +46,12 @@
 			<div class="font-bold">Process</div>
 			<div class="text-sm">{coffee.process}</div>
 		</div>
+		{#if coffee.notes !== ''}
+			<div class="flex flex-col space-y-1">
+				<div class="font-bold">Notes</div>
+				<div class="text-sm">{coffee.notes}</div>
+			</div>
+		{/if}
 	</Card.Content>
 	<Separator class="my-3" />
 	<Card.Footer class="flex w-full flex-row justify-between justify-self-end">
