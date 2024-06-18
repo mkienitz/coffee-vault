@@ -1,7 +1,9 @@
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
+import { randomBytes } from 'crypto';
+import { relations } from 'drizzle-orm';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
@@ -12,11 +14,12 @@ export const coffees = sqliteTable('coffees', {
 	name: text('name').notNull(),
 	notes: text('notes').notNull(),
 	process: text('process').notNull(),
+	producer: text('producer').notNull(),
 	region: text('region').notNull(),
 	roaster: text('roaster').notNull(),
 	roastingDate: text('roastingDate').notNull(),
 	varietals: text('varietals').notNull(),
-	weight: integer('weight').notNull()
+	weight: real('weight').notNull()
 });
 
 const sqlite = new Database('sqlite.db');

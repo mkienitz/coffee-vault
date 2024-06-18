@@ -3,12 +3,10 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { Button } from '$lib/components/ui/button';
 	import { getCountryCode, getEmojiFlag } from 'countries-list';
-	import type { z } from 'zod';
-	import type { coffeeSchema } from '$lib/schemas';
-	import { cn } from '$lib/utils';
+	import type { Coffee } from '$lib/schemas';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
-	let { coffee }: { coffee: z.infer<typeof coffeeSchema> } = $props();
+	let { coffee }: { coffee: Coffee } = $props();
 	const flag = getEmojiFlag(getCountryCode(coffee.country) || 'CO');
 	const dummyWeight = Math.floor(Math.random() * coffee.weight);
 </script>
@@ -30,8 +28,16 @@
 	<Card.Content class="flex grow flex-col space-y-4 pb-0">
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Origin</div>
-			<div class="text-sm">{coffee.farm}, {coffee.region}, {coffee.country}</div>
+			<div class="text-sm">
+				{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
+			</div>
 		</div>
+		{#if coffee.producer !== ''}
+			<div class="flex flex-col space-y-1">
+				<div class="font-bold">Producer</div>
+				<div class="text-sm">{coffee.producer}</div>
+			</div>
+		{/if}
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Varietals</div>
 			<div class="text-sm">{coffee.varietals}</div>

@@ -8,19 +8,21 @@ export const coffeeSchema = z.object({
 	country: z
 		.enum([c, ...cs], {
 			errorMap: (_issue, _ctx) => ({ message: 'A valid country is required' })
-		})
-		.default(''),
-	elevation: z.string().min(1),
-	farm: z.string().min(1),
+		}),
+	elevation: z.string(),
+	farm: z.string(),
 	name: z.string().min(1),
 	notes: z.string(),
-	process: z.string().min(1),
-	region: z.string().min(1),
+	process: z.string(),
+	producer: z.string(),
+	region: z.string(),
 	roaster: z.string().min(1),
 	roastingDate: z.string(),
-	varietals: z.string().min(1),
+	varietals: z.string(),
 	weight: z.coerce
 		.number()
 		.positive()
 		.default('' as unknown as number)
 });
+
+export type Coffee = z.infer<typeof coffeeSchema>
