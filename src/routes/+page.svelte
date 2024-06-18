@@ -41,8 +41,6 @@
 	<Toaster richColors />
 	<div class="flex flex-col items-center space-y-4">
 		<div class="flex w-full flex-row justify-between">
-			<!-- NOTE hack to center pagination bar -->
-			<div class="w-[235px]"></div>
 			<Pagination.Root
 				count={coffees.length}
 				perPage={pageSize}
@@ -76,9 +74,9 @@
 					</Pagination.Item>
 				</Pagination.Content>
 			</Pagination.Root>
-			<Button href="/coffees">Add a new Coffee</Button>
 		</div>
-		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+		<Button href="/coffees">Add a new Coffee</Button>
+		<div class="flex flex-wrap flex-row justify-center gap-4">
 			{#each currCoffees as coffee}
 				<CoffeeCard {coffee} />
 			{/each}
