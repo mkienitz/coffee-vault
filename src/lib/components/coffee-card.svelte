@@ -2,20 +2,19 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
 	import { Button } from '$lib/components/ui/button';
-	import { getCountryCode, getEmojiFlag } from 'countries-list';
+	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import type { Coffee } from '$lib/schemas';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
-	let { coffee }: { coffee: Coffee } = $props();
-	const flag = getEmojiFlag(getCountryCode(coffee.country) || 'CO');
-	const dummyWeight = Math.floor(Math.random() * coffee.weight);
+	const { coffee }: { coffee: Coffee } = $props();
+	const randomWeight = Math.floor(Math.random() * coffee.weight);
 </script>
 
 <Card.Root class={'flex w-[400px] flex-col'}>
 	<Card.Header class="pb-0">
 		<Card.Title class="flex flex-col space-y-1">
 			<div class="flex flex-row items-center justify-between">
-				<div class="text-2xl">{`${flag} ${coffee.name}`}</div>
+				<div class="text-2xl">{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}</div>
 				<Button href={`/coffees/${coffee.id}`} variant="link" class="h-fit w-fit p-0">Edit</Button>
 			</div>
 			<div class="flex flex-row items-center justify-between">
@@ -28,44 +27,44 @@
 	<Card.Content class="flex grow flex-col space-y-4 pb-0">
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Origin</div>
-			<div class="text-sm">
+			<div class="text-sm text-muted-foreground">
 				{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
 			</div>
 		</div>
 		{#if coffee.producer !== ''}
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Producer</div>
-				<div class="text-sm">{coffee.producer}</div>
+				<div class="text-sm text-muted-foreground">{coffee.producer}</div>
 			</div>
 		{/if}
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Varietals</div>
-			<div class="text-sm">{coffee.varietals}</div>
+			<div class="text-sm text-muted-foreground">{coffee.varietals}</div>
 		</div>
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Process</div>
-			<div class="text-sm">{coffee.process}</div>
+			<div class="text-sm text-muted-foreground">{coffee.process}</div>
 		</div>
 		{#if coffee.notes !== ''}
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Notes</div>
-				<div class="text-sm">{coffee.notes}</div>
+				<div class="text-sm text-muted-foreground">{coffee.notes}</div>
 			</div>
 		{/if}
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Flavor Profile</div>
-			<div class="text-sm pl-4">{coffee.flavorProfile}</div>
+			<div class="text-sm text-muted-foreground">{coffee.flavorProfile}</div>
 		</div>
 	</Card.Content>
 	<Separator class="my-3" />
-	<Card.Footer class="flex w-full flex-row justify-between justify-self-end">
+	<Card.Footer class="flex w-full flex-row justify-between">
 		<div>
 			<Badge variant="outline">some</Badge>
 			<Badge variant="outline">badges</Badge>
 		</div>
 		<div class="flex flex-row items-center space-x-1">
-			<Progress class="w-[80px]" value={(dummyWeight / coffee.weight) * 100} />
-			<div class="text-sm text-muted-foreground">{dummyWeight}/{coffee.weight}g</div>
+			<Progress class="w-[80px]" max={coffee.weight} value={randomWeight} />
+			<div class="text-sm text-muted-foreground">{randomWeight}/{coffee.weight}g</div>
 		</div>
 	</Card.Footer>
 </Card.Root>
