@@ -22,5 +22,27 @@ export const coffees = sqliteTable('coffees', {
 	weight: real('weight').notNull()
 });
 
+export const coffeesRelations = relations(coffees, ({ many }) => ({
+	doses: many(doses)
+}));
+
+export const doses = sqliteTable('doses', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	token: text('token')
+		.unique()
+		.notNull()
+		.$defaultFn(() => randomBytes(32).toString('base64')),
+	consumedOn: text('consumed_on'),
+	weight: real('weight').notNull(),
+	coffeeId: integer('coffee_id').notNull()
+});
+
+export const dosesRelations = relations(doses, ({ one }) => ({
+	coffee: one(coffees, {
+		fields: [doses.coffeeId],
+		references: [coffees.id]
+	})
+}));
+
 const sqlite = new Database('sqlite.db');
 export const db = drizzle(sqlite, { schema: { coffees } });
