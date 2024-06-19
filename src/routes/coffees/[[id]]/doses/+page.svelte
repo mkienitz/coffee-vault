@@ -1,15 +1,10 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import * as Form from '$lib/components/ui/form';
-	import { Toaster } from '$lib/components/ui/sonner';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { doseSchema } from '$lib/schemas.js';
-	import { getFlash } from 'sveltekit-flash-message';
 	import { Input } from '$lib/components/ui/input';
-	import { page } from '$app/stores';
-	import { toast } from 'svelte-sonner';
-	import { Button } from '$lib/components/ui/button';
 	let { data } = $props();
 	const coffee = $derived(data.coffee);
 	const doses = $derived(coffee.doses);
@@ -19,17 +14,8 @@
 		validators: zodClient(doseSchema)
 	});
 	const { form, enhance, formId } = sForm;
-
-	// Toaster
-	const flash = getFlash(page);
-	$effect(() => {
-		if ($flash) {
-			toast.success($flash.message);
-		}
-	});
 </script>
 
-<Toaster richColors />
 <Table.Root>
 	<Table.Header>
 		<Table.Row>

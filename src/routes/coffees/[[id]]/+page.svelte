@@ -13,7 +13,7 @@
 	import { coffeeSchema } from '$lib/schemas';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { CalendarIcon, ChevronLeft, X } from 'lucide-svelte';
+	import { CalendarIcon, ChevronLeft } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 	import {
 		CalendarDate,
@@ -22,10 +22,6 @@
 		parseDate,
 		DateFormatter
 	} from '@internationalized/date';
-	import { toast } from 'svelte-sonner';
-	import { page } from '$app/stores';
-	import { getFlash } from 'sveltekit-flash-message';
-	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { data } = $props();
 	const sForm = superForm(data.form, {
@@ -33,14 +29,6 @@
 		validators: zodClient(coffeeSchema)
 	});
 	const { form, enhance } = sForm;
-
-	// Toaster
-	const flash = getFlash(page);
-	$effect(() => {
-		if ($flash) {
-			toast.success($flash.message);
-		}
-	});
 
 	// Date Picker
 	let selectedRoastingDate: CalendarDate | undefined = $state(undefined);
@@ -65,7 +53,6 @@
 </script>
 
 <form id="coffeeForm" method="POST" use:enhance class={cn('w-[540px]')}>
-	<Toaster richColors />
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between">
 			<a href="/" class="flex flex-row">

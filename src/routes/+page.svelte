@@ -1,11 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import CoffeeCard from '$lib/components/coffee-card.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { getFlash } from 'sveltekit-flash-message';
-	import { toast } from 'svelte-sonner';
 	import * as Pagination from '$lib/components/ui/pagination';
-	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { MoveLeft, MoveRight } from 'lucide-svelte';
 
 	let { data } = $props();
@@ -21,14 +17,6 @@
 		})
 	);
 
-	// Toaster
-	const flash = getFlash(page);
-	$effect(() => {
-		if ($flash) {
-			toast.success($flash.message);
-		}
-	});
-
 	// Pagination
 	const pageSize = 8;
 	let currPage = $state(1);
@@ -38,7 +26,6 @@
 </script>
 
 <div>
-	<Toaster richColors />
 	<div class="flex flex-col items-center space-y-4">
 		<div class="flex w-full flex-row justify-between">
 			<Pagination.Root
