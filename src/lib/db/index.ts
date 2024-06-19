@@ -46,4 +46,4 @@ export const dosesRelations = relations(doses, ({ one }) => ({
 }));
 
 const sqlite = new Database('sqlite.db');
-export const db = drizzle(sqlite, { schema: { coffees } });
+export const db = drizzle(sqlite, { schema: { coffees, doses, dosesRelations, coffeesRelations } });

@@ -5,10 +5,9 @@ const [c, ...cs] = Object.values(countries).map((c) => c.name);
 
 export const coffeeSchema = z.object({
 	id: z.number().optional(),
-	country: z
-		.enum([c, ...cs], {
-			errorMap: (_issue, _ctx) => ({ message: 'A valid country is required' })
-		}),
+	country: z.enum([c, ...cs], {
+		errorMap: (_issue, _ctx) => ({ message: 'A valid country is required' })
+	}),
 	elevation: z.string(),
 	farm: z.string(),
 	flavorProfile: z.string(),
@@ -26,4 +25,12 @@ export const coffeeSchema = z.object({
 		.default('' as unknown as number)
 });
 
-export type Coffee = z.infer<typeof coffeeSchema>
+export const doseSchema = z.object({
+	id: z.number().optional(),
+	weight: z.number(),
+	token: z.string().optional(),
+	consumedOn: z.string().optional(),
+	coffeeId: z.number()
+});
+
+export type Coffee = z.infer<typeof coffeeSchema>;

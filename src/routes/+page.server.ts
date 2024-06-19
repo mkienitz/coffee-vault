@@ -4,6 +4,10 @@ import { loadFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = loadFlash(async () => {
 	return {
-		coffees: await db.query.coffees.findMany()
+		coffees: await db.query.coffees.findMany({
+			with: {
+				doses: true
+			}
+		})
 	};
 });

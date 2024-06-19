@@ -14,7 +14,9 @@
 	<Card.Header class="pb-0">
 		<Card.Title class="flex flex-col space-y-1">
 			<div class="flex flex-row items-center justify-between">
-				<div class="text-2xl">{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}</div>
+				<div class="text-2xl">
+					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
+				</div>
 				<Button href={`/coffees/${coffee.id}`} variant="link" class="h-fit w-fit p-0">Edit</Button>
 			</div>
 			<div class="flex flex-row items-center justify-between">
@@ -63,7 +65,9 @@
 			<Badge variant="outline">badges</Badge>
 		</div>
 		<div class="flex flex-row items-center space-x-1">
-			<Progress class="w-[80px]" max={coffee.weight} value={randomWeight} />
+			<a href="/coffees/{coffee.id}/doses">
+				<Progress class="w-[80px]" max={coffee.weight} value={randomWeight} />
+			</a>
 			<div class="text-sm text-muted-foreground">{randomWeight}/{coffee.weight}g</div>
 		</div>
 	</Card.Footer>
