@@ -76,7 +76,7 @@
 			</Pagination.Root>
 		</div>
 		<Button href="/coffees">Add a new Coffee</Button>
-		<div class="flex flex-wrap flex-row justify-center gap-4">
+		<div class="flex flex-row flex-wrap justify-center gap-4">
 			{#each currCoffees as coffee}
 				<CoffeeCard {coffee} />
 			{/each}

@@ -18,7 +18,6 @@ export const load: PageServerLoad = async ({ params }) => {
 	const form = await superValidate(coffee, zod(coffeeSchema));
 	return {
 		form,
-		coffees: await db.query.coffees.findMany(),
 		countryNames: Object.values(countries).map((country) => {
 			return {
 				value: country.name,
