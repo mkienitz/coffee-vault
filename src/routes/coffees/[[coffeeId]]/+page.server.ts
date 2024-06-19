@@ -9,9 +9,11 @@ import { countries } from 'countries-list';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const coffee = await db.query.coffees.findFirst({ where: eq(coffees.id, Number(params.id)) });
+	const coffee = await db.query.coffees.findFirst({
+		where: eq(coffees.id, Number(params.coffeeId))
+	});
 
-	if (params.id && !coffee) {
+	if (params.coffeeId && !coffee) {
 		throw error(404, 'Coffe not found.');
 	}
 
