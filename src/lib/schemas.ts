@@ -20,11 +20,7 @@ export const coffeeSchema = z.object({
 	roaster: z.string().min(1),
 	roastingDate: z.string(),
 	varietals: z.string(),
-	// TODO change to number
-	weight: z.coerce
-		.number()
-		.positive()
-		.default('' as unknown as number)
+	weight: z.number().positive()
 });
 
 export const doseSchema = z.object({

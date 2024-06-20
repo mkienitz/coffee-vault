@@ -154,47 +154,56 @@
 				</div>
 			</div>
 			<Separator />
-			<div class="flex flex-row space-x-4">
-				<Form.Field form={sForm} name="weight" class="w-1/2">
+			<div>
+				<div class="flex flex-row space-x-4">
+					<Form.Field form={sForm} name="weight" class="w-1/2">
+						<Form.Control let:attrs>
+							<Form.Label>Weight</Form.Label>
+							<Input {...attrs} type="number" bind:value={$form.weight} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field form={sForm} name="roastingDate" class="w-1/2">
+						<Form.Control let:attrs>
+							<Form.Label>Roasting Date</Form.Label>
+							<Popover.Root>
+								<Popover.Trigger
+									{...attrs}
+									class={cn(
+										buttonVariants({ variant: 'outline' }),
+										'w-full justify-between font-normal',
+										!selectedRoastingDate && 'text-muted-foreground'
+									)}
+								>
+									<div>
+										{selectedRoastingDate
+											? df.format(selectedRoastingDate.toDate(getLocalTimeZone()))
+											: 'Pick a date'}
+									</div>
+									<CalendarIcon class="h-4 w-4 opacity-50" />
+								</Popover.Trigger>
+								<Popover.Content side="bottom">
+									<Calendar
+										bind:value={selectedRoastingDate}
+										minValue={new CalendarDate(1900, 1, 1)}
+										maxValue={today(getLocalTimeZone())}
+										calendarLabel="Roasting date"
+										initialFocus
+										onValueChange={(v) => {
+											$form.roastingDate = v ? v.toString() : '';
+										}}
+									/>
+								</Popover.Content>
+							</Popover.Root>
+							<input hidden value={$form.roastingDate} name={attrs.name} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</div>
+				<Form.Field form={sForm} name="flavorProfile">
 					<Form.Control let:attrs>
-						<Form.Label>Weight</Form.Label>
-						<Input {...attrs} bind:value={$form.weight} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-				<Form.Field form={sForm} name="roastingDate" class="w-1/2">
-					<Form.Control let:attrs>
-						<Form.Label>Roasting Date</Form.Label>
-						<Popover.Root>
-							<Popover.Trigger
-								{...attrs}
-								class={cn(
-									buttonVariants({ variant: 'outline' }),
-									'w-full justify-between font-normal',
-									!selectedRoastingDate && 'text-muted-foreground'
-								)}
-							>
-								<div>
-									{selectedRoastingDate
-										? df.format(selectedRoastingDate.toDate(getLocalTimeZone()))
-										: 'Pick a date'}
-								</div>
-								<CalendarIcon class="h-4 w-4 opacity-50" />
-							</Popover.Trigger>
-							<Popover.Content side="bottom">
-								<Calendar
-									bind:value={selectedRoastingDate}
-									minValue={new CalendarDate(1900, 1, 1)}
-									maxValue={today(getLocalTimeZone())}
-									calendarLabel="Roasting date"
-									initialFocus
-									onValueChange={(v) => {
-										$form.roastingDate = v ? v.toString() : '';
-									}}
-								/>
-							</Popover.Content>
-						</Popover.Root>
-						<input hidden value={$form.roastingDate} name={attrs.name} />
+						<Form.Label>Tasting Notes</Form.Label>
+						<Input {...attrs} bind:value={$form.flavorProfile} />
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
