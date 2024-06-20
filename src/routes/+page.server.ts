@@ -2,12 +2,13 @@ import { db } from '$lib/db';
 import type { CoffeeWithDoses } from '$lib/schemas';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
 	return {
 		coffees: (await db.query.coffees.findMany({
 			with: {
 				doses: true
 			}
-		})) as CoffeeWithDoses[]
+		})) as CoffeeWithDoses[],
+		page: Number(url.searchParams.get('page')) || 1
 	};
 };

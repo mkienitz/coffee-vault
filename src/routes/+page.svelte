@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import CoffeeCard from '$lib/components/coffee-card.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Pagination from '$lib/components/ui/pagination';
@@ -19,10 +20,13 @@
 
 	// Pagination
 	const pageSize = 8;
-	let currPage = $state(1);
+	let currPage = $state(data.page);
 	let currCoffees = $derived(
 		coffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
 	);
+	$effect(() => {
+		goto(`?page=${currPage}`);
+	});
 </script>
 
 <div>

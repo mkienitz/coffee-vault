@@ -4,7 +4,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { buttonVariants } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Calendar } from '$lib/components/ui/calendar';
 	import { Input } from '$lib/components/ui/input';
 	import { Separator } from '$lib/components/ui/separator';
@@ -55,9 +55,13 @@
 <form id="coffeeForm" method="POST" use:enhance class={cn('w-[540px]')}>
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between">
-			<a href="/" class="flex flex-row">
+			<Button
+				variant="ghost"
+				onclick={() => window.history.back()}
+				class="flex max-w-fit flex-row pl-0"
+			>
 				<ChevronLeft />Back
-			</a>
+			</Button>
 			<div>
 				<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
 				<Card.Description>no bin juice allowed</Card.Description>
