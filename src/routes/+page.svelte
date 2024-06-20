@@ -20,7 +20,7 @@
 	// Pagination
 	const pageSize = 8;
 	let currPage = $state(1);
-	let currCoffees: typeof coffees = $derived(
+	let currCoffees = $derived(
 		coffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
 	);
 </script>
@@ -63,8 +63,9 @@
 			</Pagination.Root>
 		</div>
 		<Button href="/coffees">Add a new Coffee</Button>
-		<div class="flex flex-row flex-wrap justify-center gap-4">
-			{#each currCoffees as coffee}
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<!-- https://stackoverflow.com/questions/71883001/svelte-state-of-components-rendered-with-each-loop -->
+			{#each currCoffees as coffee (coffee.id)}
 				<CoffeeCard {coffee} />
 			{/each}
 		</div>
