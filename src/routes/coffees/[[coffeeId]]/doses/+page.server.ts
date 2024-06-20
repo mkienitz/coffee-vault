@@ -1,7 +1,7 @@
 import { coffees, db, doses } from '$lib/db';
 import { eq } from 'drizzle-orm';
 import { error, fail, type Actions } from '@sveltejs/kit';
-import { doseSchema } from '$lib/schemas';
+import { doseSchema, type CoffeeWithDoses } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const form = await superValidate({ coffeeId: coffee.id, weight: 12 }, zod(doseSchema));
 	return {
 		form,
-		coffee
+		coffee: coffee as CoffeeWithDoses
 	};
 };
 
@@ -51,15 +51,14 @@ export const actions: Actions = {
 		if (!coffee) {
 			throw error(404, 'Coffe not found. Cannot show doses.');
 		}
-		const dosed = coffee.doses.map((dose) => dose.weight).reduce((a, b) => a + b, 0)
-		const undosed = coffee.weight - dosed
+		const dosed = coffee.doses.map((dose) => dose.weight).reduce((a, b) => a + b, 0);
+		const undosed = coffee.weight - dosed;
 		if (form.data.weight > undosed) {
 			setFlash({ type: 'error', message: 'Not enough coffee left to create new dose' }, cookies);
 			return fail(400, {
 				form
 			});
 		}
-
 		await db.insert(doses).values(form.data);
 		return { form };
 	},

@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 
+// Schemas and types for superforms
 export const coffeeSchema = z.object({
 	id: z.number().optional(),
 	country: z.enum([c, ...cs], {
@@ -19,6 +20,7 @@ export const coffeeSchema = z.object({
 	roaster: z.string().min(1),
 	roastingDate: z.string(),
 	varietals: z.string(),
+	// TODO change to number
 	weight: z.coerce
 		.number()
 		.positive()
@@ -33,4 +35,14 @@ export const doseSchema = z.object({
 	coffeeId: z.number()
 });
 
-export type Coffee = z.infer<typeof coffeeSchema>;
+export type CoffeeSchema = z.infer<typeof coffeeSchema>;
+export type DoseSchema = z.infer<typeof doseSchema>;
+
+// Schemas and types for valid Objects
+const coffee = coffeeSchema.extend({ id: z.number() });
+const dose = doseSchema.extend({ id: z.number(), token: z.string() });
+
+export type Coffee = z.infer<typeof coffee>;
+export type Dose = z.infer<typeof dose>;
+
+export type CoffeeWithDoses = Coffee & { doses: Dose[] };

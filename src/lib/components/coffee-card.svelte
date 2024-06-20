@@ -3,11 +3,16 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { Button } from '$lib/components/ui/button';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import type { Coffee } from '$lib/schemas';
+	import type { CoffeeWithDoses } from '$lib/schemas';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
-	const { coffee }: { coffee: Coffee } = $props();
-	const randomWeight = Math.floor(Math.random() * coffee.weight);
+	const { coffee }: { coffee: CoffeeWithDoses } = $props();
+	const remainingWeight =
+		coffee.weight -
+		coffee.doses
+			.filter((d) => d.consumedOn)
+			.map((d) => d.weight)
+			.reduce((a, b) => a + b, 0);
 </script>
 
 <Card.Root class={'flex w-[400px] flex-col'}>
@@ -66,9 +71,9 @@
 		</div>
 		<div class="flex flex-row items-center space-x-1">
 			<a href="/coffees/{coffee.id}/doses">
-				<Progress class="w-[80px]" max={coffee.weight} value={randomWeight} />
+				<Progress class="w-[80px]" value={remainingWeight} max={coffee.weight} />
 			</a>
-			<div class="text-sm text-muted-foreground">{randomWeight}/{coffee.weight}g</div>
+			<div class="text-sm text-muted-foreground">{remainingWeight}/{coffee.weight}g</div>
 		</div>
 	</Card.Footer>
 </Card.Root>
