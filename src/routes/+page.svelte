@@ -20,7 +20,8 @@
 
 	// Pagination
 	const pageSize = 8;
-	let currPage = $state(data.page);
+	const nPages = Math.ceil(coffees.length / pageSize);
+	let currPage = $state(Math.min(data.page, nPages));
 	let currCoffees = $derived(
 		coffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
 	);

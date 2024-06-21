@@ -9,6 +9,6 @@ export const load: PageServerLoad = async ({ url }) => {
 				doses: true
 			}
 		})) as CoffeeWithDoses[],
-		page: Number(url.searchParams.get('page')) || 1
+		page: Math.max(1, Number(url.searchParams.get('page')) || 1)
 	};
 };
