@@ -3,7 +3,7 @@ export default defineConfig({
 	schema: './src/lib/db/index.ts',
 	dialect: 'sqlite',
 	dbCredentials: {
-		url: 'sqlite.db'
+		url: process.env.COFFEE_VAULT_DB_PATH!,
 	},
 	out: './drizzle',
 	verbose: true,

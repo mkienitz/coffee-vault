@@ -35,6 +35,12 @@
             nodePackages.typescript-language-server
             nodePackages.svelte-language-server
           ];
+          env = [
+            {
+              name = "COFFEE_VAULT_DB_PATH";
+              value = "./sqlite.db";
+            }
+          ];
         };
       }
     );
