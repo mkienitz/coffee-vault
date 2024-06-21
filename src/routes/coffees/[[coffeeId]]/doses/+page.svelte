@@ -1,12 +1,16 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import * as Form from '$lib/components/ui/form';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { doseSchema } from '$lib/schemas.js';
 	import { Input } from '$lib/components/ui/input';
+	import CoffeeCard from '$lib/components/coffee-card.svelte';
 	let { data } = $props();
-	const coffee = $derived(data.coffee);
+	let coffee = $state(data.coffee);
+	$effect(() => {
+		coffee = data.coffee;
+	});
 	const doses = $derived(coffee.doses);
 
 	const sForm = superForm(data.form, {
@@ -14,8 +18,23 @@
 		validators: zodClient(doseSchema)
 	});
 	const { form, enhance, formId } = sForm;
+
+	const dosed = $derived(doses.map((dose) => dose.weight).reduce((a, b) => a + b, 0));
+	const consumed = $derived(
+		doses
+			.filter((dose) => dose.consumedOn)
+			.map((dose) => dose.weight)
+			.reduce((a, b) => a + b, 0)
+	);
 </script>
 
+<CoffeeCard bind:coffee />
+<div class="flex flex-col">
+	<span>Total: {coffee.weight}</span>
+	<span>Dosed: {dosed}</span>
+	<span>Consumed: {consumed}</span>
+	<span>Remaining: {coffee.weight - consumed}</span>
+</div>
 <form id="doseForm" method="POST" use:enhance class="flex flex-row items-end space-x-4">
 	<Table.Root>
 		<Table.Header>
@@ -82,4 +101,3 @@
 	</Table.Root>
 	<input hidden bind:value={$form.coffeeId} name="coffeeId" />
 </form>
-<!-- <SuperDebug data={$form} /> -->

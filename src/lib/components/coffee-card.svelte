@@ -6,13 +6,14 @@
 	import type { CoffeeWithDoses } from '$lib/schemas';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
-	const { coffee }: { coffee: CoffeeWithDoses } = $props();
-	const remainingWeight =
+	let { coffee = $bindable() }: { coffee: CoffeeWithDoses } = $props();
+	const remainingWeight = $derived(
 		coffee.weight -
-		coffee.doses
-			.filter((d) => d.consumedOn)
-			.map((d) => d.weight)
-			.reduce((a, b) => a + b, 0);
+			coffee.doses
+				.filter((d) => d.consumedOn)
+				.map((d) => d.weight)
+				.reduce((a, b) => a + b, 0)
+	);
 </script>
 
 <Card.Root class={'flex w-[400px] flex-col'}>
