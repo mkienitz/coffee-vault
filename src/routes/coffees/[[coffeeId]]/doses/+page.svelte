@@ -6,6 +6,7 @@
 	import { doseSchema } from '$lib/schemas.js';
 	import { Input } from '$lib/components/ui/input';
 	import CoffeeCard from '$lib/components/coffee-card.svelte';
+	import { Progress } from '$lib/components/ui/progress';
 	let { data } = $props();
 	let coffee = $state(data.coffee);
 	$effect(() => {
@@ -29,13 +30,15 @@
 </script>
 
 <CoffeeCard bind:coffee />
-<div class="flex flex-col">
-	<span>Total: {coffee.weight}</span>
-	<span>Dosed: {dosed}</span>
-	<span>Consumed: {consumed}</span>
-	<span>Remaining: {coffee.weight - consumed}</span>
+<div class="flex w-1/3 flex-col">
+	<div class="flex items-center justify-between">
+		Dosed: <Progress class="w-1/2" value={dosed} max={coffee.weight} />
+	</div>
+	<div class="flex items-center justify-between">
+		Remaining: <Progress class="w-1/2" value={coffee.weight - consumed} max={coffee.weight} />
+	</div>
 </div>
-<form id="doseForm" method="POST" use:enhance class="flex flex-row items-end space-x-4">
+<form id="doseForm" method="POST" use:enhance class="w-[75%]">
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -58,7 +61,6 @@
 							{dose.consumedOn}
 						{:else}
 							<Form.Button
-								class="w-full"
 								variant="secondary"
 								name="id"
 								value={dose.id}
@@ -69,10 +71,9 @@
 							>
 						{/if}
 					</Table.Cell>
-					<Table.Cell>
+					<Table.Cell class="text-center">
 						{#if !dose.consumedOn}
 							<Form.Button
-								class="w-full"
 								variant={dose.printed ? 'outline' : 'secondary'}
 								name="id"
 								value={dose.id}
@@ -83,10 +84,9 @@
 							>
 						{/if}
 					</Table.Cell>
-					<Table.Cell class="flex flex-row">
+					<Table.Cell class="text-center">
 						<Form.Button
 							variant="destructive"
-							class="flex-grow"
 							name="id"
 							value={dose.id}
 							onclick={() => {
@@ -108,16 +108,15 @@
 								max="50"
 								placeholder="12.5"
 								step="0.5"
-								class="max-w-[6rem]"
+								class="m-auto block max-w-[6rem]"
 								bind:value={$form.weight}
 							/>
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
 				</Table.Cell>
-				<Table.Cell>
+				<Table.Cell class="text-center">
 					<Form.Button
-						class="w-full"
 						onclick={() => {
 							$formId = 'add';
 						}}
@@ -125,9 +124,8 @@
 					>
 				</Table.Cell>
 				<Table.Cell></Table.Cell>
-				<Table.Cell>
+				<Table.Cell class="text-center">
 					<Form.Button
-						class="w-full"
 						disabled={coffee.doses.every((d) => d.printed || d.consumedOn)}
 						variant="secondary"
 						onclick={() => {
