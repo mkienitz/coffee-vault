@@ -6,6 +6,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
+import { printQRCodes } from '$lib/print';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const coffee = await db.query.coffees.findFirst({
@@ -81,8 +82,12 @@ export const actions: Actions = {
 				form
 			});
 		}
-		console.log(`Printing dose ${form.data.token}`);
-		await db.update(doses).set({ printed: true }).where(eq(doses.id, form.data.id!));
+		const res = await db
+			.update(doses)
+			.set({ printed: true })
+			.where(eq(doses.id, form.data.id!))
+			.returning({ token: doses.token });
+		printQRCodes(res.map((t) => t.token));
 		return { form };
 	},
 	printAll: async ({ request, params }) => {
@@ -93,14 +98,14 @@ export const actions: Actions = {
 				form
 			});
 		}
-		const printed = await db
+		const res = await db
 			.update(doses)
 			.set({ printed: true })
 			.where(and(eq(doses.coffeeId, Number(params.coffeeId)), eq(doses.printed, false)))
 			.returning({
-				printedToken: doses.token
+				token: doses.token
 			});
-		console.log(printed);
+		printQRCodes(res.map((t) => t.token));
 		return { form };
 	}
 };
