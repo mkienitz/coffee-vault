@@ -63,6 +63,22 @@ export const actions: Actions = {
 		await db.insert(doses).values(form.data);
 		return { form };
 	},
+	consume: async ({ request }) => {
+		const formData = await request.formData();
+		const form = await superValidate(formData, zod(doseSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		const time = new Intl.DateTimeFormat('en-DE', {
+			timeStyle: 'short',
+			dateStyle: 'short'
+		}).format(Date.now());
+
+		await db.update(doses).set({ consumedOn: time }).where(eq(doses.id, form.data.id!));
+		return { form };
+	},
 	delete: async ({ request }) => {
 		const formData = await request.formData();
 		const form = await superValidate(formData, zod(doseSchema));

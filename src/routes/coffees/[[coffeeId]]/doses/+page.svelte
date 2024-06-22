@@ -53,7 +53,22 @@
 					<Table.Cell class="max-w-[10rem] truncate text-center"
 						><a href="/doses/{dose.token}">{dose.token}</a></Table.Cell
 					>
-					<Table.Cell class="text-center">{dose.consumedOn || '-'}</Table.Cell>
+					<Table.Cell class="text-center">
+						{#if dose.consumedOn}
+							{dose.consumedOn}
+						{:else}
+							<Form.Button
+								class="w-full"
+								variant="secondary"
+								name="id"
+								value={dose.id}
+								onclick={() => {
+									$formId = dose.id.toString();
+								}}
+								formaction="?/consume">Mark as consumed</Form.Button
+							>
+						{/if}
+					</Table.Cell>
 					<Table.Cell>
 						<Form.Button
 							class="w-full"

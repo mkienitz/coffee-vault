@@ -1,7 +1,6 @@
 import { coffees, db, doses } from '$lib/db';
 import { eq } from 'drizzle-orm';
-import { error, type Actions } from '@sveltejs/kit';
-import { redirect } from 'sveltekit-flash-message/server';
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -21,23 +20,4 @@ export const load: PageServerLoad = async ({ params }) => {
 		coffee,
 		dose
 	};
-};
-
-export const actions: Actions = {
-	consume: async ({ params, cookies }) => {
-		const time = new Intl.DateTimeFormat('en-DE', {
-			timeStyle: 'short',
-			dateStyle: 'short'
-		}).format(Date.now());
-		const res = await db
-			.update(doses)
-			.set({ consumedOn: time })
-			.where(eq(doses.token, params.doseToken!))
-			.returning();
-		redirect(
-			`/coffees/${res[0].coffeeId}/doses`,
-			{ type: 'success', message: 'Dose marked as consumed' },
-			cookies
-		);
-	}
 };
