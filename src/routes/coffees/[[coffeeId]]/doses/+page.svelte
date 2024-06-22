@@ -51,7 +51,7 @@
 				<Table.Row>
 					<Table.Cell class="max-w-[5rem] text-center">{dose.weight}g</Table.Cell>
 					<Table.Cell class="max-w-[10rem] truncate text-center"
-						><a href="./doses/{dose.id}">{dose.token}</a></Table.Cell
+						><a href="/doses/{dose.token}">{dose.token}</a></Table.Cell
 					>
 					<Table.Cell class="text-center">{dose.consumedOn || '-'}</Table.Cell>
 					<Table.Cell>
