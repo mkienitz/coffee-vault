@@ -32,8 +32,9 @@ export const doses = sqliteTable('doses', {
 	token: text('token')
 		.unique()
 		.notNull()
-		.$defaultFn(() => randomBytes(32).toString('base64')),
+		.$defaultFn(() => randomBytes(32).toString('base64url')),
 	consumedOn: text('consumed_on'),
+	printed: integer('printed', { mode: 'boolean' }).notNull().default(false),
 	weight: real('weight').notNull(),
 	coffeeId: integer('coffee_id').notNull()
 });

@@ -1,5 +1,5 @@
 import { coffees, db, doses } from '$lib/db';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { doseSchema, type CoffeeWithDoses } from '$lib/schemas';
 import { superValidate } from 'sveltekit-superforms';
@@ -71,6 +71,36 @@ export const actions: Actions = {
 			});
 		}
 		await db.delete(doses).where(eq(doses.id, form.data.id!));
+		return { form };
+	},
+	print: async ({ request }) => {
+		const formData = await request.formData();
+		const form = await superValidate(formData, zod(doseSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		console.log(`Printing dose ${form.data.token}`);
+		await db.update(doses).set({ printed: true }).where(eq(doses.id, form.data.id!));
+		return { form };
+	},
+	printAll: async ({ request, params }) => {
+		const formData = await request.formData();
+		const form = await superValidate(formData, zod(doseSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		const printed = await db
+			.update(doses)
+			.set({ printed: true })
+			.where(and(eq(doses.coffeeId, Number(params.coffeeId)), eq(doses.printed, false)))
+			.returning({
+				printedToken: doses.token
+			});
+		console.log(printed);
 		return { form };
 	}
 };

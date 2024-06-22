@@ -42,6 +42,7 @@
 				<Table.Head class="text-center">Weight</Table.Head>
 				<Table.Head class="text-center">Token</Table.Head>
 				<Table.Head class="text-center">Consumed</Table.Head>
+				<Table.Head class="text-center">Printed</Table.Head>
 				<Table.Head class="text-center"></Table.Head>
 			</Table.Row>
 		</Table.Header>
@@ -53,6 +54,18 @@
 						><a href="./doses/{dose.id}">{dose.token}</a></Table.Cell
 					>
 					<Table.Cell class="text-center">{dose.consumedOn || '-'}</Table.Cell>
+					<Table.Cell>
+						<Form.Button
+							class="w-full"
+							variant={dose.printed ? 'outline' : 'secondary'}
+							name="id"
+							value={dose.id}
+							onclick={() => {
+								$formId = dose.id.toString();
+							}}
+							formaction="?/print">Print {dose.printed ? 'again' : ''}</Form.Button
+						>
+					</Table.Cell>
 					<Table.Cell class="flex flex-row">
 						<Form.Button
 							variant="destructive"
@@ -87,9 +100,19 @@
 				</Table.Cell>
 				<Table.Cell></Table.Cell>
 				<Table.Cell></Table.Cell>
-				<Table.Cell class="flex flex-row">
+				<Table.Cell>
 					<Form.Button
-						class="flex-grow"
+						class="w-full"
+						variant="secondary"
+						onclick={() => {
+							$formId = 'printAll';
+						}}
+						formaction="?/printAll">Print All</Form.Button
+					>
+				</Table.Cell>
+				<Table.Cell>
+					<Form.Button
+						class="w-full"
 						onclick={() => {
 							$formId = 'add';
 						}}
