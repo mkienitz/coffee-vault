@@ -70,16 +70,18 @@
 						{/if}
 					</Table.Cell>
 					<Table.Cell>
-						<Form.Button
-							class="w-full"
-							variant={dose.printed ? 'outline' : 'secondary'}
-							name="id"
-							value={dose.id}
-							onclick={() => {
-								$formId = dose.id.toString();
-							}}
-							formaction="?/print">Print {dose.printed ? 'again' : ''}</Form.Button
-						>
+						{#if !dose.consumedOn}
+							<Form.Button
+								class="w-full"
+								variant={dose.printed ? 'outline' : 'secondary'}
+								name="id"
+								value={dose.id}
+								onclick={() => {
+									$formId = dose.id.toString();
+								}}
+								formaction="?/print">Print {dose.printed ? 'again' : ''}</Form.Button
+							>
+						{/if}
 					</Table.Cell>
 					<Table.Cell class="flex flex-row">
 						<Form.Button
@@ -113,18 +115,6 @@
 						<Form.FieldErrors />
 					</Form.Field>
 				</Table.Cell>
-				<Table.Cell></Table.Cell>
-				<Table.Cell></Table.Cell>
-				<Table.Cell>
-					<Form.Button
-						class="w-full"
-						variant="secondary"
-						onclick={() => {
-							$formId = 'printAll';
-						}}
-						formaction="?/printAll">Print All</Form.Button
-					>
-				</Table.Cell>
 				<Table.Cell>
 					<Form.Button
 						class="w-full"
@@ -134,6 +124,19 @@
 						formaction="?/add">Add Dose</Form.Button
 					>
 				</Table.Cell>
+				<Table.Cell></Table.Cell>
+				<Table.Cell>
+					<Form.Button
+						class="w-full"
+						disabled={coffee.doses.every((d) => d.printed || d.consumedOn)}
+						variant="secondary"
+						onclick={() => {
+							$formId = 'printAll';
+						}}
+						formaction="?/printAll">Print All</Form.Button
+					>
+				</Table.Cell>
+				<Table.Cell></Table.Cell>
 			</Table.Row>
 		</Table.Body>
 	</Table.Root>
