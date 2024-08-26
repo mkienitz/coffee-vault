@@ -1,30 +1,35 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     devshell = {
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {
-    flake-utils,
+  outputs = inputs @ {
+    flake-parts,
     devshell,
     nixpkgs,
     ...
   }:
-    flake-utils.lib.eachDefaultSystem
-    (
-      system: let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            devshell.overlays.default
-          ];
-        };
-      in {
+    flake-parts.lib.mkFlake
+    {inherit inputs;}
+    {
+      imports = [
+        inputs.devshell.flakeModule
+      ];
+      flake = {
+      };
+      systems = [
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-linux"
+        "x86_64-darwin"
+      ];
+      perSystem = {pkgs, ...}: {
         formatter = pkgs.alejandra;
-        devShells.default = pkgs.devshell.mkShell {
+        devshells.default = {
           packages = with pkgs; [
             nil
             sqlite
@@ -42,6 +47,6 @@
             }
           ];
         };
-      }
-    );
+      };
+    };
 }
