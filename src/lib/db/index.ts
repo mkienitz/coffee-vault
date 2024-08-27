@@ -4,7 +4,7 @@ import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
 import { randomBytes } from 'crypto';
 import { relations } from 'drizzle-orm';
-import { env } from '$env/dynamic/private'
+import { env } from '$env/dynamic/private';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
