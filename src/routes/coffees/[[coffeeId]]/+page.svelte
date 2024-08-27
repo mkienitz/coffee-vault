@@ -52,7 +52,7 @@
 	let countryFlag = $derived(countryCode ? getEmojiFlag(countryCode) : '');
 </script>
 
-<form id="coffeeForm" method="POST" use:enhance class={cn('w-[540px]')}>
+<form id="coffeeForm" method="POST" use:enhance class="max-w-[540px]">
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between">
 			<Button
