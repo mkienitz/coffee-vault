@@ -27,18 +27,21 @@
 			.map((dose) => dose.weight)
 			.reduce((a, b) => a + b, 0)
 	);
+	const undosed = $derived(coffee.weight - dosed);
 </script>
 
-<CoffeeCard bind:coffee />
-<div class="flex w-1/3 flex-col">
-	<div class="flex items-center justify-between">
-		Dosed: <Progress class="w-1/2" value={dosed} max={coffee.weight} />
+<div class="flex flex-col space-y-4">
+	<CoffeeCard bind:coffee />
+	<div class="flex items-center justify-between space-x-4">
+		<span>Undosed:</span>
+		<Progress class="w-3/4" value={undosed} max={coffee.weight - consumed} />
 	</div>
-	<div class="flex items-center justify-between">
-		Remaining: <Progress class="w-1/2" value={coffee.weight - consumed} max={coffee.weight} />
+	<div class="flex items-center justify-between space-x-4">
+		<span>Remaining:</span>
+		<Progress class="w-3/4" value={coffee.weight - consumed} max={coffee.weight} />
 	</div>
 </div>
-<form id="doseForm" method="POST" use:enhance class="w-[75%]">
+<form id="doseForm" method="POST" use:enhance class="w-full">
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
