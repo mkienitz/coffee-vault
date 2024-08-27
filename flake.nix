@@ -45,6 +45,18 @@
               name = "COFFEE_VAULT_DB_PATH";
               value = "./sqlite.db";
             }
+            {
+              name = "COFFEE_VAULT_PRINTER_ADDRESS";
+              value = "192.168.178.39";
+            }
+            {
+              name = "COFFEE_VAULT_PRINTER_PORT";
+              value = "9100";
+            }
+            {
+              name = "COFFEE_VAULT_DOMAIN";
+              value = "coffee.maxkienitz.com";
+            }
           ];
         };
       };
