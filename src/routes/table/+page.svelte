@@ -9,6 +9,15 @@
 	import type { CoffeeWithDoses } from '$lib/schemas';
 	import { Button } from '$lib/components/ui/button/index.js';
 
+	let { data } = $props();
+	const coffees = $state(data.coffees);
+
+	// FILTERING
+	type Filter = (coffee: CoffeeWithDoses) => boolean;
+	let currentFilter: Filter = $state((_) => true);
+	let filteredCoffees = $derived(coffees.filter(currentFilter));
+
+	// SORTING
 	type SortingFunction = (a: CoffeeWithDoses, b: CoffeeWithDoses) => number;
 	let sortedBy = $state('roastingDate');
 	let ascending = $state(true);
@@ -35,24 +44,18 @@
 	};
 
 	let currentSortingFunction: SortingFunction = $derived(createSortingFunction(sortedBy));
+	let sortedCoffees = $derived(filteredCoffees.toSorted(currentSortingFunction));
 
-	type Filter = (coffee: CoffeeWithDoses) => boolean;
-	let currentFilter: Filter = $state((_) => true);
-
-	let { data } = $props();
-	const coffees = $state(data.coffees);
-
-	// Pagination
+	// PAGINATION
 	const pageSize = 15;
-	const nPages = $derived(Math.ceil(coffees.length / pageSize));
+	const nPages = $derived(Math.ceil(filteredCoffees.length / pageSize));
 	let currPage = $state(Math.min(data.page, nPages));
+	$effect(() => {
+		currPage = Math.min(data.page, nPages);
+	});
 
-	let filteredCoffees = $derived(coffees.filter(currentFilter));
-
-	let currCoffees = $derived(
-		filteredCoffees
-			.toSorted(currentSortingFunction)
-			.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
+	let paginatedCoffees = $derived(
+		sortedCoffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
 	);
 	$effect(() => {
 		goto(`?page=${currPage}`);
@@ -82,7 +85,7 @@
 	<div class="flex flex-col items-center space-y-4">
 		<div class="flex w-full flex-row justify-between">
 			<Pagination.Root
-				count={coffees.length}
+				count={filteredCoffees.length}
 				perPage={pageSize}
 				bind:page={currPage}
 				let:pages
@@ -136,7 +139,7 @@
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each currCoffees as coffee (coffee.id)}
+				{#each paginatedCoffees as coffee (coffee.id)}
 					<Table.Row class="content-center">
 						<Table.Cell
 							><Button variant="link" href="/coffees/{coffee.id}/doses">{coffee.name}</Button
