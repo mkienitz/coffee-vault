@@ -35,7 +35,6 @@
             sqlite
             nodejs
             nodePackages."@tailwindcss/language-server"
-            nodePackages.npm
             nodePackages.tailwindcss
             nodePackages.typescript-language-server
             nodePackages.svelte-language-server
@@ -46,12 +45,12 @@
               value = "./sqlite.db";
             }
             {
-              name = "COFFEE_VAULT_PRINTER_ADDRESS";
-              value = "192.168.178.39";
+              name = "COFFEE_VAULT_BQL_PRINT_ADDRESS";
+              value = "192.168.178.32";
             }
             {
-              name = "COFFEE_VAULT_PRINTER_PORT";
-              value = "9100";
+              name = "COFFEE_VAULT_BQL_PRINT_PORT";
+              value = "10001";
             }
             {
               name = "COFFEE_VAULT_DOMAIN";
