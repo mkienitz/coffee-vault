@@ -1,258 +1,118 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import * as Form from '$lib/components/ui/form';
-	import * as Popover from '$lib/components/ui/popover';
-	import * as Select from '$lib/components/ui/select';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { Calendar } from '$lib/components/ui/calendar';
-	import { Input } from '$lib/components/ui/input';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { getCountryCode, getEmojiFlag } from 'countries-list';
+	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { coffeeSchema } from '$lib/schemas';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { CalendarIcon, ChevronLeft } from 'lucide-svelte';
-	import { cn } from '$lib/utils';
-	import {
-		CalendarDate,
-		getLocalTimeZone,
-		today,
-		parseDate,
-		DateFormatter
-	} from '@internationalized/date';
 
 	let { data } = $props();
-	const sForm = superForm(data.form, {
+	const { form, enhance } = superForm(data.form, {
 		resetForm: false,
 		validators: zodClient(coffeeSchema)
 	});
-	const { form, enhance } = sForm;
 
-	// Date Picker
-	let selectedRoastingDate: CalendarDate | undefined = $state(undefined);
-	$effect(() => {
-		selectedRoastingDate = $form.roastingDate ? parseDate($form.roastingDate) : undefined;
-	});
-	const df = new DateFormatter('en-DE', {
-		dateStyle: 'long'
-	});
-
-	// Country
-	let selectedCountry = $derived(
-		$form.country
-			? {
-					value: $form.country,
-					label: $form.country
-				}
-			: undefined
-	);
-	let countryCode = $derived(getCountryCode($form.country));
-	let countryFlag = $derived(countryCode ? getEmojiFlag(countryCode) : '');
+	// Modal
+	let modalOpen = $state(false);
 </script>
 
 <form id="coffeeForm" method="POST" use:enhance class="max-w-[540px]">
-	<Card.Root>
-		<Card.Header class="flex flex-row items-center justify-between">
-			<Button
-				variant="ghost"
-				onclick={() => window.history.back()}
-				class="flex max-w-fit flex-row pl-0"
-			>
-				<ChevronLeft />Back
-			</Button>
-			<div>
-				<Card.Title>{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}</Card.Title>
-				<Card.Description>no bin juice allowed</Card.Description>
-			</div>
-			<div class="aria-hidden w-[60px]"></div>
-		</Card.Header>
-		<Card.Content class="space-y-4">
-			<input hidden bind:value={$form.id} name="id" />
-			<div class="flex flex-row space-x-4">
-				<Form.Field form={sForm} name="name" class="w-1/2">
-					<Form.Control let:attrs>
-						<Form.Label>Name</Form.Label>
-						<Input {...attrs} bind:value={$form.name} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-				<Form.Field form={sForm} name="roaster" class="w-1/2">
-					<Form.Control let:attrs>
-						<Form.Label>Roaster</Form.Label>
-						<Input {...attrs} bind:value={$form.roaster} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			</div>
-			<Separator />
-			<div class="flex flex-row space-x-4">
-				<Form.Field form={sForm} name="varietals" class="w-1/2">
-					<Form.Control let:attrs>
-						<Form.Label>Varietals</Form.Label>
-						<Input {...attrs} bind:value={$form.varietals} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-				<Form.Field form={sForm} name="process" class="w-1/2">
-					<Form.Control let:attrs>
-						<Form.Label>Process</Form.Label>
-						<Input {...attrs} bind:value={$form.process} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			</div>
-			<Separator />
-			<div>
-				<div class="flex flex-row justify-between space-x-4">
-					<Form.Field form={sForm} name="country" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Country</Form.Label>
-							<Select.Root
-								selected={selectedCountry}
-								onSelectedChange={(v) => {
-									v && ($form.country = v.value);
-								}}
-							>
-								<Select.Trigger
-									{...attrs}
-									class="justify-between space-x-1 text-ellipsis text-start"
-								>
-									<div>{countryFlag}</div>
-									<Select.Value placeholder="Select the origin country" class="w-full" />
-								</Select.Trigger>
-								<Select.Content class="max-h-72 overflow-y-auto">
-									{#each data.countryNames as countryName}
-										<Select.Item {...countryName} />
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							<input hidden bind:value={$form.country} name={attrs.name} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field form={sForm} name="region" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Region</Form.Label>
-							<Input {...attrs} bind:value={$form.region} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-				<div class="flex flex-row space-x-4">
-					<Form.Field form={sForm} name="farm" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Farm</Form.Label>
-							<Input {...attrs} bind:value={$form.farm} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field form={sForm} name="elevation" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Elevation</Form.Label>
-							<Input {...attrs} bind:value={$form.elevation} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-			</div>
-			<Separator />
-			<div>
-				<div class="flex flex-row space-x-4">
-					<Form.Field form={sForm} name="weight" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Weight</Form.Label>
-							<Input {...attrs} type="number" bind:value={$form.weight} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field form={sForm} name="roastingDate" class="w-1/2">
-						<Form.Control let:attrs>
-							<Form.Label>Roasting Date</Form.Label>
-							<Popover.Root>
-								<Popover.Trigger
-									{...attrs}
-									class={cn(
-										buttonVariants({ variant: 'outline' }),
-										'w-full justify-between font-normal',
-										!selectedRoastingDate && 'text-muted-foreground'
-									)}
-								>
-									<div>
-										{selectedRoastingDate
-											? df.format(selectedRoastingDate.toDate(getLocalTimeZone()))
-											: 'Pick a date'}
-									</div>
-									<CalendarIcon class="h-4 w-4 opacity-50" />
-								</Popover.Trigger>
-								<Popover.Content side="bottom">
-									<Calendar
-										bind:value={selectedRoastingDate}
-										minValue={new CalendarDate(1900, 1, 1)}
-										maxValue={today(getLocalTimeZone())}
-										calendarLabel="Roasting date"
-										initialFocus
-										onValueChange={(v) => {
-											$form.roastingDate = v ? v.toString() : '';
-										}}
-									/>
-								</Popover.Content>
-							</Popover.Root>
-							<input hidden value={$form.roastingDate} name={attrs.name} />
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-				<Form.Field form={sForm} name="flavorProfile">
-					<Form.Control let:attrs>
-						<Form.Label>Tasting Notes</Form.Label>
-						<Input {...attrs} bind:value={$form.flavorProfile} />
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			</div>
-			<Separator />
-			<Form.Field form={sForm} name="notes">
-				<Form.Control let:attrs>
-					<Form.Label>Notes</Form.Label>
-					<Textarea
-						{...attrs}
-						placeholder="Add some notes"
-						class="resize-none"
-						bind:value={$form.notes}
-					/>
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<div class="flex flex-row justify-between">
-				<Form.Button variant="secondary">{$form.id ? 'Save Changes' : 'Add Coffee'}</Form.Button>
-				{#if $form.id}
-					<AlertDialog.Root>
-						<AlertDialog.Trigger class={cn(buttonVariants({ variant: 'destructive' }))}
-							>Delete Coffee</AlertDialog.Trigger
-						>
-						<AlertDialog.Content>
-							<AlertDialog.Header>
-								<AlertDialog.Title>Are you sure?</AlertDialog.Title>
-								<AlertDialog.Description>
-									This action cannot be undone. This will permanently delete the coffee.
-								</AlertDialog.Description>
-							</AlertDialog.Header>
-							<AlertDialog.Footer>
-								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-								<!-- https://github.com/shadcn-ui/ui/issues/709#issuecomment-1662586709 -->
-								<AlertDialog.Action
-									class={cn(buttonVariants({ variant: 'destructive' }))}
-									form="coffeeForm"
-									name="delete"
-									type="submit">Delete</AlertDialog.Action
-								>
-							</AlertDialog.Footer>
-						</AlertDialog.Content>
-					</AlertDialog.Root>
-				{/if}
-			</div>
-		</Card.Content>
-	</Card.Root>
+	<h2>
+		{#if !$form.id}
+			Add a new Coffee
+		{:else}
+			Edit Coffee
+		{/if}
+	</h2>
+
+	<input hidden bind:value={$form.id} name="id" />
+	<label>
+		Name
+		<input type="text" name="name" bind:value={$form.name} />
+	</label>
+	<label>
+		Roaster
+		<input type="text" name="roaster" bind:value={$form.roaster} />
+	</label>
+	<label>
+		Varietals
+		<input type="text" name="varietals" bind:value={$form.varietals} />
+	</label>
+	<label>
+		Process
+		<input type="text" name="process" bind:value={$form.process} />
+	</label>
+	<div class="grid">
+		<label>
+			Country
+			<select name="country" bind:value={$form.country}>
+				<option selected disabled value="">Please select a country</option>
+				{#each data.countryNames as countryName}
+					<option value={countryName}>
+						{`${countryName}  ${getEmojiFlag(getCountryCode(countryName) as TCountryCode)}`}
+					</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			Region
+			<input type="text" name="region" bind:value={$form.region} />
+		</label>
+	</div>
+	<div class="grid">
+		<label>
+			Farm
+			<input type="text" name="farm" bind:value={$form.farm} />
+		</label>
+		<label>
+			Elevation
+			<input type="text" name="elevation" bind:value={$form.elevation} />
+		</label>
+	</div>
+	<div class="grid">
+		<label>
+			Weight
+			<input type="number" min="2" step="0.5" name="weight" bind:value={$form.weight} />
+		</label>
+		<label>
+			Roasting Date
+			<input type="date" name="roastingDate" bind:value={$form.roastingDate} />
+		</label>
+	</div>
+	<label>
+		Tasting Notes
+		<input type="text" name="flavorProfile" bind:value={$form.flavorProfile} />
+	</label>
+	<label>
+		Notes
+		<textarea bind:value={$form.notes} placeholder="You can add some notes here"></textarea>
+	</label>
+
+	<input type="submit" value={$form.id ? 'Save Changes' : 'Add Coffee'} />
+	{#if $form.id}
+		<input
+			type="submit"
+			class="contrast"
+			onclick={(e) => {
+				e.preventDefault();
+				modalOpen = true;
+			}}
+			value="Delete Coffee"
+		/>
+	{/if}
+	{#if $form.id}
+		<dialog open={modalOpen}>
+			<article>
+				<h3>Are you sure?</h3>
+				<p>This action cannot be undone. This will permanently delete the coffee.</p>
+				<footer>
+					<button
+						onclick={(e) => {
+							e.preventDefault();
+							modalOpen = false;
+						}}>Cancel</button
+					>
+					<button name="delete" class="contrast"> Delete Coffee</button>
+				</footer>
+			</article>
+		</dialog>
+	{/if}
 </form>

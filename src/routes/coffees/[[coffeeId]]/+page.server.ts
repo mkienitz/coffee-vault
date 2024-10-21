@@ -20,12 +20,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const form = await superValidate(coffee, zod(coffeeSchema));
 	return {
 		form,
-		countryNames: Object.values(countries).map((country) => {
-			return {
-				value: country.name,
-				label: country.name
-			};
-		})
+		countryNames: Object.values(countries).map((country) => country.name)
 	};
 };
 

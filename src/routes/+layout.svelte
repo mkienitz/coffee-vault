@@ -1,6 +1,6 @@
 <script>
-	import '../app.pcss';
-	import { Toaster } from '$lib/components/ui/sonner';
+	import '@picocss/pico/css/pico.css';
+	//import { Toaster } from '$lib/components/ui/sonner';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
@@ -23,8 +23,16 @@
 	});
 </script>
 
-<Toaster richColors />
-<div class="container flex flex-col items-center space-y-10 pb-10 pt-10">
-	<a href="/table"><h1 class="text-5xl">CoffeeVault</h1></a>
-	{@render children()}
-</div>
+<!-- <Toaster richColors /> -->
+<header>
+	<nav>
+		<ul>
+			<li><a href="/"><h1>CoffeeVault</h1></a></li>
+		</ul>
+		<ul>
+			<li><big><a href="#" class="contrast">Coffees</a></big></li>
+			<li><big><a href="#" class="contrast">Doses</a></big></li>
+		</ul>
+	</nav>
+</header>
+<main>{@render children()}</main>

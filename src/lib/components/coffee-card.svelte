@@ -1,11 +1,6 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Progress } from '$lib/components/ui/progress';
-	import { Button } from '$lib/components/ui/button';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import type { CoffeeWithDoses } from '$lib/schemas';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Badge } from '$lib/components/ui/badge';
 	let { coffee = $bindable() }: { coffee: CoffeeWithDoses } = $props();
 	const remainingWeight = $derived(
 		coffee.weight -
@@ -16,65 +11,46 @@
 	);
 </script>
 
-<Card.Root class={'flex w-[400px] flex-col'}>
-	<Card.Header class="pb-0">
-		<Card.Title class="flex flex-col space-y-1">
-			<div class="flex flex-row items-center justify-between">
-				<div class="text-2xl">
-					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
-				</div>
-				<Button href={`/coffees/${coffee.id}`} variant="link" class="h-fit w-fit p-0">Edit</Button>
-			</div>
-			<div class="flex flex-row items-center justify-between">
-				<small class="text-muted-foreground">{coffee.roaster}</small>
-				<small class="text-muted-foreground">{coffee.roastingDate}</small>
-			</div>
-		</Card.Title>
-	</Card.Header>
-	<Separator class="my-3" />
-	<Card.Content class="flex grow flex-col space-y-4 pb-0">
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Origin</div>
-			<div class="text-sm text-muted-foreground">
+{#snippet coffeeField(fieldName: keyof CoffeeWithDoses, title: string | undefined = undefined)}
+	<hgroup>
+		<h5>{title ? title : fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}</h5>
+		<p>{coffee[fieldName]}</p>
+	</hgroup>
+{/snippet}
+
+<article style="max-width: 50rem;">
+	<header style="display: flex; flex-direction: row; justify-content: space-between">
+		<hgroup>
+			<h2>{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}</h2>
+			<p>{coffee.roaster}</p>
+		</hgroup>
+		<a href={`/coffees/${coffee.id}`} style="justify-self: end">Edit Coffee</a>
+	</header>
+	<main>
+		<hgroup>
+			<h5>Origin</h5>
+			<p>
 				{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
-			</div>
-		</div>
+			</p>
+		</hgroup>
 		{#if coffee.producer !== ''}
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Producer</div>
-				<div class="text-sm text-muted-foreground">{coffee.producer}</div>
-			</div>
+			{@render coffeeField('producer')}
 		{/if}
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Varietals</div>
-			<div class="text-sm text-muted-foreground">{coffee.varietals}</div>
-		</div>
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Process</div>
-			<div class="text-sm text-muted-foreground">{coffee.process}</div>
-		</div>
+		{@render coffeeField('varietals')}
+		{@render coffeeField('process')}
+		{@render coffeeField('varietals')}
+		{@render coffeeField('flavorProfile', 'Flavor Profile')}
 		{#if coffee.notes !== ''}
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Notes</div>
-				<div class="text-sm text-muted-foreground">{coffee.notes}</div>
-			</div>
+			{@render coffeeField('notes')}
 		{/if}
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Flavor Profile</div>
-			<div class="text-sm text-muted-foreground">{coffee.flavorProfile}</div>
-		</div>
-	</Card.Content>
-	<Separator class="my-3" />
-	<Card.Footer class="flex w-full flex-row justify-between">
-		<div>
-			<Badge variant="outline">some</Badge>
-			<Badge variant="outline">badges</Badge>
-		</div>
-		<div class="flex flex-row items-center space-x-1">
-			<a href="/coffees/{coffee.id}/doses">
-				<Progress class="w-[80px]" value={remainingWeight} max={coffee.weight} />
-			</a>
-			<div class="text-sm text-muted-foreground">{remainingWeight}/{coffee.weight}g</div>
-		</div>
-	</Card.Footer>
-</Card.Root>
+	</main>
+	<footer class="grid">
+		<a href={`/coffees/${coffee.id}/doses`} class="contrast">
+			<div>
+				Remaining Coffee: {remainingWeight}/{coffee.weight}g
+				<progress value={remainingWeight} max={coffee.weight}></progress>
+			</div>
+		</a>
+		<small style="justify-self: end">Roasted on {coffee.roastingDate}</small>
+	</footer>
+</article>

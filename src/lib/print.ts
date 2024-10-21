@@ -2,9 +2,9 @@ import { toBuffer } from 'qrcode';
 import { env } from '$env/dynamic/private';
 
 export async function printQRCodes(tokens: string[]) {
-	console.log(`Starting to print ${tokens.length} tokens`)
+	console.log(`Starting to print ${tokens.length} tokens`);
 	tokens.forEach(async (token, i, tokens) => {
-		console.log(`Printing token ${token}`)
+		console.log(`Printing token ${token}`);
 
 		const buffer = await toBuffer(`https://${env.COFFEE_VAULT_DOMAIN}/doses/${token}`, {
 			width: 236
@@ -15,8 +15,9 @@ export async function printQRCodes(tokens: string[]) {
 		const formData = new FormData();
 		formData.append('image', file);
 		formData.append('settings', JSON.stringify(settings));
-		console.log(formData)
+		console.log(formData);
 
+		return;
 		const host = env.COFFEE_VAULT_BQL_PRINT_ADDRESS;
 		const port = Number(env.COFFEE_VAULT_BQL_PRINT_PORT);
 		await fetch(`http://${host}:${port}/print`, {
@@ -24,5 +25,5 @@ export async function printQRCodes(tokens: string[]) {
 			body: formData
 		});
 	});
-	console.log('Finished printing all tokens')
+	console.log('Finished printing all tokens');
 }
