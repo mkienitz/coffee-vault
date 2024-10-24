@@ -24,7 +24,15 @@
 </script>
 
 <Toaster richColors />
-<div class="container flex flex-col items-center space-y-10 pb-10 pt-10">
-	<a href="/table"><h1 class="text-5xl">CoffeeVault</h1></a>
+<header>
+	<nav class="flex items-end justify-between">
+		<a href="/" class="text-5xl text-secondary-foreground">CoffeeVault</a>
+		<div class="space-x-4">
+			<a href="/"><span class="text-xl">Coffees</span></a>
+			<a href="/doses"><span class="text-xl">Doses</span></a>
+		</div>
+	</nav>
+</header>
+<main>
 	{@render children()}
-</div>
+</main>
