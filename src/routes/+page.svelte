@@ -3,7 +3,7 @@
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import * as Pagination from '$lib/components/ui/pagination';
 	import * as Table from '$lib/components/ui/table';
-	import { ArrowDownZa, ArrowUpAz, MoveLeft, MoveRight } from 'lucide-svelte';
+	import { ArrowDownZa, ArrowUpAz, MoveLeft, MoveRight, X } from 'lucide-svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import * as HoverCard from '$lib/components/ui/hover-card';
 	import type { CoffeeWithDoses } from '$lib/schemas';
@@ -12,44 +12,40 @@
 	let { data } = $props();
 	const coffees = $state(data.coffees);
 
+	type CoffeeKey = keyof CoffeeWithDoses;
+
 	// FILTERING
-	type Filter = (coffee: CoffeeWithDoses) => boolean;
-	let currentFilter: Filter = $state((_) => true);
-	let filteredCoffees = $derived(coffees.filter(currentFilter));
+	type Filter = { key: CoffeeKey; value: CoffeeWithDoses[CoffeeKey] };
+	let filters: Filter[] = $state([]);
+	let filteredCoffees = $derived(
+		coffees.filter((coffee) => {
+			return !filters.some(({ key, value }) => coffee[key] !== value);
+		})
+	);
 
 	// SORTING
-	type SortingFunction = (a: CoffeeWithDoses, b: CoffeeWithDoses) => number;
-	let sortedBy = $state('roastingDate');
-	let ascending = $state(true);
+	let sortedBy: { key: CoffeeKey; ascending: boolean } = $state({
+		key: 'roastingDate',
+		ascending: true
+	});
 
-	const createSortingFunction: (fieldName: string) => SortingFunction = (fieldName) => {
-		return (c1, c2) => {
-			const accessor = (coffee: CoffeeWithDoses) => coffee[fieldName as keyof typeof coffee];
-			if (accessor(c1) === accessor(c2)) {
+	let sortedCoffees = $derived(
+		filteredCoffees.toSorted((a, b) => {
+			if (a[sortedBy.key] === b[sortedBy.key]) {
 				return 0;
 			}
-			if (accessor(c1) < accessor(c2)) {
-				return ascending ? -1 : 1;
+			if (a[sortedBy.key] < b[sortedBy.key]) {
+				return sortedBy.ascending ? -1 : 1;
 			} else {
-				return ascending ? 1 : -1;
+				return sortedBy.ascending ? 1 : -1;
 			}
-		};
-	};
-
-	const sortBy = (fieldName: string) => {
-		if (sortedBy === fieldName) {
-			ascending = !ascending;
-		}
-		sortedBy = fieldName;
-	};
-
-	let currentSortingFunction: SortingFunction = $derived(createSortingFunction(sortedBy));
-	let sortedCoffees = $derived(filteredCoffees.toSorted(currentSortingFunction));
+		})
+	);
 
 	// PAGINATION
 	const pageSize = 15;
 	const nPages = $derived(Math.ceil(filteredCoffees.length / pageSize));
-	let currPage = $state(Math.min(data.page, nPages));
+	let currPage = $state(data.page);
 	$effect(() => {
 		currPage = Math.min(data.page, nPages);
 	});
@@ -62,16 +58,19 @@
 	});
 </script>
 
-{#snippet tableHead(headerName: string, fieldName: string)}
+{#snippet tableHead(fieldName: CoffeeKey, headerName: string | undefined = undefined)}
 	<Table.Head>
 		<Button
 			variant="ghost"
 			onclick={() => {
-				sortBy(fieldName);
+				if (sortedBy.key == fieldName) {
+					sortedBy.ascending = !sortedBy.ascending;
+				}
+				sortedBy.key = fieldName;
 			}}
-			>{headerName}
-			{#if sortedBy === fieldName}
-				{#if ascending}
+			>{headerName ?? fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+			{#if sortedBy.key === fieldName}
+				{#if sortedBy.ascending}
 					<ArrowUpAz />
 				{:else}
 					<ArrowDownZa />
@@ -119,23 +118,35 @@
 			</Pagination.Root>
 		</div>
 		<div class="flex w-full flex-row justify-between">
-			<Button
-				variant="secondary"
-				onclick={() => {
-					currentFilter = (_) => true;
-				}}>Reset Filters</Button
-			>
+			<div class="space-x-2">
+				{#each filters as filter}
+					<button>
+						<Badge variant="secondary"
+							>{filter.value}<X
+								class="size-4"
+								onclick={() => filters.splice(filters.indexOf(filter))}
+							/></Badge
+						>
+					</button>
+				{/each}
+				<Button
+					variant="secondary"
+					onclick={() => {
+						filters = [];
+					}}>Reset Filters</Button
+				>
+			</div>
 			<Button href="/coffees">Add Coffee</Button>
 		</div>
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>
-					{@render tableHead('Name', 'name')}
-					{@render tableHead('Country', 'country')}
-					{@render tableHead('Variety', 'varietals')}
-					{@render tableHead('Roaster', 'roaster')}
-					{@render tableHead('Process', 'process')}
-					{@render tableHead('Roast Date', 'roastingDate')}
+					{@render tableHead('name')}
+					{@render tableHead('country')}
+					{@render tableHead('varietals')}
+					{@render tableHead('roaster')}
+					{@render tableHead('process')}
+					{@render tableHead('roastingDate', 'Roasted')}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -149,7 +160,7 @@
 							<Button
 								variant="ghost"
 								onclick={() => {
-									currentFilter = (c) => c.country === coffee.country;
+									filters.push({ key: 'country', value: coffee.country });
 								}}
 							>
 								{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
@@ -159,7 +170,7 @@
 							><Button
 								variant="ghost"
 								onclick={() => {
-									currentFilter = (c) => c.varietals === coffee.varietals;
+									filters.push({ key: 'varietals', value: coffee.varietals });
 								}}>{coffee.varietals}</Button
 							></Table.Cell
 						>
@@ -167,7 +178,7 @@
 							><Button
 								variant="ghost"
 								onclick={() => {
-									currentFilter = (c) => c.roaster === coffee.roaster;
+									filters.push({ key: 'roaster', value: coffee.roaster });
 								}}>{coffee.roaster}</Button
 							></Table.Cell
 						>
