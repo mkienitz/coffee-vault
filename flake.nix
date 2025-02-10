@@ -33,7 +33,7 @@
           packages = with pkgs; [
             nil
             sqlite
-            nodejs
+            nodejs_22
             nodePackages."@tailwindcss/language-server"
             nodePackages.tailwindcss
             nodePackages.typescript-language-server
