@@ -25,7 +25,7 @@
 
 <Toaster richColors />
 <header>
-	<nav class="flex items-end justify-between">
+	<nav class="flex items-end justify-between pb-8 pt-4">
 		<a href="/" class="text-5xl text-secondary-foreground">CoffeeVault</a>
 		<div class="space-x-4">
 			<a href="/"><span class="text-xl">Coffees</span></a>

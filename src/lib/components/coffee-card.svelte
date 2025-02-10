@@ -32,7 +32,7 @@
 		</Card.Title>
 	</Card.Header>
 	<Separator class="my-3" />
-	<Card.Content class="flex grow flex-col space-y-4 pb-0">
+	<Card.Content class="flex grow flex-col space-y-4 py-0">
 		<div class="flex flex-col space-y-1">
 			<div class="font-bold">Origin</div>
 			<div class="text-sm text-muted-foreground">
@@ -70,10 +70,8 @@
 			<Badge variant="outline">some</Badge>
 			<Badge variant="outline">badges</Badge>
 		</div>
-		<div class="flex flex-row items-center space-x-1">
-			<a href="/coffees/{coffee.id}/doses">
-				<Progress class="w-[80px]" value={remainingWeight} max={coffee.weight} />
-			</a>
+		<div class="flex flex-row items-center space-x-2">
+			<Progress class="w-[80px]" value={remainingWeight} max={coffee.weight} />
 			<div class="text-sm text-muted-foreground">{remainingWeight}/{coffee.weight}g</div>
 		</div>
 	</Card.Footer>

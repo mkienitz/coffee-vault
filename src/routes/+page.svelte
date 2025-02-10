@@ -22,6 +22,7 @@
 			return !filters.some(({ key, value }) => coffee[key] !== value);
 		})
 	);
+	$inspect(filters);
 
 	// SORTING
 	let sortedBy: { key: CoffeeKey; ascending: boolean } = $state({
@@ -120,12 +121,13 @@
 		<div class="flex w-full flex-row justify-between">
 			<div class="space-x-2">
 				{#each filters as filter}
-					<button>
-						<Badge variant="secondary"
-							>{filter.value}<X
-								class="size-4"
-								onclick={() => filters.splice(filters.indexOf(filter))}
-							/></Badge
+					<button
+						onclick={() => {
+							filters = filters.filter((f) => f !== filter);
+						}}
+					>
+						<Badge variant="secondary" class="hover:bg-destructive"
+							>{filter.value}<X class="size-4" /></Badge
 						>
 					</button>
 				{/each}
@@ -160,7 +162,7 @@
 							<Button
 								variant="ghost"
 								onclick={() => {
-									filters.push({ key: 'country', value: coffee.country });
+									filters = [...filters, { key: 'country', value: coffee.country }];
 								}}
 							>
 								{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
@@ -170,7 +172,7 @@
 							><Button
 								variant="ghost"
 								onclick={() => {
-									filters.push({ key: 'varietals', value: coffee.varietals });
+									filters = [...filters, { key: 'varietals', value: coffee.varietals }];
 								}}>{coffee.varietals}</Button
 							></Table.Cell
 						>
@@ -178,7 +180,7 @@
 							><Button
 								variant="ghost"
 								onclick={() => {
-									filters.push({ key: 'roaster', value: coffee.roaster });
+									filters = [...filters, { key: 'roaster', value: coffee.roaster }];
 								}}>{coffee.roaster}</Button
 							></Table.Cell
 						>

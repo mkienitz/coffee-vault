@@ -6,19 +6,22 @@
 	const dose = data.dose;
 </script>
 
-<CoffeeCard {coffee} />
+<div class="flex flex-col items-center space-y-8">
+	<CoffeeCard {coffee} />
 
-{#if dose.consumedOn}
-	<span>This Dose has already been consumed on {dose.consumedOn}</span>
-{:else}
-	<form method="POST">
-		<Form.Button
-			class="w-full"
-			variant="secondary"
-			name="id"
-			value={dose.id}
-			formaction="/coffees/{coffee.id}/doses?/consume">Mark {dose.weight}g as consumed</Form.Button
-		>
-		<input type="hidden" name="__superform_id" value={dose.id.toString()} />
-	</form>
-{/if}
+	{#if dose.consumedOn}
+		<span>This Dose has already been consumed on {dose.consumedOn}</span>
+	{:else}
+		<form method="POST">
+			<Form.Button
+				class="w-full"
+				variant="secondary"
+				name="id"
+				value={dose.id}
+				formaction="/coffees/{coffee.id}/doses?/consume"
+				>Mark {dose.weight}g as consumed</Form.Button
+			>
+			<input type="hidden" name="__superform_id" value={dose.id.toString()} />
+		</form>
+	{/if}
+</div>
