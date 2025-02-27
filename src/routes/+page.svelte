@@ -5,7 +5,6 @@
 	import * as Table from '$lib/components/ui/table';
 	import { ArrowDownZa, ArrowUpAz, MoveLeft, MoveRight, X } from 'lucide-svelte';
 	import { Badge } from '$lib/components/ui/badge';
-	import * as HoverCard from '$lib/components/ui/hover-card';
 	import type { CoffeeWithDoses } from '$lib/schemas';
 	import { Button } from '$lib/components/ui/button/index.js';
 
@@ -185,14 +184,7 @@
 							></Table.Cell
 						>
 						<Table.Cell class="text-center">
-							<HoverCard.Root>
-								<HoverCard.Trigger target="_blank">
-									<Badge variant="outline" class="bg-pink-600">washed</Badge>
-								</HoverCard.Trigger>
-								<HoverCard.Content class="w-fit text-center"
-									><span class="text-sm">{coffee.process}</span></HoverCard.Content
-								>
-							</HoverCard.Root>
+							<Badge variant="outline" class="bg-pink-600">washed</Badge>
 						</Table.Cell>
 						<Table.Cell class="text-center">{coffee.roastingDate}</Table.Cell>
 					</Table.Row>
