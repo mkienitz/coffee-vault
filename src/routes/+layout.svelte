@@ -1,9 +1,7 @@
 <script>
-	import '../app.pcss';
-	import { Toaster } from '$lib/components/ui/sonner';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { toast } from 'svelte-sonner';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	const { children } = $props();
 
@@ -23,16 +21,16 @@
 	});
 </script>
 
-<Toaster richColors />
+<!-- <Toaster richColors /> -->
 <header>
-	<nav class="flex items-end justify-between pb-8 pt-4">
-		<a href="/" class="text-5xl text-secondary-foreground">CoffeeVault</a>
+	<nav class="flex items-end justify-between pt-4 pb-8">
+		<a href="/" class="text-secondary-foreground text-5xl">CoffeeVault</a>
 		<div class="space-x-4">
 			<a href="/"><span class="text-xl">Coffees</span></a>
 			<a href="/doses"><span class="text-xl">Doses</span></a>
 		</div>
 	</nav>
 </header>
-<main>
+<main class="flex flex-col items-center">
 	{@render children()}
 </main>

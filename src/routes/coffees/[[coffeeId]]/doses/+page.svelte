@@ -1,10 +1,7 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table';
-	import * as Form from '$lib/components/ui/form';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { doseSchema } from '$lib/schemas.js';
-	import { Input } from '$lib/components/ui/input';
 	import CoffeeCard from '$lib/components/coffee-card.svelte';
 
 	let { data } = $props();
@@ -24,105 +21,95 @@
 <div class="flex flex-col items-center space-y-8">
 	<CoffeeCard bind:coffee />
 	<form id="doseForm" method="POST" use:enhance class="w-full">
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					<Table.Head class="text-center">Weight</Table.Head>
-					<Table.Head class="text-center">Token</Table.Head>
-					<Table.Head class="text-center">Consumed</Table.Head>
-					<Table.Head class="text-center">Printed</Table.Head>
-					<Table.Head class="text-center"></Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
+		<table>
+			<thead>
+				<tr>
+					<th scope="col" class="text-center">Weight</th>
+					<th scope="col" class="text-center">Token</th>
+					<th scope="col" class="text-center">Consumed</th>
+					<th scope="col" class="text-center">Printed</th>
+					<th scope="col" class="text-center"></th>
+				</tr>
+			</thead>
+			<tbody>
 				{#each doses as dose}
-					<Table.Row>
-						<Table.Cell class="max-w-[5rem] text-center">{dose.weight}g</Table.Cell>
-						<Table.Cell class="max-w-[10rem] truncate text-center"
-							><a href="/doses/{dose.token}">{dose.token}</a></Table.Cell
+					<tr>
+						<td class="max-w-[5rem] text-center">{dose.weight}g</td>
+						<td class="max-w-[10rem] truncate text-center"
+							><a href="/doses/{dose.token}">{dose.token}</a></td
 						>
-						<Table.Cell class="text-center">
+						<td class="text-center">
 							{#if dose.consumedOn}
 								{dose.consumedOn}
 							{:else}
-								<Form.Button
-									variant="secondary"
+								<button
 									name="id"
 									value={dose.id}
 									onclick={() => {
 										$formId = dose.id.toString();
 									}}
-									formaction="?/consume">Mark as consumed</Form.Button
+									formaction="?/consume">Mark as consumed</button
 								>
 							{/if}
-						</Table.Cell>
-						<Table.Cell class="text-center">
+						</td>
+						<td class="text-center">
 							{#if !dose.consumedOn}
-								<Form.Button
-									variant={dose.printed ? 'outline' : 'secondary'}
+								<button
 									name="id"
 									value={dose.id}
 									onclick={() => {
 										$formId = dose.id.toString();
 									}}
-									formaction="?/print">Print {dose.printed ? 'again' : ''}</Form.Button
+									formaction="?/print">Print {dose.printed ? 'again' : ''}</button
 								>
 							{/if}
-						</Table.Cell>
-						<Table.Cell class="text-center">
-							<Form.Button
-								variant="destructive"
+						</td>
+						<td class="text-center">
+							<button
 								name="id"
 								value={dose.id}
 								onclick={() => {
 									$formId = dose.id.toString();
 								}}
-								formaction="?/delete">Delete Dose</Form.Button
+								formaction="?/delete">Delete Dose</button
 							>
-						</Table.Cell>
-					</Table.Row>
+						</td>
+					</tr>
 				{/each}
-				<Table.Row>
-					<Table.Cell>
-						<Form.Field form={sForm} name="weight">
-							<Form.Control let:attrs>
-								<Input
-									{...attrs}
-									type="number"
-									min="1"
-									max="50"
-									placeholder="12.5"
-									step="0.5"
-									class="m-auto block max-w-[6rem]"
-									bind:value={$form.weight}
-								/>
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-					</Table.Cell>
-					<Table.Cell class="text-center">
-						<Form.Button
+				<tr>
+					<td>
+						<input
+							type="number"
+							min="1"
+							max="50"
+							placeholder="12.5"
+							step="0.5"
+							class="m-auto block max-w-[6rem]"
+							bind:value={$form.weight}
+						/>
+					</td>
+					<td class="text-center">
+						<button
 							onclick={() => {
 								$formId = 'add';
 							}}
-							formaction="?/add">Add Dose</Form.Button
+							formaction="?/add">Add Dose</button
 						>
-					</Table.Cell>
-					<Table.Cell></Table.Cell>
-					<Table.Cell class="text-center">
-						<Form.Button
+					</td>
+					<td></td>
+					<td class="text-center">
+						<button
 							disabled={coffee.doses.every((d) => d.printed || d.consumedOn)}
-							variant="secondary"
 							onclick={() => {
 								$formId = 'printAll';
 							}}
-							formaction="?/printAll">Print All</Form.Button
+							formaction="?/printAll">Print All</button
 						>
-					</Table.Cell>
-					<Table.Cell></Table.Cell>
-				</Table.Row>
-			</Table.Body>
-		</Table.Root>
+					</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
 		<input hidden bind:value={$form.coffeeId} name="coffeeId" />
 	</form>
 </div>

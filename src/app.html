@@ -4,11 +4,11 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link href="/src/app.css" rel="stylesheet" />
 		<title>CoffeeVault</title>
 		%sveltekit.head%
 	</head>
-	<!-- TODO Implement dark mode -->
-	<body data-sveltekit-preload-data="hover" class="dark container">
-		%sveltekit.body%
+	<body data-sveltekit-preload-data="hover" class="dark container mx-auto">
+		<div class="prose container contents">%sveltekit.body%</div>
 	</body>
 </html>

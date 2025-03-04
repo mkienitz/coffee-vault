@@ -1,12 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import * as Pagination from '$lib/components/ui/pagination';
-	import * as Table from '$lib/components/ui/table';
-	import { ArrowDownZa, ArrowUpAz, MoveLeft, MoveRight, X } from 'lucide-svelte';
-	import { Badge } from '$lib/components/ui/badge';
+	import { ArrowDownZa, ArrowUpAz, X } from 'lucide-svelte';
 	import type { CoffeeWithDoses } from '$lib/schemas';
-	import { Button } from '$lib/components/ui/button/index.js';
 
 	let { data } = $props();
 	const coffees = $state(data.coffees);
@@ -43,25 +38,25 @@
 	);
 
 	// PAGINATION
-	const pageSize = 15;
-	const nPages = $derived(Math.ceil(filteredCoffees.length / pageSize));
-	let currPage = $state(data.page);
-	$effect(() => {
-		currPage = Math.min(data.page, nPages);
-	});
-
-	let paginatedCoffees = $derived(
-		sortedCoffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
-	);
-	$effect(() => {
-		goto(`?page=${currPage}`);
-	});
+	//const pageSize = 15;
+	//const nPages = $derived(Math.ceil(filteredCoffees.length / pageSize));
+	//let currPage = $state(data.page);
+	//$effect(() => {
+	//	currPage = Math.min(data.page, nPages);
+	//});
+	//
+	//let paginatedCoffees = $derived(
+	//	sortedCoffees.slice((currPage - 1) * pageSize, (currPage - 1) * pageSize + pageSize)
+	//);
+	//$effect(() => {
+	//	goto(`?page=${currPage}`);
+	//});
 </script>
 
 {#snippet tableHead(fieldName: CoffeeKey, headerName: string | undefined = undefined)}
-	<Table.Head>
-		<Button
-			variant="ghost"
+	<th scope="col">
+		<button
+			class="flex flex-row"
 			onclick={() => {
 				if (sortedBy.key == fieldName) {
 					sortedBy.ascending = !sortedBy.ascending;
@@ -76,120 +71,76 @@
 					<ArrowDownZa />
 				{/if}
 			{/if}
-		</Button>
-	</Table.Head>
+		</button>
+	</th>
 {/snippet}
 
-<div>
-	<div class="flex flex-col items-center space-y-4">
-		<div class="flex w-full flex-row justify-between">
-			<Pagination.Root
-				count={filteredCoffees.length}
-				perPage={pageSize}
-				bind:page={currPage}
-				let:pages
-				let:currentPage
+<div class="flex w-full flex-row justify-between">
+	<!-- FILTER CONTROLS -->
+	<div class="flex flex-row space-x-2">
+		{#each filters as filter}
+			<button
+				class="btn hover:bg-error"
+				onclick={() => {
+					filters = filters.filter((f) => f !== filter);
+				}}
 			>
-				<Pagination.Content>
-					<Pagination.Item>
-						<Pagination.PrevButton>
-							<MoveLeft />
-						</Pagination.PrevButton>
-					</Pagination.Item>
-					{#each pages as page (page.key)}
-						{#if page.type === 'ellipsis'}
-							<Pagination.Item>
-								<Pagination.Ellipsis />
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item>
-								<Pagination.Link {page} isActive={currentPage == page.value}>
-									{page.value}
-								</Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
-					<Pagination.Item>
-						<Pagination.NextButton>
-							<MoveRight />
-						</Pagination.NextButton>
-					</Pagination.Item>
-				</Pagination.Content>
-			</Pagination.Root>
-		</div>
-		<div class="flex w-full flex-row justify-between">
-			<div class="space-x-2">
-				{#each filters as filter}
+				{filter.value}<X class="size-4" />
+			</button>
+		{/each}
+		<button
+			class="btn"
+			onclick={() => {
+				filters = [];
+			}}>Reset Filters</button
+		>
+	</div>
+	<button class="btn btn-primary"><a href="/coffees">Add Coffee</a></button>
+</div>
+
+<table class="table">
+	<thead>
+		<tr>
+			{@render tableHead('name')}
+			{@render tableHead('country')}
+			{@render tableHead('varietals')}
+			{@render tableHead('roaster')}
+			{@render tableHead('process')}
+			{@render tableHead('roastingDate', 'Roasted')}
+		</tr>
+	</thead>
+	<tbody>
+		{#each sortedCoffees as coffee (coffee.id)}
+			<tr class="content-center">
+				<th><a href="/coffees/{coffee.id}/doses">{coffee.name}</a></th>
+				<td>
 					<button
 						onclick={() => {
-							filters = filters.filter((f) => f !== filter);
+							filters = [...filters, { key: 'country', value: coffee.country }];
 						}}
 					>
-						<Badge variant="secondary" class="hover:bg-destructive"
-							>{filter.value}<X class="size-4" /></Badge
-						>
+						{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
 					</button>
-				{/each}
-				<Button
-					variant="secondary"
-					onclick={() => {
-						filters = [];
-					}}>Reset Filters</Button
+				</td>
+				<td
+					><button
+						onclick={() => {
+							filters = [...filters, { key: 'varietals', value: coffee.varietals }];
+						}}>{coffee.varietals}</button
+					></td
 				>
-			</div>
-			<Button href="/coffees">Add Coffee</Button>
-		</div>
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					{@render tableHead('name')}
-					{@render tableHead('country')}
-					{@render tableHead('varietals')}
-					{@render tableHead('roaster')}
-					{@render tableHead('process')}
-					{@render tableHead('roastingDate', 'Roasted')}
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each paginatedCoffees as coffee (coffee.id)}
-					<Table.Row class="content-center">
-						<Table.Cell
-							><Button variant="link" href="/coffees/{coffee.id}/doses">{coffee.name}</Button
-							></Table.Cell
-						>
-						<Table.Cell>
-							<Button
-								variant="ghost"
-								onclick={() => {
-									filters = [...filters, { key: 'country', value: coffee.country }];
-								}}
-							>
-								{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
-							</Button>
-						</Table.Cell>
-						<Table.Cell
-							><Button
-								variant="ghost"
-								onclick={() => {
-									filters = [...filters, { key: 'varietals', value: coffee.varietals }];
-								}}>{coffee.varietals}</Button
-							></Table.Cell
-						>
-						<Table.Cell
-							><Button
-								variant="ghost"
-								onclick={() => {
-									filters = [...filters, { key: 'roaster', value: coffee.roaster }];
-								}}>{coffee.roaster}</Button
-							></Table.Cell
-						>
-						<Table.Cell class="text-center">
-							<Badge variant="outline" class="bg-pink-600">washed</Badge>
-						</Table.Cell>
-						<Table.Cell class="text-center">{coffee.roastingDate}</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	</div>
-</div>
+				<td
+					><button
+						onclick={() => {
+							filters = [...filters, { key: 'roaster', value: coffee.roaster }];
+						}}>{coffee.roaster}</button
+					></td
+				>
+				<td>
+					<div class="badge badge-primary">washed</div>
+				</td>
+				<td class="text-center">{coffee.roastingDate}</td>
+			</tr>
+		{/each}
+	</tbody>
+</table>

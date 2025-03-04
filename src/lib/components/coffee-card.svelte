@@ -1,11 +1,6 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import { Progress } from '$lib/components/ui/progress';
-	import { Button } from '$lib/components/ui/button';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import type { CoffeeWithDoses } from '$lib/schemas';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Badge } from '$lib/components/ui/badge';
 	let { coffee = $bindable() }: { coffee: CoffeeWithDoses } = $props();
 	const remainingWeight = $derived(
 		coffee.weight -
@@ -16,63 +11,61 @@
 	);
 </script>
 
-<Card.Root class={'flex w-[400px] flex-col'}>
-	<Card.Header class="pb-0">
-		<Card.Title class="flex flex-col space-y-1">
-			<div class="flex flex-row items-center justify-between">
+<div class="card flex w-[400px] flex-col shadow-xl">
+	<div class="card-body flex flex-col space-y-8">
+		<div class="card-title flex flex-col space-y-1">
+			<div class="flex w-[100%] flex-row items-center justify-between">
 				<div class="text-2xl">
 					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
 				</div>
-				<Button href={`/coffees/${coffee.id}`} variant="link" class="h-fit w-fit p-0">Edit</Button>
+				<a href={`/coffees/${coffee.id}`} class="h-fit w-fit p-0">Edit</a>
 			</div>
-			<div class="flex flex-row items-center justify-between">
+			<div class="flex w-[100%] flex-row items-center justify-between">
 				<small class="text-muted-foreground">{coffee.roaster}</small>
 				<small class="text-muted-foreground">{coffee.roastingDate}</small>
 			</div>
-		</Card.Title>
-	</Card.Header>
-	<Separator class="my-3" />
-	<Card.Content class="flex grow flex-col space-y-4 py-0">
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Origin</div>
-			<div class="text-sm text-muted-foreground">
-				{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
-			</div>
 		</div>
-		{#if coffee.producer !== ''}
+		<div class="flex grow flex-col space-y-4 py-0">
 			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Producer</div>
-				<div class="text-sm text-muted-foreground">{coffee.producer}</div>
+				<div class="font-bold">Origin</div>
+				<div class="text-muted-foreground text-sm">
+					{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
+				</div>
 			</div>
-		{/if}
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Varietals</div>
-			<div class="text-sm text-muted-foreground">{coffee.varietals}</div>
-		</div>
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Process</div>
-			<div class="text-sm text-muted-foreground">{coffee.process}</div>
-		</div>
-		{#if coffee.notes !== ''}
+			{#if coffee.producer !== ''}
+				<div class="flex flex-col space-y-1">
+					<div class="font-bold">Producer</div>
+					<div class="text-muted-foreground text-sm">{coffee.producer}</div>
+				</div>
+			{/if}
 			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Notes</div>
-				<div class="text-sm text-muted-foreground">{coffee.notes}</div>
+				<div class="font-bold">Varietals</div>
+				<div class="text-muted-foreground text-sm">{coffee.varietals}</div>
 			</div>
-		{/if}
-		<div class="flex flex-col space-y-1">
-			<div class="font-bold">Flavor Profile</div>
-			<div class="text-sm text-muted-foreground">{coffee.flavorProfile}</div>
+			<div class="flex flex-col space-y-1">
+				<div class="font-bold">Process</div>
+				<div class="text-muted-foreground text-sm">{coffee.process}</div>
+			</div>
+			{#if coffee.notes !== ''}
+				<div class="flex flex-col space-y-1">
+					<div class="font-bold">Notes</div>
+					<div class="text-muted-foreground text-sm">{coffee.notes}</div>
+				</div>
+			{/if}
+			<div class="flex flex-col space-y-1">
+				<div class="font-bold">Flavor Profile</div>
+				<div class="text-muted-foreground text-sm">{coffee.flavorProfile}</div>
+			</div>
 		</div>
-	</Card.Content>
-	<Separator class="my-3" />
-	<Card.Footer class="flex w-full flex-row justify-between">
-		<div>
-			<Badge variant="outline">some</Badge>
-			<Badge variant="outline">badges</Badge>
+		<div class="flex w-full flex-row justify-between">
+			<div>
+				<div class="badge badge-accent">some</div>
+				<div class="badge badge-primary">badges</div>
+			</div>
+			<div class="flex flex-row items-center space-x-2">
+				<!--<div class="w-[80px]" value={remainingWeight} max={coffee.weight}></div>-->
+				<div class="text-muted-foreground text-sm">{remainingWeight}/{coffee.weight}g</div>
+			</div>
 		</div>
-		<div class="flex flex-row items-center space-x-2">
-			<Progress class="w-[80px]" value={remainingWeight} max={coffee.weight} />
-			<div class="text-sm text-muted-foreground">{remainingWeight}/{coffee.weight}g</div>
-		</div>
-	</Card.Footer>
-</Card.Root>
+	</div>
+</div>
