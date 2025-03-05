@@ -63,7 +63,7 @@
 				<div class="badge badge-primary">badges</div>
 			</div>
 			<div class="flex flex-row items-center space-x-2">
-				<!--<div class="w-[80px]" value={remainingWeight} max={coffee.weight}></div>-->
+				<progress class="progress w-[80px]" value={remainingWeight} max={coffee.weight}></progress>
 				<div class="text-muted-foreground text-sm">{remainingWeight}/{coffee.weight}g</div>
 			</div>
 		</div>

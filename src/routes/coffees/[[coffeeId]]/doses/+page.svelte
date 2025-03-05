@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { doseSchema } from '$lib/schemas.js';
 	import CoffeeCard from '$lib/components/coffee-card.svelte';
@@ -11,16 +11,14 @@
 	});
 	const doses = $derived(coffee.doses);
 
-	const sForm = superForm(data.form, {
-		resetForm: false,
+	const {form, enhance, formId } = superForm(data.form, {
 		validators: zodClient(doseSchema)
 	});
-	const { form, enhance, formId } = sForm;
 </script>
 
 <div class="flex flex-col items-center space-y-8">
 	<CoffeeCard bind:coffee />
-	<form id="doseForm" method="POST" use:enhance class="w-full">
+	<form method="POST" use:enhance class="w-full">
 		<table>
 			<thead>
 				<tr>
@@ -44,6 +42,7 @@
 							{:else}
 								<button
 									name="id"
+									class="btn btn-primary"
 									value={dose.id}
 									onclick={() => {
 										$formId = dose.id.toString();
@@ -56,6 +55,7 @@
 							{#if !dose.consumedOn}
 								<button
 									name="id"
+									class="btn {!dose.printed ? 'btn-primary' : ''}"
 									value={dose.id}
 									onclick={() => {
 										$formId = dose.id.toString();
@@ -67,6 +67,7 @@
 						<td class="text-center">
 							<button
 								name="id"
+								class="btn btn-error"
 								value={dose.id}
 								onclick={() => {
 									$formId = dose.id.toString();
@@ -78,18 +79,24 @@
 				{/each}
 				<tr>
 					<td>
-						<input
-							type="number"
-							min="1"
-							max="50"
-							placeholder="12.5"
-							step="0.5"
-							class="m-auto block max-w-[6rem]"
-							bind:value={$form.weight}
-						/>
+						<label class="input">
+							<input
+								name="weight"
+								type="number"
+								min="1"
+								max="50"
+								placeholder="12.5"
+								step="0.5"
+								class="input m-auto block max-w-[6rem]"
+								bind:value={$form.weight}
+							/>
+							<span class="label">g</span>
+						</label>
 					</td>
 					<td class="text-center">
 						<button
+							class="btn btn-success"
+							type="submit"
 							onclick={() => {
 								$formId = 'add';
 							}}
@@ -100,6 +107,7 @@
 					<td class="text-center">
 						<button
 							disabled={coffee.doses.every((d) => d.printed || d.consumedOn)}
+							class="btn btn-primary"
 							onclick={() => {
 								$formId = 'printAll';
 							}}
@@ -113,3 +121,4 @@
 		<input hidden bind:value={$form.coffeeId} name="coffeeId" />
 	</form>
 </div>
+<SuperDebug data={$form} />

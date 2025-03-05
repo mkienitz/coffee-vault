@@ -6,11 +6,10 @@
 	import { ChevronLeft } from 'lucide-svelte';
 
 	let { data } = $props();
-	const sForm = superForm(data.form, {
+	const { form, errors, enhance } = superForm(data.form, {
 		resetForm: false,
 		validators: zodClient(coffeeSchema)
 	});
-	const { form, enhance } = sForm;
 </script>
 
 <div class="card w-fit shadow-xl">
@@ -32,6 +31,7 @@
 					type="text"
 					placeholder="Coffee Name"
 					bind:value={$form.name}
+					required
 					class="input"
 				/>
 			</label>
@@ -42,6 +42,7 @@
 					type="text"
 					placeholder="Roaster"
 					bind:value={$form.roaster}
+					required
 					class="input"
 				/>
 			</label>
@@ -52,6 +53,7 @@
 					type="text"
 					placeholder="Varietals"
 					bind:value={$form.varietals}
+					required
 					class="input"
 				/>
 			</label>
@@ -62,6 +64,7 @@
 					type="text"
 					placeholder="Process"
 					bind:value={$form.process}
+					required
 					class="input"
 				/>
 			</label>
@@ -83,6 +86,7 @@
 					type="text"
 					placeholder="Region"
 					bind:value={$form.region}
+					required
 					class="input"
 				/>
 			</label>
@@ -97,16 +101,30 @@
 					type="text"
 					placeholder="Elevation"
 					bind:value={$form.elevation}
+					required
 					class="input"
 				/>
 			</label>
 			<label class="form-control w-full max-w-xs">
 				Weight
-				<input name="weight" type="number" step="0.5" bind:value={$form.weight} class="input" />
+				<input
+					name="weight"
+					type="number"
+					step="0.5"
+					bind:value={$form.weight}
+					required
+					class="input"
+				/>
 			</label>
 			<label class="form-control w-full max-w-xs">
 				Roasting Date
-				<input name="roastingDate" type="date" bind:value={$form.roastingDate} class="input" />
+				<input
+					name="roastingDate"
+					type="date"
+					bind:value={$form.roastingDate}
+					required
+					class="input"
+				/>
 			</label>
 			<label class="form-control w-full max-w-xs">
 				Tasting Notes
@@ -115,6 +133,7 @@
 					type="text"
 					placeholder="Add some tasting notes"
 					bind:value={$form.flavorProfile}
+					required
 					class="input"
 				/>
 			</label>
@@ -133,4 +152,5 @@
 		</div>
 	</div>
 </div>
+{$errors}
 <SuperDebug data={$form} />

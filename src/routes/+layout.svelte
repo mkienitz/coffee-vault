@@ -1,6 +1,6 @@
 <script>
 	import { getFlash } from 'sveltekit-flash-message';
-	import { toast } from 'svelte-sonner';
+	import { toast, Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
 
 	const { children } = $props();
@@ -21,7 +21,7 @@
 	});
 </script>
 
-<!-- <Toaster richColors /> -->
+<Toaster />
 <header>
 	<nav class="flex items-end justify-between pt-4 pb-8">
 		<a href="/" class="text-secondary-foreground text-5xl">CoffeeVault</a>

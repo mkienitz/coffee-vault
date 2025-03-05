@@ -78,6 +78,13 @@
 <div class="flex w-full flex-row justify-between">
 	<!-- FILTER CONTROLS -->
 	<div class="flex flex-row space-x-2">
+		<button
+			disabled={filters.length == 0}
+			class="btn btn-primary"
+			onclick={() => {
+				filters = [];
+			}}>Reset Filters</button
+		>
 		{#each filters as filter}
 			<button
 				class="btn hover:bg-error"
@@ -88,14 +95,8 @@
 				{filter.value}<X class="size-4" />
 			</button>
 		{/each}
-		<button
-			class="btn"
-			onclick={() => {
-				filters = [];
-			}}>Reset Filters</button
-		>
 	</div>
-	<button class="btn btn-primary"><a href="/coffees">Add Coffee</a></button>
+	<button class="btn btn-success"><a href="/coffees">Add Coffee</a></button>
 </div>
 
 <table class="table">
@@ -112,7 +113,7 @@
 	<tbody>
 		{#each sortedCoffees as coffee (coffee.id)}
 			<tr class="content-center">
-				<th><a href="/coffees/{coffee.id}/doses">{coffee.name}</a></th>
+				<td><a href="/coffees/{coffee.id}/doses">{coffee.name}</a></td>
 				<td>
 					<button
 						onclick={() => {
@@ -139,7 +140,7 @@
 				<td>
 					<div class="badge badge-primary">washed</div>
 				</td>
-				<td class="text-center">{coffee.roastingDate}</td>
+				<td>{coffee.roastingDate}</td>
 			</tr>
 		{/each}
 	</tbody>
