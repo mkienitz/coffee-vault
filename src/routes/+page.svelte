@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { ArrowDownZa, ArrowUpAz, X } from 'lucide-svelte';
-	import type { CoffeeWithDoses } from '$lib/schemas';
 
 	let { data } = $props();
 	const coffees = $state(data.coffees);
 
-	type CoffeeKey = keyof CoffeeWithDoses;
+	type Coffee = (typeof coffees)[number];
+	type CoffeeKey = keyof Coffee;
 
 	// FILTERING
-	type Filter = { key: CoffeeKey; value: CoffeeWithDoses[CoffeeKey] };
+	type Filter = { key: CoffeeKey; value: Coffee[CoffeeKey] };
 	let filters: Filter[] = $state([]);
 	let filteredCoffees = $derived(
 		coffees.filter((coffee) => {
@@ -54,7 +54,7 @@
 </script>
 
 {#snippet tableHead(fieldName: CoffeeKey, headerName: string | undefined = undefined)}
-	<th scope="col">
+	<th scope="col" class="max-w-fit">
 		<button
 			class="flex flex-row"
 			onclick={() => {
@@ -75,73 +75,76 @@
 	</th>
 {/snippet}
 
-<div class="flex w-full flex-row justify-between">
-	<!-- FILTER CONTROLS -->
-	<div class="flex flex-row space-x-2">
-		<button
-			disabled={filters.length == 0}
-			class="btn btn-primary"
-			onclick={() => {
-				filters = [];
-			}}>Reset Filters</button
-		>
-		{#each filters as filter}
+<div>
+	<div class="flex w-full flex-row justify-between">
+		<!-- FILTER CONTROLS -->
+		<div class="flex flex-row space-x-2">
 			<button
-				class="btn hover:bg-error"
+				disabled={filters.length == 0}
+				class="btn btn-primary"
 				onclick={() => {
-					filters = filters.filter((f) => f !== filter);
-				}}
+					filters = [];
+				}}>Reset Filters</button
 			>
-				{filter.value}<X class="size-4" />
-			</button>
-		{/each}
+			{#each filters as filter}
+				<button
+					class="btn hover:bg-error"
+					onclick={() => {
+						filters = filters.filter((f) => f !== filter);
+					}}
+				>
+					{filter.value}<X class="size-4" />
+				</button>
+			{/each}
+		</div>
+		<a href="/coffees/new"><button class="btn btn-success">Add Coffee</button></a>
 	</div>
-	<button class="btn btn-success"><a href="/coffees">Add Coffee</a></button>
-</div>
-
-<table class="table">
-	<thead>
-		<tr>
-			{@render tableHead('name')}
-			{@render tableHead('country')}
-			{@render tableHead('varietals')}
-			{@render tableHead('roaster')}
-			{@render tableHead('process')}
-			{@render tableHead('roastingDate', 'Roasted')}
-		</tr>
-	</thead>
-	<tbody>
-		{#each sortedCoffees as coffee (coffee.id)}
-			<tr class="content-center">
-				<td><a href="/coffees/{coffee.id}/doses">{coffee.name}</a></td>
-				<td>
-					<button
-						onclick={() => {
-							filters = [...filters, { key: 'country', value: coffee.country }];
-						}}
-					>
-						{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
-					</button>
-				</td>
-				<td
-					><button
-						onclick={() => {
-							filters = [...filters, { key: 'varietals', value: coffee.varietals }];
-						}}>{coffee.varietals}</button
-					></td
-				>
-				<td
-					><button
-						onclick={() => {
-							filters = [...filters, { key: 'roaster', value: coffee.roaster }];
-						}}>{coffee.roaster}</button
-					></td
-				>
-				<td>
-					<div class="badge badge-primary">washed</div>
-				</td>
-				<td>{coffee.roastingDate}</td>
+	<table class="table table-auto border-collapse">
+		<thead>
+			<tr>
+				{@render tableHead('name')}
+				{@render tableHead('country')}
+				{@render tableHead('varietals')}
+				{@render tableHead('roaster')}
+				{@render tableHead('process')}
+				{@render tableHead('roastingDate', 'Roasted')}
 			</tr>
-		{/each}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			{#each sortedCoffees as coffee (coffee.id)}
+				<tr class="content-center">
+					<td><a href="/coffees/{coffee.id}">{coffee.name}</a></td>
+					<td>
+						<button
+							onclick={() => {
+								filters = [...filters, { key: 'country', value: coffee.country }];
+							}}
+						>
+							{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
+						</button>
+					</td>
+					<td
+						><button
+							onclick={() => {
+								filters = [...filters, { key: 'varietals', value: coffee.varietals }];
+							}}>{coffee.varietals}</button
+						></td
+					>
+					<td
+						><button
+							onclick={() => {
+								filters = [...filters, { key: 'roaster', value: coffee.roaster }];
+							}}>{coffee.roaster}</button
+						></td
+					>
+					<td>
+						<div class="tooltip" data-tip={coffee.process}>
+							<div class="badge badge-primary">washed</div>
+						</div>
+					</td>
+					<td>{coffee.roastingDate}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>

@@ -1,7 +1,8 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import BQJson from './bq.json';
-import { coffees, db } from '$lib/db';
+import { db } from '$lib/db';
 import { coffeeSchema } from '$lib/schemas';
+import { coffees } from '$lib/db/schema';
 
 type BQ = typeof BQJson;
 

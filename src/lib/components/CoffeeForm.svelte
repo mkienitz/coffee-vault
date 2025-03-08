@@ -1,29 +1,35 @@
 <script lang="ts">
-	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import { coffeeSchema } from '$lib/schemas';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { getCountryCode, getEmojiFlag, countries, type TCountryCode } from 'countries-list';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { ChevronLeft } from 'lucide-svelte';
+	import { type CoffeeSchema } from '$lib/zod-schemas';
 
-	let { data } = $props();
-	const { form, errors, enhance } = superForm(data.form, {
-		resetForm: false,
-		validators: zodClient(coffeeSchema)
+	let { data, mode }: { data: SuperValidated<Infer<CoffeeSchema>>; mode: 'create' | 'edit' } =
+		$props();
+
+	const { form, enhance } = superForm(data, {
+		resetForm: mode === 'create',
+	});
+
+	const countryNames = Object.values(countries).map((country) => {
+		return {
+			value: country.name,
+			label: country.name
+		};
 	});
 </script>
 
 <div class="card w-fit shadow-xl">
 	<div class="card-body">
 		<div class="card-title flex flex-row items-center justify-start">
-			<button onclick={() => window.history.back()} class="btn">
+			<button onclick={() => window.history.back()} class="btn btn-link text-primary-content">
 				<ChevronLeft />Back
 			</button>
 			<span class="text-primary-content text-xl">
-				{!$form.id ? 'Add a new Coffee' : 'Edit existing Coffee'}
+				{mode === 'create' ? 'Add a new Coffee' : 'Edit existing Coffee'}
 			</span>
 		</div>
 		<form id="coffeeForm" method="POST" use:enhance class="flex flex-col space-y-4">
-			<input hidden bind:value={$form.id} name="id" />
 			<label class="form-control w-full max-w-xs">
 				<span class="text">Name</span>
 				<input
@@ -71,7 +77,7 @@
 			<label class="form-control w-full max-w-xs">
 				Country
 				<select name="country" bind:value={$form.country} class="select w-full max-w-xs">
-					{#each data.countryNames as countryName}
+					{#each countryNames as countryName}
 						<option value={countryName.value}>
 							{countryName.value}
 							{getEmojiFlag(getCountryCode(countryName.value) as TCountryCode)}
@@ -139,18 +145,34 @@
 			</label>
 			<label class="form-control flex w-full max-w-xs flex-col">
 				Notes
-				<textarea name="flavorProfile" bind:value={$form.notes} class="textarea"> </textarea>
+				<textarea name="notes" bind:value={$form.notes} class="textarea"> </textarea>
 			</label>
 		</form>
 		<div class="card-actions">
-			{#if $form.id}
-				<input type="submit" form="coffeeForm" class="btn btn-primary" value="Update" />
-				<input type="submit" form="coffeeForm" class="btn btn-error" name="delete" value="Delete" />
+			{#if mode === 'create'}
+				<input
+					type="submit"
+					value="Add Coffee"
+					form="coffeeForm"
+					formaction="?/create"
+					class="btn btn-success"
+				/>
 			{:else}
-				<input type="submit" form="coffeeForm" class="btn btn-success" value="Add Coffee" />
+				<input
+					type="submit"
+					value="Update"
+					form="coffeeForm"
+					formaction="?/update"
+					class="btn btn-primary"
+				/>
+				<input
+					type="submit"
+					value="Delete"
+					form="coffeeForm"
+					formaction="?/delete"
+					class="btn btn-error"
+				/>
 			{/if}
 		</div>
 	</div>
 </div>
-{$errors}
-<SuperDebug data={$form} />

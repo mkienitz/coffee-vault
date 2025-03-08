@@ -1,51 +1,9 @@
+import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
-import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { countries } from 'countries-list';
-import { randomBytes } from 'crypto';
-import { relations } from 'drizzle-orm';
-import { env } from '$env/dynamic/private';
+import { coffees, coffeesRelations, doses, dosesRelations } from './schema';
 
-const [c, ...cs] = Object.values(countries).map((c) => c.name);
-export const coffees = sqliteTable('coffees', {
-	id: integer('id').primaryKey({ autoIncrement: true }),
-	country: text('country', { enum: [c, ...cs] }).notNull(),
-	elevation: text('elevation').notNull(),
-	farm: text('farm').notNull(),
-	flavorProfile: text('flavorProfile').notNull(),
-	name: text('name').notNull(),
-	notes: text('notes').notNull(),
-	process: text('process').notNull(),
-	producer: text('producer').notNull(),
-	region: text('region').notNull(),
-	roaster: text('roaster').notNull(),
-	roastingDate: text('roastingDate').notNull(),
-	varietals: text('varietals').notNull(),
-	weight: real('weight').notNull()
+export const db = drizzle({
+	client: new Database(env.COFFEE_VAULT_DB_PATH),
+	schema: { coffees, doses, dosesRelations, coffeesRelations }
 });
-
-export const coffeesRelations = relations(coffees, ({ many }) => ({
-	doses: many(doses)
-}));
-
-export const doses = sqliteTable('doses', {
-	id: integer('id').primaryKey({ autoIncrement: true }),
-	token: text('token')
-		.unique()
-		.notNull()
-		.$defaultFn(() => randomBytes(32).toString('base64url')),
-	consumedOn: text('consumed_on'),
-	printed: integer('printed', { mode: 'boolean' }).notNull().default(false),
-	weight: real('weight').notNull(),
-	coffeeId: integer('coffee_id').notNull()
-});
-
-export const dosesRelations = relations(doses, ({ one }) => ({
-	coffee: one(coffees, {
-		fields: [doses.coffeeId],
-		references: [coffees.id]
-	})
-}));
-
-const sqlite = new Database(env.COFFEE_VAULT_DB_PATH);
-export const db = drizzle(sqlite, { schema: { coffees, doses, dosesRelations, coffeesRelations } });

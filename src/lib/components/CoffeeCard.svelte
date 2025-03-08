@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import type { CoffeeWithDoses } from '$lib/schemas';
-	let { coffee = $bindable() }: { coffee: CoffeeWithDoses } = $props();
+	import { type Coffee, type Dose } from '$lib/zod-schemas';
+
+	const { coffee, doses }: { coffee: Coffee; doses: Dose[] } = $props();
+
 	const remainingWeight = $derived(
-		coffee.weight -
-			coffee.doses
-				.filter((d) => d.consumedOn)
-				.map((d) => d.weight)
-				.reduce((a, b) => a + b, 0)
+		coffee.weight - doses.map((d) => d.weight!).reduce((a, b) => a + b, 0)
 	);
 </script>
 
@@ -18,7 +16,7 @@
 				<div class="text-2xl">
 					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
 				</div>
-				<a href={`/coffees/${coffee.id}`} class="h-fit w-fit p-0">Edit</a>
+				<a href={`/coffees/${coffee.id}/edit`} class="h-fit w-fit p-0">Edit</a>
 			</div>
 			<div class="flex w-[100%] flex-row items-center justify-between">
 				<small class="text-muted-foreground">{coffee.roaster}</small>
