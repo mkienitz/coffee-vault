@@ -56,7 +56,7 @@
 				{#each doses as dose}
 					{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
 					<tr>
-						<td class="max-w-[5rem] text-center">{tubeName}</td>
+						<td class="max-w-[5rem] text-center"><a href="/doses/{tubeName}">{tubeName}</a></td>
 						<td class="max-w-[5rem] text-center">{dose.weight}g</td>
 						<td class="text-center">
 							{dose.createdOn}
