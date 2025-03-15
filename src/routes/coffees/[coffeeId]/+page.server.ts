@@ -1,4 +1,4 @@
-import { db } from '$lib/db';
+import { clearDose, consumeDose, db, getDose } from '$lib/db';
 import { and, eq, isNull } from 'drizzle-orm';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
@@ -6,7 +6,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
 import { brews, coffees, doses } from '$lib/db/schema';
-import { doseCreationSchema, doseManagementSchema } from '$lib/zod-schemas';
+import { doseCreationSchema, doseManagementSchema, type Dose } from '$lib/zod-schemas';
 import { getCurrentDateTime } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -92,27 +92,13 @@ export const actions: Actions = {
 				form
 			});
 		}
-		const dose = await db.query.doses.findFirst({
-			where: and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber))
-		});
+		const dose = await getDose(form.data);
 		if (!dose || !dose.weight || !dose.coffeeId || !dose.creationDate) {
 			return fail(400, {
 				form
 			});
 		}
-		await db.transaction(async (tx) => {
-			// Create brew
-			await tx.insert(brews).values({
-				coffeeId: dose.coffeeId!,
-				weight: dose.weight!,
-				consumptionDate: getCurrentDateTime()
-			});
-			// Delete dose
-			await tx
-				.update(doses)
-				.set({ weight: null, creationDate: null, coffeeId: null })
-				.where(and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber)));
-		});
+		await consumeDose(dose as Dose);
 		return { form };
 	},
 	delete: async ({ request }) => {
@@ -123,10 +109,7 @@ export const actions: Actions = {
 				form
 			});
 		}
-		await db
-			.update(doses)
-			.set({ weight: null, creationDate: null, coffeeId: null })
-			.where(and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber)));
+		await clearDose(form.data);
 		return { form };
 	}
 };

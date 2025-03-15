@@ -4,7 +4,7 @@ import { relations } from 'drizzle-orm';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
-	id: integer().primaryKey({ autoIncrement: true }),
+	id: integer().primaryKey({ autoIncrement: true }).notNull(),
 	country: text({ enum: [c, ...cs] }).notNull(),
 	elevation: text().notNull(),
 	farm: text().notNull(),
@@ -28,8 +28,8 @@ export const coffeesRelations = relations(coffees, ({ many }) => ({
 export const doses = sqliteTable(
 	'doses',
 	{
-		drawer: text({ enum: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'] }),
-		tubeNumber: text({ enum: ['1', '2', '3', '4', '5', '6', '7', '8'] }),
+		drawer: text({ enum: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'] }).notNull(),
+		tubeNumber: text({ enum: ['1', '2', '3', '4', '5', '6', '7', '8'] }).notNull(),
 		creationDate: text(),
 		weight: real(),
 		coffeeId: integer().references(() => coffees.id)
@@ -45,7 +45,7 @@ export const dosesRelations = relations(doses, ({ one }) => ({
 }));
 
 export const brews = sqliteTable('brews', {
-	id: integer().primaryKey({ autoIncrement: true }),
+	id: integer().primaryKey({ autoIncrement: true }).notNull(),
 	coffeeId: integer()
 		.references(() => coffees.id)
 		.notNull(),

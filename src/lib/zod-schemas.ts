@@ -28,17 +28,28 @@ export type Coffee = z.infer<typeof coffeeSchemaWithId>;
 // DOSES
 const drawerSchema = z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']);
 export type Drawer = z.infer<typeof drawerSchema>;
+
 const tubeNumberSchema = z.enum(['1', '2', '3', '4', '5', '6', '7', '8']);
 export type TubeNumber = z.infer<typeof tubeNumberSchema>;
-const doseSchema = z.object({
+
+export const doseManagementSchema = z.object({
 	drawer: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']),
-	tubeNumber: z.enum(['1', '2', '3', '4', '5', '6', '7', '8']),
+	tubeNumber: z.enum(['1', '2', '3', '4', '5', '6', '7', '8'])
+});
+export type DoseIdentifier = z.infer<typeof doseManagementSchema>;
+
+const doseSchema = doseManagementSchema.extend({
 	weight: z.number(),
 	creationDate: z.string(),
 	coffeeId: z.number()
 });
 export type Dose = z.infer<typeof doseSchema>;
-export const doseManagementSchema = doseSchema.pick({ drawer: true, tubeNumber: true });
+export type EmptyDose = DoseIdentifier & {
+	weight: null;
+	creatioDate: null;
+	coffeeId: null;
+};
+
 export const doseCreationSchema = doseSchema.pick({ weight: true });
 
 // BREWS
