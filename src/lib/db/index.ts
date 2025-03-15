@@ -2,8 +2,8 @@ import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import { brews, brewsRelations, coffees, coffeesRelations, doses, dosesRelations } from './schema';
-import type { Dose, DoseIdentifier, Drawer, EmptyDose, TubeNumber } from '$lib/zod-schemas';
-import { and, eq } from 'drizzle-orm';
+import type { CoffeeWithDosesAndBrews, DoseIdentifier } from '$lib/zod-schemas';
+import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { getCurrentDateTime } from '$lib/utils';
 
 export const db = drizzle({
@@ -11,38 +11,108 @@ export const db = drizzle({
 	schema: { coffees, coffeesRelations, doses, dosesRelations, brews, brewsRelations }
 });
 
-export async function clearDose(dose: DoseIdentifier) {
-	await db
-		.update(doses)
-		.set({ weight: null, creationDate: null, coffeeId: null })
-		.where(and(eq(doses.drawer, dose.drawer), eq(doses.tubeNumber, dose.tubeNumber)));
+// COFFEES
+export async function getCoffeeWithDosesAndBrews(
+	coffeeId: number
+): Promise<CoffeeWithDosesAndBrews> {
+	const coffee = await db.query.coffees.findFirst({
+		where: eq(coffees.id, coffeeId),
+		with: {
+			doses: true,
+			brews: true
+		}
+	})!;
+	if (!coffee) {
+		throw new Error();
+	}
+	return coffee as CoffeeWithDosesAndBrews;
 }
 
-export async function consumeDose(dose: Dose) {
+// DOSES
+type AddDoseResult = {
+	success: boolean;
+	error: 'Not enough coffee left' | 'No empty tube available' | undefined;
+};
+export async function addDose(coffeeId: number, weight: number): Promise<AddDoseResult> {
+	return await db.transaction(async (tx) => {
+		// Get coffee
+		const coffee = await tx.query.coffees.findFirst({
+			where: eq(coffees.id, coffeeId),
+			with: {
+				doses: true,
+				brews: true
+			}
+		});
+		if (!coffee) {
+			throw new Error();
+		}
+		// Check if enough coffee is left
+		const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
+		const dosed = coffee.doses.reduce((acc, dose) => acc + dose.weight!, 0);
+		const remainingCoffee = coffee.weight - brewed - dosed;
+		if (weight > remainingCoffee) {
+			return {
+				success: false,
+				error: 'Not enough coffee left'
+			} satisfies AddDoseResult;
+		}
+		// Update first empty dose
+		const dose = await tx
+			.update(doses)
+			.set({ weight, creationDate: getCurrentDateTime(), coffeeId: coffee.id })
+			.where(isNull(doses.coffeeId))
+			.limit(1)
+			.returning();
+		if (dose.length !== 1) {
+			return {
+				success: false,
+				error: 'No empty tube available'
+			} satisfies AddDoseResult;
+		}
+		return {
+			success: true,
+			error: undefined
+		} satisfies AddDoseResult;
+	});
+}
+
+type DBHandle = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
+async function clearDoseHelper(dbHandle: DBHandle, doseIdent: DoseIdentifier): Promise<void> {
+	const res = await dbHandle
+		.update(doses)
+		.set({ weight: null, creationDate: null, coffeeId: null })
+		.where(
+			and(
+				eq(doses.drawer, doseIdent.drawer),
+				eq(doses.tubeNumber, doseIdent.tubeNumber),
+				isNotNull(doses.coffeeId),
+				isNotNull(doses.weight),
+				isNotNull(doses.creationDate)
+			)
+		)
+		.returning();
+	if (res.length !== 1) {
+		throw new Error();
+	}
+}
+
+export async function clearDose(dose: DoseIdentifier): Promise<void> {
+	await clearDoseHelper(db, dose);
+}
+
+export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
 	await db.transaction(async (tx) => {
-		// Create brew
+		const dose = await tx.query.doses.findFirst({
+			where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
+		});
+		if (!dose) {
+			throw Error();
+		}
+		await clearDoseHelper(tx, doseIdent);
 		await tx.insert(brews).values({
 			coffeeId: dose.coffeeId!,
 			weight: dose.weight!,
 			consumptionDate: getCurrentDateTime()
 		});
-		// Clear dose
-		await tx
-			.update(doses)
-			.set({ weight: null, creationDate: null, coffeeId: null })
-			.where(and(eq(doses.drawer, dose.drawer), eq(doses.tubeNumber, dose.tubeNumber)));
 	});
-}
-
-export async function getDose(dose: DoseIdentifier): Promise<Dose | EmptyDose | undefined> {
-	const res = await db.query.doses.findFirst({
-		where: and(eq(doses.drawer, dose.drawer), eq(doses.tubeNumber, dose.tubeNumber))
-	});
-	if (!res) {
-		return undefined;
-	}
-	if (res.coffeeId && res.creationDate && res.weight) {
-		return res as Dose;
-	}
-	return res as unknown as EmptyDose;
 }

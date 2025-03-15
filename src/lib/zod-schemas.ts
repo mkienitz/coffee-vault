@@ -59,3 +59,6 @@ const brewSchema = z.object({
 	coffeeId: z.number()
 });
 export type Brew = z.infer<typeof brewSchema>;
+
+// COMBINATORS
+export type CoffeeWithDosesAndBrews = Coffee & { doses: Dose[]; brews: Brew[] };
