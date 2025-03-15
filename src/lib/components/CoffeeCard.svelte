@@ -9,14 +9,14 @@
 	);
 </script>
 
-<div class="card flex w-[400px] flex-col shadow-xl">
+<div class="card flex max-h-fit w-[400px] flex-col shadow-xl">
 	<div class="card-body flex flex-col space-y-8">
 		<div class="card-title flex flex-col space-y-1">
 			<div class="flex w-[100%] flex-row items-center justify-between">
-				<div class="text-2xl">
+				<a href="/coffees/{coffee.id}" class="text-2xl">
 					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
-				</div>
-				<a href={`/coffees/${coffee.id}/edit`} class="h-fit w-fit p-0">Edit</a>
+				</a>
+				<a href="/coffees/{coffee.id}/edit" class="link h-fit w-fit p-0">Edit</a>
 			</div>
 			<div class="flex w-[100%] flex-row items-center justify-between">
 				<small class="text-muted-foreground">{coffee.roaster}</small>

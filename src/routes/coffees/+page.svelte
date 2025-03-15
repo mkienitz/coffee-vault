@@ -82,7 +82,7 @@
 				</button>
 			{/each}
 		</div>
-		<a href="/coffees/new"><button class="btn btn-success">Add Coffee</button></a>
+		<a href="/coffees/new" class="btn btn-success">Add Coffee</a>
 	</div>
 	<table class="table-pin-rows table table-auto border-collapse">
 		<thead>

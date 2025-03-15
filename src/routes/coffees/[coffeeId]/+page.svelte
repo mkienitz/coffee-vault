@@ -18,11 +18,11 @@
 	const { enhance: managementEnhance, formId: managementId } = superForm(data.managementForm);
 </script>
 
-<div class="flex flex-col items-center space-y-8">
+<div class="grid grid-cols-1 justify-items-center space-y-8">
 	<CoffeeCard {coffee} {doses} />
 
 	<div class="flex w-full flex-col space-y-4">
-		<form id="creationForm" method="POST" use:creationEnhance class="self-end">
+		<form id="creationForm" method="POST" use:creationEnhance class="self-end space-x-2">
 			<label class="input max-w-fit">
 				<input
 					name="weight"
@@ -32,7 +32,7 @@
 					placeholder="12.5"
 					step="0.5"
 					bind:value={$creationForm.weight}
-					class="w-[3rem]"
+					class="max-w-[3.5rem]"
 				/>
 				<span class="label">g</span>
 			</label>
@@ -58,7 +58,9 @@
 				{#each doses as dose}
 					{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
 					<tr>
-						<td class="max-w-[5rem] text-center"><a href="/doses/{tubeName}">{tubeName}</a></td>
+						<td class="max-w-[5rem] text-center"
+							><a href="/doses/{tubeName}" class="link font-bold">{tubeName}</a></td
+						>
 						<td class="max-w-[5rem] text-center">{dose.weight}g</td>
 						<td class="text-center">
 							{dose.createdOn}
