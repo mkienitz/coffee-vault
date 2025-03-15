@@ -30,7 +30,7 @@ export type Drawer = z.infer<typeof drawerSchema>;
 const tubeNumberSchema = z.enum(['1', '2', '3', '4', '5', '6', '7', '8']);
 export type TubeNumber = z.infer<typeof tubeNumberSchema>;
 
-export const doseSchema = z.object({
+const doseSchema = z.object({
 	drawer: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']),
 	tubeNumber: z.enum(['1', '2', '3', '4', '5', '6', '7', '8']),
 	weight: z.number(),
