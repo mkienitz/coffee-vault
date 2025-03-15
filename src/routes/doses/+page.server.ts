@@ -1,14 +1,11 @@
 import { db } from '$lib/db';
-import { count, isNull } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
-import { doses } from '$lib/db/schema';
+import type { Dose } from '$lib/zod-schemas';
+import * as _ from 'radash';
 
 export const load: PageServerLoad = async () => {
-	const emptyDoses = await db.select({ count: count() }).from(doses).where(isNull(doses.coffeeId));
-	const allDoses = await db.query.doses.findMany();
-
+	const allDoses = (await db.query.doses.findMany()) as Dose[];
 	return {
-		doses: allDoses,
-		count: emptyDoses[0].count
+		doses: _.group(allDoses, (dose) => dose.drawer)
 	};
 };
