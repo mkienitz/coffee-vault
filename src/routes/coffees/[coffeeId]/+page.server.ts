@@ -54,21 +54,23 @@ export const actions: Actions = {
 			});
 		}
 
-		// Make sure there is enough coffee left to dose
 		const coffee = await db.query.coffees.findFirst({
 			where: eq(coffees.id, Number(params.coffeeId)),
 			with: {
-				doses: true
+				doses: true,
+				brews: true
 			}
 		});
 		// TODO: neccessary?
 		if (!coffee) {
-			throw error(404, 'Coffe not found. Cannot show doses.');
+			throw error(404, 'Coffee not found. Cannot show doses.');
 		}
 
-		const dosed = coffee.doses.map((dose) => dose.weight!).reduce((a, b) => a + b, 0);
-		const undosed = coffee.weight - dosed;
-		if (form.data.weight > undosed) {
+		// Make sure there is enough coffee left to dose
+		const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
+		const dosed = coffee.doses.reduce((acc, dose) => acc + dose.weight!, 0);
+		const remainingCoffee = coffee.weight - brewed - dosed;
+		if (form.data.weight > remainingCoffee) {
 			setFlash({ type: 'error', message: 'Not enough coffee left to create new dose' }, cookies);
 			return fail(400, {
 				form
