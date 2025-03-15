@@ -9,7 +9,7 @@
 			{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
 			<div
 				class="flex h-8 w-8 items-center justify-center rounded-full font-mono
-				{dose.coffeeId ? 'bg-error' : 'bg-success'}"
+				{dose.coffeeId ? 'bg-success' : 'bg-neutral-600'}"
 			>
 				{#if dose.coffeeId}
 					<a href="/doses/{tubeName}" class="link">
