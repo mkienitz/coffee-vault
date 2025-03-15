@@ -12,7 +12,9 @@
 
 	const doses = $derived(coffee.doses as Dose[]);
 
-	const { form: creationForm, enhance: creationEnhance } = superForm(data.creationForm);
+	const { form: creationForm, enhance: creationEnhance } = superForm(data.creationForm, {
+		resetForm: false
+	});
 	const { enhance: managementEnhance, formId: managementId } = superForm(data.managementForm);
 </script>
 
