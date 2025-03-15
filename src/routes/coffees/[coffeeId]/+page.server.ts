@@ -5,14 +5,16 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
-import { coffees, doses } from '$lib/db/schema';
+import { brews, coffees, doses } from '$lib/db/schema';
 import { doseCreationSchema, doseManagementSchema } from '$lib/zod-schemas';
+import { getCurrentDateTime } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const coffee = await db.query.coffees.findFirst({
 		where: eq(coffees.id, Number(params.coffeeId)),
 		with: {
-			doses: true
+			doses: true,
+			brews: true
 		}
 	});
 
@@ -72,34 +74,45 @@ export const actions: Actions = {
 				form
 			});
 		}
-		const time = new Intl.DateTimeFormat('en-DE', {
-			timeStyle: 'short',
-			dateStyle: 'short'
-		}).format(Date.now());
 
 		await db
 			.update(doses)
-			.set({ coffeeId: coffee.id, weight: form.data.weight, createdOn: time })
+			.set({ coffeeId: coffee.id, weight: form.data.weight, creationDate: getCurrentDateTime() })
 			.where(and(eq(doses.drawer, emptyTube.drawer!), eq(doses.tubeNumber, emptyTube.tubeNumber!)));
 
 		return { form };
 	},
-	//consume: async ({ request }) => {
-	//	const formData = await request.formData();
-	//	const form = await superValidate(formData, zod(doseSchema));
-	//	if (!form.valid) {
-	//		return fail(400, {
-	//			form
-	//		});
-	//	}
-	//	const time = new Intl.DateTimeFormat('en-DE', {
-	//		timeStyle: 'short',
-	//		dateStyle: 'short'
-	//	}).format(Date.now());
-	//
-	//	await db.update(doses).set({ consumedOn: time }).where(eq(doses.id, form.data.id!));
-	//	return { form };
-	//},
+	consume: async ({ request }) => {
+		const formData = await request.formData();
+		const form = await superValidate(formData, zod(doseManagementSchema));
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+		const dose = await db.query.doses.findFirst({
+			where: and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber))
+		});
+		if (!dose || !dose.weight || !dose.coffeeId || !dose.creationDate) {
+			return fail(400, {
+				form
+			});
+		}
+		await db.transaction(async (tx) => {
+			// Create brew
+			await tx.insert(brews).values({
+				coffeeId: dose.coffeeId!,
+				weight: dose.weight!,
+				consumptionDate: getCurrentDateTime()
+			});
+			// Delete dose
+			await tx
+				.update(doses)
+				.set({ weight: null, creationDate: null, coffeeId: null })
+				.where(and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber)));
+		});
+		return { form };
+	},
 	delete: async ({ request }) => {
 		const formData = await request.formData();
 		const form = await superValidate(formData, zod(doseManagementSchema));
@@ -110,42 +123,8 @@ export const actions: Actions = {
 		}
 		await db
 			.update(doses)
-			.set({ weight: null, createdOn: null, coffeeId: null })
+			.set({ weight: null, creationDate: null, coffeeId: null })
 			.where(and(eq(doses.drawer, form.data.drawer), eq(doses.tubeNumber, form.data.tubeNumber)));
 		return { form };
 	}
-	//print: async ({ request }) => {
-	//	const formData = await request.formData();
-	//	const form = await superValidate(formData, zod(doseSchema));
-	//	if (!form.valid) {
-	//		return fail(400, {
-	//			form
-	//		});
-	//	}
-	//	const res = await db
-	//		.update(doses)
-	//		.set({ printed: true })
-	//		.where(eq(doses.id, form.data.id!))
-	//		.returning({ token: doses.token });
-	//	printQRCodes(res.map((t) => t.token));
-	//	return { form };
-	//},
-	//printAll: async ({ request, params }) => {
-	//	const formData = await request.formData();
-	//	const form = await superValidate(formData, zod(doseSchema));
-	//	if (!form.valid) {
-	//		return fail(400, {
-	//			form
-	//		});
-	//	}
-	//	const res = await db
-	//		.update(doses)
-	//		.set({ printed: true })
-	//		.where(and(eq(doses.coffeeId, Number(params.coffeeId)), eq(doses.printed, false)))
-	//		.returning({
-	//			token: doses.token
-	//		});
-	//	printQRCodes(res.map((t) => t.token));
-	//	return { form };
-	//}
 };

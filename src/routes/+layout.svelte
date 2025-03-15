@@ -26,7 +26,11 @@
 
 {#snippet NavElem(pathname: string)}
 	{@const path = `/${pathname.toLowerCase()}`}
-	<li><a href={path} class={path === page.url.pathname ? 'underline font-bold' : ''}>{pathname}</a></li>
+	<li>
+		<a href={path} class="text-lg {path === page.url.pathname ? 'font-bold underline' : ''}"
+			>{pathname}</a
+		>
+	</li>
 {/snippet}
 
 {#snippet NavMenu()}
@@ -37,7 +41,7 @@
 {/snippet}
 
 <header>
-	<div class="navbar mb-6 shadow-sm">
+	<nav class="navbar h-16 bg-base-100 fixed top-0 z-50 shadow-sm">
 		<div class="navbar-start">
 			<div class="dropdown">
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -47,7 +51,7 @@
 					{@render NavMenu()}
 				</ul>
 			</div>
-			<a href="/" class="btn btn-ghost text-xl no-underline">CoffeeVault</a>
+			<a href="/" class="btn btn-ghost font-mono text-2xl no-underline">CoffeeVault</a>
 		</div>
 		<div class="navbar-center hidden lg:flex">
 			<ul class="menu menu-horizontal px-1">
@@ -57,8 +61,8 @@
 		<div class="navbar-end">
 			<a href="/login" class="btn">Login</a>
 		</div>
-	</div>
+	</nav>
 </header>
-<main class="flex flex-col items-center">
+<main class="mt-16 pt-4 flex flex-col items-center">
 	{@render children()}
 </main>

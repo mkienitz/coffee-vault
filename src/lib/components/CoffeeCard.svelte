@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import { type Coffee, type Dose } from '$lib/zod-schemas';
+	import { type Coffee, type Dose, type Brew } from '$lib/zod-schemas';
 
-	const { coffee, doses }: { coffee: Coffee; doses: Dose[] } = $props();
+	const { coffee, doses, brews }: { coffee: Coffee; doses: Dose[]; brews: Brew[] } = $props();
 
 	const remainingWeight = $derived(
-		coffee.weight - doses.map((d) => d.weight!).reduce((a, b) => a + b, 0)
+		coffee.weight - brews.reduce((acc, brew) => acc + brew.weight, 0)
 	);
 </script>
 

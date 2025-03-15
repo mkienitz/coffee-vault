@@ -1,6 +1,12 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import type { Dose } from './zod-schemas';
 
-export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+export function getCurrentDateTime() {
+	return new Intl.DateTimeFormat('en-DE', {
+		timeStyle: 'short',
+		dateStyle: 'short'
+	}).format(Date.now());
+}
+
+export function getTubeName(dose: Dose) {
+	return `${dose.drawer}${dose.tubeNumber}`;
 }

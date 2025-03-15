@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 	const coffee = await db.query.coffees.findFirst({
 		where: eq(coffees.id, dose.coffeeId!),
-		with: { doses: true }
+		with: { doses: true, brews: true }
 	});
 	return {
 		coffee,

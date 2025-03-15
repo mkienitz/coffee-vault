@@ -21,7 +21,8 @@ export const coffees = sqliteTable('coffees', {
 });
 
 export const coffeesRelations = relations(coffees, ({ many }) => ({
-	doses: many(doses)
+	doses: many(doses),
+	brews: many(brews)
 }));
 
 export const doses = sqliteTable(
@@ -29,7 +30,7 @@ export const doses = sqliteTable(
 	{
 		drawer: text({ enum: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'] }),
 		tubeNumber: text({ enum: ['1', '2', '3', '4', '5', '6', '7', '8'] }),
-		createdOn: text(),
+		creationDate: text(),
 		weight: real(),
 		coffeeId: integer().references(() => coffees.id)
 	},
@@ -39,6 +40,22 @@ export const doses = sqliteTable(
 export const dosesRelations = relations(doses, ({ one }) => ({
 	coffee: one(coffees, {
 		fields: [doses.coffeeId],
+		references: [coffees.id]
+	})
+}));
+
+export const brews = sqliteTable('brews', {
+	id: integer().primaryKey({ autoIncrement: true }),
+	coffeeId: integer()
+		.references(() => coffees.id)
+		.notNull(),
+	consumptionDate: text().notNull(),
+	weight: real().notNull()
+});
+
+export const brewsRelations = relations(brews, ({ one }) => ({
+	coffee: one(coffees, {
+		fields: [brews.coffeeId],
 		references: [coffees.id]
 	})
 }));

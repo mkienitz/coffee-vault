@@ -1,26 +1,29 @@
 <script lang="ts">
 	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
-	import { type Dose } from '$lib/zod-schemas';
+	import { type Dose, type Brew } from '$lib/zod-schemas';
+	import { getTubeName } from '$lib/utils';
 	const { data } = $props();
-	const { coffee, dose } = data;
+	const coffee = data.coffee;
+	const dose = data.dose;
 </script>
 
 <div class="flex flex-col items-center space-y-8">
 	{#if coffee}
-		<CoffeeCard {coffee} doses={coffee!.doses as Dose[]} />
-		<!--
-		<form method="POST">
-			<button
-				class="w-full"
-				name="id"
-				value={dose.id}
-				formaction="/coffees/{coffee.id}/doses?/consume">Mark {dose.weight}g as consumed</button
-			>
-			<input type="hidden" name="__superform_id" value={dose.id.toString()} />
-		</form>
-		-->
+		{@const doses = coffee!.doses as Dose[]}
+		{@const brews = coffee!.brews as Brew[]}
+		<CoffeeCard {coffee} {doses} {brews} />
 		<span>This tube holds {dose.weight}g of coffee</span>
-		<button class="btn btn-primary">Consume Button (WIP)</button>
+		<form method="POST">
+			<input
+				type="submit"
+				formaction="/coffees/{coffee.id}?/consume"
+				value="Consume"
+				class="btn btn-primary"
+			/>
+			<input hidden name="drawer" value={dose.drawer} />
+			<input hidden name="tubeNumber" value={dose.tubeNumber} />
+			<input type="hidden" name="__superform_id" value={getTubeName(dose)} />
+		</form>
 	{:else}
 		<span>This tube is currently empty</span>
 	{/if}
