@@ -12,6 +12,11 @@
 
 	const doses = $derived(coffee.doses as Dose[]);
 	const brews = $derived(coffee.brews);
+	const leftToDose = $derived(
+		coffee.weight -
+			brews.reduce((acc, brew) => acc + brew.weight, 0) -
+			doses.reduce((acc, dose) => acc + dose.weight, 0)
+	);
 
 	const { form: creationForm, enhance: creationEnhance } = superForm(data.creationForm, {
 		resetForm: false
@@ -21,31 +26,34 @@
 
 <div class="grid grid-cols-1 justify-items-center space-y-8">
 	<CoffeeCard {coffee} {doses} {brews} />
-
-	<div class="prose flex w-full flex-col space-y-4">
+	<div class="prose flex w-full flex-col">
 		<h2>Doses</h2>
-		<form id="creationForm" method="POST" use:creationEnhance class="space-x-2 self-end">
-			<label class="input max-w-fit">
+		<div class="flex items-center place-content-between">
+			<span>Left to dose: {leftToDose}g</span>
+			<form id="creationForm" method="POST" use:creationEnhance class="space-x-2">
+				<label class="input max-w-fit">
+					<input
+						name="weight"
+						type="number"
+						min="1"
+						max="20"
+						placeholder="12.5"
+						step="0.5"
+						bind:value={$creationForm.weight}
+						class="max-w-[3.5rem]"
+					/>
+					<span class="label">g</span>
+				</label>
 				<input
-					name="weight"
-					type="number"
-					min="1"
-					max="20"
-					placeholder="12.5"
-					step="0.5"
-					bind:value={$creationForm.weight}
-					class="max-w-[3.5rem]"
+					type="submit"
+					value="Add Dose"
+					form="creationForm"
+					formaction="?/add"
+					disabled={$creationForm.weight > leftToDose}
+					class="btn btn-success"
 				/>
-				<span class="label">g</span>
-			</label>
-			<input
-				type="submit"
-				value="Add Dose"
-				form="creationForm"
-				formaction="?/add"
-				class="btn btn-success"
-			/>
-		</form>
+			</form>
+		</div>
 		<table class="table">
 			<thead>
 				<tr>
@@ -103,7 +111,7 @@
 		</table>
 	</div>
 
-	<div class="prose flex w-full flex-col space-y-4">
+	<div class="prose flex w-full flex-col">
 		<h2>Brews</h2>
 		<table class="table">
 			<thead>
