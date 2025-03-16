@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { type Coffee, type Dose, type Brew } from '$lib/zod-schemas';
+	import { getCoffeeFlag } from '$lib/utils'
 
 	const { coffee, doses, brews }: { coffee: Coffee; doses: Dose[]; brews: Brew[] } = $props();
 
@@ -14,7 +14,7 @@
 		<div class="card-title flex flex-col space-y-1">
 			<div class="flex w-[100%] flex-row items-center justify-between">
 				<a href="/coffees/{coffee.id}" class="text-2xl">
-					{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.name}`}
+					{`${getCoffeeFlag(coffee)} ${coffee.name}`}
 				</a>
 				<a href="/coffees/{coffee.id}/edit" class="link h-fit w-fit p-0">Edit</a>
 			</div>

@@ -1,4 +1,5 @@
-import type { Dose } from './zod-schemas';
+import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
+import type { Coffee, Dose } from './zod-schemas';
 
 export function getCurrentDateTime() {
 	return new Intl.DateTimeFormat('en-DE', {
@@ -9,4 +10,8 @@ export function getCurrentDateTime() {
 
 export function getTubeName(dose: Dose) {
 	return `${dose.drawer}${dose.tubeNumber}`;
+}
+
+export function getCoffeeFlag(coffee: Coffee) {
+	return getEmojiFlag(getCountryCode(coffee.country) as TCountryCode);
 }
