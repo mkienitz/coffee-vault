@@ -1,13 +1,10 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import BQJson from './bq.json';
 import { db } from '$lib/db';
-import { coffeeSchema } from '$lib/schemas';
 import { coffees } from '$lib/db/schema';
-
-type BQ = typeof BQJson;
+import { coffeeSchema } from '$lib/zod-schemas';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const bqData: BQ = await request.json();
+	const bqData = await request.json();
 	const beans = bqData.BEANS;
 	for (const bean of beans) {
 		const { farm, farmer, variety, country, elevation, processing, region }: any =
