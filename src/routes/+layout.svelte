@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.css';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
