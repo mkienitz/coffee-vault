@@ -27,6 +27,7 @@
         inputs.flake-parts.flakeModules.easyOverlay
         inputs.pre-commit-hooks.flakeModule
         inputs.treefmt-nix.flakeModule
+        ./nix/module.nix
       ];
       flake = {
       };
@@ -37,7 +38,12 @@
         "x86_64-darwin"
       ];
       perSystem =
-        { pkgs, config, ... }:
+        {
+          pkgs,
+          config,
+          lib,
+          ...
+        }:
         {
           devshells.default = {
             devshell.startup.pre-commit.text = config.pre-commit.installationScript;
@@ -53,15 +59,7 @@
             env = [
               {
                 name = "COFFEE_VAULT_DB_PATH";
-                value = "./sqlite.db";
-              }
-              {
-                name = "COFFEE_VAULT_BQL_PRINT_ADDRESS";
-                value = "192.168.178.32";
-              }
-              {
-                name = "COFFEE_VAULT_BQL_PRINT_PORT";
-                value = "10001";
+                value = "./db.sqlite";
               }
               {
                 name = "COFFEE_VAULT_DOMAIN";
@@ -69,7 +67,30 @@
               }
             ];
           };
+
           pre-commit.settings.hooks.treefmt.enable = true;
+
+          packages.default = pkgs.buildNpmPackage {
+            pname = "coffee-vault";
+            version = "0.0.1";
+            src = ./.;
+            npmDepsHash = "sha256-erwLmZ+/J1iF9YxndwGk+AwMB3SVA4s4Tk3xeClogAI=";
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out/bin $out/share
+              cp -R build $out/share/
+              makeWrapper ${lib.getExe pkgs.nodejs_22} $out/bin/coffee-vault \
+                --add-flags $out/share/build
+              runHook postInstall
+            '';
+            meta = {
+              description = "A manager for frozen coffee";
+              mainProgram = "coffee-vault";
+            };
+          };
+
+          overlayAttrs.coffee-vault = config.packages.default;
 
           treefmt = {
             projectRootFile = "flake.nix";
