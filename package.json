@@ -52,7 +52,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@libsql/client": "^0.15.4",
+		"@libsql/client": "^0.15.8",
 		"@sveltejs/adapter-node": "^5.2.11",
 		"radash": "^12.1.0"
 	}
