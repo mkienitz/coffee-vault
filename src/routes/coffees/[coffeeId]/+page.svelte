@@ -117,28 +117,33 @@
 	<div class="prose flex w-full flex-col">
 		<h2>Doses</h2>
 		<DoseCreatePanel />
-		<DoseTable />
 		{#if doses.length === 0}
-			<span class="self-center">There are currently no doses</span>
+			<span class="mt-8 self-center">There are currently no doses</span>
+		{:else}
+			<DoseTable />
 		{/if}
 	</div>
 	<div class="prose flex w-full flex-col">
 		<h2>Brews</h2>
-		<table class="table">
-			<thead>
-				<tr>
-					<th scope="col" class="text-center">Weight</th>
-					<th scope="col" class="text-center">Brewed on</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each brews as brew}
+		{#if brews.length === 0}
+			<span class="self-center">There are no recorded brews</span>
+		{:else}
+			<table class="table">
+				<thead>
 					<tr>
-						<td class="max-w-[5rem] text-center">{brew.weight}g</td>
-						<td class="text-center">{brew.consumptionDate}</td>
+						<th scope="col" class="text-center">Weight</th>
+						<th scope="col" class="text-center">Brewed on</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each brews as brew}
+						<tr>
+							<td class="max-w-[5rem] text-center">{brew.weight}g</td>
+							<td class="text-center">{brew.consumptionDate}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		{/if}
 	</div>
 </div>

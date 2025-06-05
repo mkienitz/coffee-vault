@@ -8,7 +8,7 @@
 		$props();
 
 	const { form, enhance } = superForm(data, {
-		resetForm: mode === 'create',
+		resetForm: mode === 'create'
 	});
 
 	const countryNames = Object.values(countries).map((country) => {

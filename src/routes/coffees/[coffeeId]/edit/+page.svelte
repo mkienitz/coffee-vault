@@ -4,5 +4,4 @@
 	let { data } = $props();
 </script>
 
-<CoffeeForm data={data.form} mode="edit"/>
-
+<CoffeeForm data={data.form} mode="edit" />

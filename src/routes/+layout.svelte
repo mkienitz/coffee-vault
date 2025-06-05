@@ -42,7 +42,7 @@
 {/snippet}
 
 <header>
-	<nav class="navbar h-16 bg-base-100 fixed top-0 z-50 shadow-sm">
+	<nav class="navbar bg-base-100 fixed top-0 z-50 h-16 shadow-sm">
 		<div class="navbar-start">
 			<div class="dropdown">
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -64,6 +64,6 @@
 		</div>
 	</nav>
 </header>
-<main class="mt-16 pt-4 flex flex-col items-center">
+<main class="mt-16 flex flex-col items-center pt-4">
 	{@render children()}
 </main>
