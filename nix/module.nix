@@ -45,11 +45,27 @@
               type = types.str;
               default = "/var/lib/coffee-vault";
             };
+            domain = mkOption {
+              description = ''
+                Domain the application is hosted on.
+                The physical NFC tags need a matching domain.
+              '';
+              type = types.str;
+            };
           };
           config = mkIf cfg.enable {
             nixpkgs.overlays = [
               flakeConfig.overlays.default
             ];
+            users = {
+              users.coffee-vault = {
+                group = "coffee-vault";
+                isSystemUser = true;
+                home = cfg.workingDirectory;
+                shell = "/sbin/nologin";
+              };
+              groups.coffee-vault = { };
+            };
             systemd.services.coffee-vault = {
               description = "coffee-vault";
               after = [
@@ -60,7 +76,7 @@
                 ExecStart = lib.getExe cfg.package;
                 User = "coffee-vault";
                 Group = "coffee-vault";
-                DynamicUser = true;
+                DynamicUser = false;
                 WorkingDirectory = cfg.workingDirectory;
                 StateDirectory = "coffee-vault";
                 StateDirectoryMode = "0750";
@@ -69,6 +85,7 @@
               environment = {
                 HOST = cfg.address;
                 PORT = toString cfg.port;
+                ORIGIN = "https://${cfg.domain}";
                 COFFEE_VAULT_DB_PATH = "${cfg.workingDirectory}/db.sqlite";
               };
             };

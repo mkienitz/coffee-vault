@@ -74,12 +74,12 @@
             pname = "coffee-vault";
             version = "0.0.1";
             src = ./.;
-            npmDepsHash = "sha256-erwLmZ+/J1iF9YxndwGk+AwMB3SVA4s4Tk3xeClogAI=";
+            npmDepsHash = "sha256-3NrrvF1CzhqTXWXIpis3EouvnfVeLolAVFMHWKCoDpQ=";
             nativeBuildInputs = [ pkgs.makeWrapper ];
             installPhase = ''
               runHook preInstall
               mkdir -p $out/bin $out/share
-              cp -R build $out/share/
+              cp -R build node_modules $out/share/
               makeWrapper ${lib.getExe pkgs.nodejs_22} $out/bin/coffee-vault \
                 --add-flags $out/share/build
               runHook postInstall
