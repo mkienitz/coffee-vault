@@ -23,6 +23,6 @@ export const actions: Actions = {
 			});
 		}
 		await db.insert(coffees).values(form.data);
-		redirect('/', { type: 'success', message: 'Coffee successfully added' }, cookies);
+		redirect('/coffees', { type: 'success', message: 'Coffee successfully added' }, cookies);
 	}
 };
