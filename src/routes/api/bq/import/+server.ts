@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { db } from '$lib/db';
-import { coffees } from '$lib/db/schema';
+import { db } from '$lib/server/db';
+import { coffees } from '$lib/server/db/schema';
 import { coffeeSchema } from '$lib/zod-schemas';
 
 export const POST: RequestHandler = async ({ request }) => {

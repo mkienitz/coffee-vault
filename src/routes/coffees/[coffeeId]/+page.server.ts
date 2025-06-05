@@ -1,4 +1,4 @@
-import { addDose, clearDose, consumeDose, getCoffeeWithDosesAndBrews } from '$lib/db';
+import { addDose, clearDose, consumeDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
 import { fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';

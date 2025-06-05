@@ -1,8 +1,8 @@
 import { and, eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/db';
-import { coffees, doses } from '$lib/db/schema';
+import { db } from '$lib/server/db';
+import { coffees, doses } from '$lib/server/db/schema';
 import type { Drawer, TubeNumber, Dose } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {

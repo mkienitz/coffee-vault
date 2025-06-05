@@ -1,4 +1,4 @@
-import { db } from '$lib/db';
+import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 import type { Dose } from '$lib/zod-schemas';
 import * as _ from 'radash';

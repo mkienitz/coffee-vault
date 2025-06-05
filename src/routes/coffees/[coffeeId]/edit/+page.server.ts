@@ -1,5 +1,5 @@
-import { coffees } from '$lib/db/schema';
-import { db } from '$lib/db';
+import { coffees } from '$lib/server/db/schema';
+import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { error, fail, type Actions } from '@sveltejs/kit';

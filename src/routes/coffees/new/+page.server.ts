@@ -1,5 +1,5 @@
-import { coffees } from '$lib/db/schema';
-import { db } from '$lib/db';
+import { coffees } from '$lib/server/db/schema';
+import { db } from '$lib/server/db';
 import { fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
