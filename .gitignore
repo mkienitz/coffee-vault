@@ -4,5 +4,6 @@ build
 package
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-sqlite.db
+db.sqlite
+result
 .pre-commit-config.yaml
