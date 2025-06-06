@@ -3,29 +3,28 @@
 	import { ArrowDownZa, ArrowUpAz, X } from 'lucide-svelte';
 
 	let { data } = $props();
-	const coffees = $state(data.coffees);
+	const tableEntries = $state(data.tableEntries);
 
-	type Coffee = (typeof coffees)[number];
-	type CoffeeKey = keyof Coffee;
+	type TableEntry = (typeof tableEntries)[number];
+	type TableEntryKey = keyof TableEntry;
 
 	// FILTERING
-	type Filter = { key: CoffeeKey; value: Coffee[CoffeeKey] };
+	type Filter = { key: TableEntryKey; value: TableEntry[TableEntryKey] };
 	let filters: Filter[] = $state([]);
-	let filteredCoffees = $derived(
-		coffees.filter((coffee) => {
-			return !filters.some(({ key, value }) => coffee[key] !== value);
+	let filteredEntries = $derived(
+		tableEntries.filter((tableEntry) => {
+			return !filters.some(({ key, value }) => tableEntry[key] !== value);
 		})
 	);
-	$inspect(filters);
 
 	// SORTING
-	let sortedBy: { key: CoffeeKey; ascending: boolean } = $state({
+	let sortedBy: { key: TableEntryKey; ascending: boolean } = $state({
 		key: 'roastingDate',
 		ascending: true
 	});
 
-	let sortedCoffees = $derived(
-		filteredCoffees.toSorted((a, b) => {
+	let sortedEntries = $derived(
+		filteredEntries.toSorted((a, b) => {
 			if (a[sortedBy.key] === b[sortedBy.key]) {
 				return 0;
 			}
@@ -38,7 +37,7 @@
 	);
 </script>
 
-{#snippet tableHead(fieldName: CoffeeKey, headerName: string | undefined = undefined)}
+{#snippet tableHead(fieldName: TableEntryKey, headerName: string | undefined = undefined)}
 	<th scope="col" class="max-w-fit">
 		<button
 			class="flex flex-row"
@@ -93,11 +92,13 @@
 					{@render tableHead('varietals')}
 					{@render tableHead('roaster')}
 					{@render tableHead('process')}
+					{@render tableHead('dosesRemaining', 'Doses')}
+					{@render tableHead('dosesBrewed', 'Brews')}
 					{@render tableHead('roastingDate', 'Roasted')}
 				</tr>
 			</thead>
 			<tbody>
-				{#each sortedCoffees as coffee (coffee.id)}
+				{#each sortedEntries as coffee (coffee.id)}
 					<tr class="hover:bg-base-300 content-center">
 						<th><a href="/coffees/{coffee.id}">{coffee.name}</a></th>
 						<td>
@@ -128,6 +129,20 @@
 								<div class="badge badge-primary">washed</div>
 							</div>
 						</td>
+						<td
+							><button
+								onclick={() => {
+									filters = [...filters, { key: 'dosesRemaining', value: coffee.dosesRemaining }];
+								}}>{coffee.dosesRemaining}</button
+							></td
+						>
+						<td
+							><button
+								onclick={() => {
+									filters = [...filters, { key: 'dosesBrewed', value: coffee.dosesBrewed }];
+								}}>{coffee.dosesBrewed}</button
+							></td
+						>
 						<td>{coffee.roastingDate}</td>
 					</tr>
 				{/each}
