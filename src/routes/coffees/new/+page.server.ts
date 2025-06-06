@@ -22,7 +22,11 @@ export const actions: Actions = {
 				form
 			});
 		}
-		await db.insert(coffees).values(form.data);
-		redirect('/coffees', { type: 'success', message: 'Coffee successfully added' }, cookies);
+		const newCoffee = (await db.insert(coffees).values(form.data).returning({ id: coffees.id }))[0];
+		redirect(
+			`/coffees/${newCoffee.id}`,
+			{ type: 'success', message: 'Coffee successfully added' },
+			cookies
+		);
 	}
 };
