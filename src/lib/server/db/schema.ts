@@ -1,6 +1,7 @@
 import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
 import { relations } from 'drizzle-orm';
+import { processValues } from '$lib/zod-schemas';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
@@ -11,7 +12,8 @@ export const coffees = sqliteTable('coffees', {
 	flavorProfile: text().notNull(),
 	name: text().notNull(),
 	notes: text().notNull(),
-	process: text().notNull(),
+	process: text({ enum: [...processValues] }).notNull(),
+	processDetails: text().notNull(),
 	producer: text().notNull(),
 	region: text().notNull(),
 	roaster: text().notNull(),

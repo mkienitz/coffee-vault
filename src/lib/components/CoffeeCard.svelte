@@ -54,7 +54,7 @@
 			</div>
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Process</div>
-				<div class="text-base-content/70 text-sm">{coffee.process}</div>
+				<div class="text-base-content/70 text-sm">{coffee.processDetails}</div>
 			</div>
 			{#if coffee.notes !== ''}
 				<div class="flex flex-col space-y-1">

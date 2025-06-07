@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, countries, type TCountryCode } from 'countries-list';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { ChevronLeft } from 'lucide-svelte';
-	import { type CoffeeSchema } from '$lib/zod-schemas';
+	import { type CoffeeSchema, processValues } from '$lib/zod-schemas';
 
 	let { data, mode }: { data: SuperValidated<Infer<CoffeeSchema>>; mode: 'create' | 'edit' } =
 		$props();
@@ -63,19 +63,36 @@
 					class="input"
 				/>
 			</label>
-			<label class="form-control w-full max-w-xs">
-				Process
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend">Process</legend>
+				<span class="label">Category</span>
+				<div class="join">
+					{#each processValues as process}
+						<input
+							type="radio"
+							name="process"
+							class="join-item btn"
+							aria-label={process}
+							value={process}
+							bind:group={$form.process}
+							checked={process == 'washed'}
+						/>
+					{/each}
+				</div>
+				<span class="label">Details</span>
 				<input
-					name="process"
+					name="processDetails"
 					type="text"
-					placeholder="Process"
-					bind:value={$form.process}
+					placeholder="the process as stated on the bag"
+					bind:value={$form.processDetails}
+					aria-label="Process Details"
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Country
+			</fieldset>
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend">Origin</legend>
+				<span class="label">Country</span>
 				<select name="country" bind:value={$form.country} class="select w-full max-w-xs">
 					{#each countryNames as countryName}
 						<option value={countryName.value}>
@@ -84,35 +101,36 @@
 						</option>
 					{/each}
 				</select>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Region
+				<span class="label">Region</span>
 				<input
 					name="region"
 					type="text"
-					placeholder="Region"
+					placeholder="Where in the country was the coffee grown?"
 					bind:value={$form.region}
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Farm
-				<input name="farm" type="text" placeholder="Farm" bind:value={$form.farm} class="input" />
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Elevation
+				<span class="label">Farm</span>
+				<input
+					name="farm"
+					type="text"
+					placeholder="What's the name of the farm or station?"
+					bind:value={$form.farm}
+					class="input"
+				/>
+				<span class="label">Elevation</span>
 				<input
 					name="elevation"
 					type="text"
-					placeholder="Elevation"
+					placeholder="e.g. 1800m"
 					bind:value={$form.elevation}
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Weight
+			</fieldset>
+			<fieldset class="fieldset">
+				<legend class="fieldset-legend">Other</legend>
+				<span class="label">Weight</span>
 				<input
 					name="weight"
 					type="number"
@@ -121,9 +139,7 @@
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Roasting Date
+				<span class="label">Roasting Date</span>
 				<input
 					name="roastingDate"
 					type="date"
@@ -131,9 +147,7 @@
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Tasting Notes
+				<span class="label">Tasting Notes</span>
 				<input
 					name="flavorProfile"
 					type="text"
@@ -142,11 +156,10 @@
 					required
 					class="input"
 				/>
-			</label>
-			<label class="form-control flex w-full max-w-xs flex-col">
-				Notes
+				<span class="label">Notes</span>
 				<textarea name="notes" bind:value={$form.notes} class="textarea"> </textarea>
-			</label>
+			</fieldset>
+			<!-- <SuperDebug data={$form}></SuperDebug> -->
 		</form>
 		<div class="card-actions">
 			{#if mode === 'create'}

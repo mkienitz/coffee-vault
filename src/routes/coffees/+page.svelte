@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Process } from '$lib/zod-schemas.js';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { ArrowDownZa, ArrowUpAz, X } from 'lucide-svelte';
 
@@ -35,6 +36,14 @@
 			}
 		})
 	);
+
+	// MISC
+	const processColorMap: Record<Process, string> = {
+		washed: 'badge-success',
+		honey: 'badge-warning',
+		natural: 'badge-error',
+		advanced: 'badge-primary'
+	};
 </script>
 
 {#snippet tableHead(fieldName: TableEntryKey, headerName: string | undefined = undefined)}
@@ -125,24 +134,14 @@
 							></td
 						>
 						<td>
-							<div class="tooltip" data-tip={coffee.process}>
-								<div class="badge badge-primary">washed</div>
+							<div class="tooltip" data-tip={coffee.processDetails}>
+								<div class="badge badge-soft {processColorMap[coffee.process]}">
+									{coffee.process}
+								</div>
 							</div>
 						</td>
-						<td
-							><button
-								onclick={() => {
-									filters = [...filters, { key: 'dosesRemaining', value: coffee.dosesRemaining }];
-								}}>{coffee.dosesRemaining}</button
-							></td
-						>
-						<td
-							><button
-								onclick={() => {
-									filters = [...filters, { key: 'dosesBrewed', value: coffee.dosesBrewed }];
-								}}>{coffee.dosesBrewed}</button
-							></td
-						>
+						<td>{coffee.dosesRemaining}</td>
+						<td>{coffee.dosesBrewed}</td>
 						<td>{coffee.roastingDate}</td>
 					</tr>
 				{/each}
