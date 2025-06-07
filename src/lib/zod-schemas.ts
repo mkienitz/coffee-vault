@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 
+// COFFEE
 export const processValues = ['washed', 'natural', 'honey', 'advanced'] as const;
 
-// COFFEE
 export const coffeeSchema = z.object({
 	country: z.enum([c, ...cs], {
 		errorMap: () => ({ message: 'A valid country is required' })
@@ -39,8 +39,8 @@ const tubeNumberSchema = z.enum(['1', '2', '3', '4', '5', '6', '7', '8']);
 export type TubeNumber = z.infer<typeof tubeNumberSchema>;
 
 export const doseManagementSchema = z.object({
-	drawer: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']),
-	tubeNumber: z.enum(['1', '2', '3', '4', '5', '6', '7', '8'])
+	drawer: drawerSchema,
+	tubeNumber: tubeNumberSchema
 });
 export type DoseIdentifier = z.infer<typeof doseManagementSchema>;
 
