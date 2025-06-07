@@ -2,7 +2,7 @@
 	import { getCountryCode, getEmojiFlag, countries, type TCountryCode } from 'countries-list';
 	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { ChevronLeft } from 'lucide-svelte';
-	import { type CoffeeSchema, processValues } from '$lib/zod-schemas';
+	import { type CoffeeSchema, type Process, processValues } from '$lib/zod-schemas';
 
 	let { data, mode }: { data: SuperValidated<Infer<CoffeeSchema>>; mode: 'create' | 'edit' } =
 		$props();
@@ -17,6 +17,13 @@
 			label: country.name
 		};
 	});
+
+	const processColorMap: Record<Process, string> = {
+		washed: 'btn-success',
+		honey: 'btn-warning',
+		natural: 'btn-error',
+		advanced: 'btn-primary'
+	};
 </script>
 
 <div class="card w-fit shadow-xl">
@@ -59,7 +66,6 @@
 					type="text"
 					placeholder="Varietals"
 					bind:value={$form.varietals}
-					required
 					class="input"
 				/>
 			</label>
@@ -71,7 +77,7 @@
 						<input
 							type="radio"
 							name="process"
-							class="join-item btn"
+							class={['join-item btn', $form.process == process && processColorMap[process]]}
 							aria-label={process}
 							value={process}
 							bind:group={$form.process}
@@ -86,7 +92,6 @@
 					placeholder="the process as stated on the bag"
 					bind:value={$form.processDetails}
 					aria-label="Process Details"
-					required
 					class="input"
 				/>
 			</fieldset>
@@ -107,7 +112,6 @@
 					type="text"
 					placeholder="Where in the country was the coffee grown?"
 					bind:value={$form.region}
-					required
 					class="input"
 				/>
 				<span class="label">Farm</span>
@@ -124,7 +128,6 @@
 					type="text"
 					placeholder="e.g. 1800m"
 					bind:value={$form.elevation}
-					required
 					class="input"
 				/>
 			</fieldset>
@@ -153,13 +156,11 @@
 					type="text"
 					placeholder="Add some tasting notes"
 					bind:value={$form.flavorProfile}
-					required
 					class="input"
 				/>
 				<span class="label">Notes</span>
 				<textarea name="notes" bind:value={$form.notes} class="textarea"> </textarea>
 			</fieldset>
-			<!-- <SuperDebug data={$form}></SuperDebug> -->
 		</form>
 		<div class="card-actions">
 			{#if mode === 'create'}
