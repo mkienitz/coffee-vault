@@ -81,7 +81,6 @@
 							aria-label={process}
 							value={process}
 							bind:group={$form.process}
-							checked={process == 'washed'}
 						/>
 					{/each}
 				</div>
@@ -99,6 +98,9 @@
 				<legend class="fieldset-legend">Origin</legend>
 				<span class="label">Country</span>
 				<select name="country" bind:value={$form.country} class="select w-full max-w-xs">
+					<option value={undefined} disabled selected={$form.country === undefined}
+						>Select a country</option
+					>
 					{#each countryNames as countryName}
 						<option value={countryName.value}>
 							{countryName.value}
@@ -143,13 +145,7 @@
 					class="input"
 				/>
 				<span class="label">Roasting Date</span>
-				<input
-					name="roastingDate"
-					type="date"
-					bind:value={$form.roastingDate}
-					required
-					class="input"
-				/>
+				<input name="roastingDate" type="date" bind:value={$form.roastingDate} class="input" />
 				<span class="label">Tasting Notes</span>
 				<input
 					name="flavorProfile"
@@ -158,8 +154,10 @@
 					bind:value={$form.flavorProfile}
 					class="input"
 				/>
+				<span class="label">Description</span>
+				<textarea name="description" bind:value={$form.description} class="textarea"></textarea>
 				<span class="label">Notes</span>
-				<textarea name="notes" bind:value={$form.notes} class="textarea"> </textarea>
+				<textarea name="notes" bind:value={$form.notes} class="textarea"></textarea>
 			</fieldset>
 		</form>
 		<div class="card-actions">

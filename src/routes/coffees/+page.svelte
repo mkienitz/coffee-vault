@@ -26,10 +26,23 @@
 
 	let sortedEntries = $derived(
 		filteredEntries.toSorted((a, b) => {
-			if (a[sortedBy.key] === b[sortedBy.key]) {
+			const aVal = a[sortedBy.key];
+			const bVal = b[sortedBy.key];
+			const aNull = aVal == null;
+			const bNull = bVal == null;
+			if (aNull && bNull) {
 				return 0;
 			}
-			if (a[sortedBy.key] < b[sortedBy.key]) {
+			if (aNull) {
+				return 1;
+			}
+			if (bNull) {
+				return -1;
+			}
+			if (aVal === bVal) {
+				return 0;
+			}
+			if (aVal < bVal) {
 				return sortedBy.ascending ? -1 : 1;
 			} else {
 				return sortedBy.ascending ? 1 : -1;
@@ -111,21 +124,29 @@
 					<tr class="hover:bg-base-300 content-center">
 						<th><a href="/coffees/{coffee.id}">{coffee.name}</a></th>
 						<td>
-							<button
-								onclick={() => {
-									filters = [...filters, { key: 'country', value: coffee.country }];
-								}}
-							>
-								{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
-							</button>
+							{#if coffee.country}
+								<button
+									onclick={() => {
+										filters = [...filters, { key: 'country', value: coffee.country }];
+									}}
+								>
+									{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
+								</button>
+							{:else}
+								❔ Unknown
+							{/if}
 						</td>
-						<td
-							><button
-								onclick={() => {
-									filters = [...filters, { key: 'varietals', value: coffee.varietals }];
-								}}>{coffee.varietals}</button
-							></td
-						>
+						<td>
+							{#if coffee.varietals}
+								<button
+									onclick={() => {
+										filters = [...filters, { key: 'varietals', value: coffee.varietals }];
+									}}>{coffee.varietals}</button
+								>
+							{:else}
+								Unknown
+							{/if}
+						</td>
 						<td
 							><button
 								onclick={() => {
@@ -134,15 +155,19 @@
 							></td
 						>
 						<td>
-							<div class="tooltip" data-tip={coffee.processDetails}>
-								<div class="badge badge-soft {processColorMap[coffee.process]}">
-									{coffee.process}
+							{#if coffee.process}
+								<div class="tooltip" data-tip={coffee.processDetails}>
+									<div class="badge badge-soft {processColorMap[coffee.process]}">
+										{coffee.process}
+									</div>
 								</div>
-							</div>
+							{:else}
+								Unknown
+							{/if}
 						</td>
 						<td>{coffee.dosesRemaining}</td>
 						<td>{coffee.dosesBrewed}</td>
-						<td>{coffee.roastingDate}</td>
+						<td>{coffee.roastingDate ?? 'Unknown'}</td>
 					</tr>
 				{/each}
 			</tbody>

@@ -1,25 +1,26 @@
 import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
 import { relations } from 'drizzle-orm';
-import { processValues } from '$lib/zod-schemas';
+import { processValues } from '../../zod-schemas';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
 	id: integer().primaryKey({ autoIncrement: true }).notNull(),
-	country: text({ enum: [c, ...cs] }).notNull(),
-	elevation: text().notNull(),
-	farm: text().notNull(),
-	flavorProfile: text().notNull(),
 	name: text().notNull(),
-	notes: text().notNull(),
-	process: text({ enum: [...processValues] }).notNull(),
-	processDetails: text().notNull(),
-	producer: text().notNull(),
-	region: text().notNull(),
-	roaster: text().notNull(),
-	roastingDate: text().notNull(),
-	varietals: text().notNull(),
-	weight: real().notNull()
+	roaster: text(),
+	varietals: text(),
+	process: text({ enum: [...processValues] }),
+	processDetails: text(),
+	flavorProfile: text(),
+	country: text({ enum: [c, ...cs] }),
+	region: text(),
+	farm: text(),
+	producer: text(),
+	elevation: text(),
+	roastingDate: text(),
+	weight: real().notNull(),
+	description: text(),
+	notes: text()
 });
 
 export const coffeesRelations = relations(coffees, ({ many }) => ({

@@ -19,6 +19,9 @@
 			return 'text-green-500';
 		}
 	});
+	const originInfo = [coffee.farm, coffee.region, coffee.country]
+		.filter((v) => v && v !== '')
+		.join(', ');
 </script>
 
 <div class="card flex max-h-fit w-[400px] flex-col shadow-xl">
@@ -31,18 +34,18 @@
 				<a href="/coffees/{coffee.id}/edit" class="link h-fit w-fit p-0">Edit</a>
 			</div>
 			<div class="flex w-[100%] flex-row items-center justify-between">
-				<small class="text-base-content/70">{coffee.roaster}</small>
-				<small class="text-base-content/70">{coffee.roastingDate}</small>
+				<small class="text-base-content/70">{coffee.roaster ?? 'Unknown Roaster'}</small>
+				<small class="text-base-content/70">{coffee.roastingDate ?? 'Unknown Roasting Date'}</small>
 			</div>
 		</div>
 		<div class="flex grow flex-col space-y-4 py-0">
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Origin</div>
 				<div class="text-base-content/70 text-sm">
-					{[coffee.farm, coffee.region, coffee.country].filter((v) => v !== '').join(', ')}
+					{originInfo === '' ? 'Unknown' : originInfo}
 				</div>
 			</div>
-			{#if coffee.producer !== ''}
+			{#if coffee.producer}
 				<div class="flex flex-col space-y-1">
 					<div class="font-bold">Producer</div>
 					<div class="text-base-content/70 text-sm">{coffee.producer}</div>
@@ -50,22 +53,30 @@
 			{/if}
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Varietals</div>
-				<div class="text-base-content/70 text-sm">{coffee.varietals}</div>
+				<div class="text-base-content/70 text-sm">{coffee.varietals ?? 'Unknown'}</div>
 			</div>
 			<div class="flex flex-col space-y-1">
 				<div class="font-bold">Process</div>
-				<div class="text-base-content/70 text-sm">{coffee.processDetails}</div>
+				<div class="text-base-content/70 text-sm">{coffee.processDetails ?? 'Unknown'}</div>
 			</div>
-			{#if coffee.notes !== ''}
+			{#if coffee.flavorProfile}
+				<div class="flex flex-col space-y-1">
+					<div class="font-bold">Flavor Profile</div>
+					<div class="text-base-content/70 text-sm">{coffee.flavorProfile}</div>
+				</div>
+			{/if}
+			{#if coffee.description}
+				<div class="flex flex-col space-y-1">
+					<div class="font-bold">Description</div>
+					<div class="text-base-content/70 text-sm">{coffee.description}</div>
+				</div>
+			{/if}
+			{#if coffee.notes}
 				<div class="flex flex-col space-y-1">
 					<div class="font-bold">Notes</div>
 					<div class="text-base-content/70 text-sm">{coffee.notes}</div>
 				</div>
 			{/if}
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Flavor Profile</div>
-				<div class="text-base-content/70 text-sm">{coffee.flavorProfile}</div>
-			</div>
 		</div>
 		<div class="flex flex-row items-center space-x-2 self-end">
 			<progress
