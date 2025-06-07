@@ -116,11 +116,11 @@
 	<CoffeeCard {coffee} {doses} {brews} />
 	<div class="prose flex w-full flex-col">
 		<h2>Doses</h2>
-		<DoseCreatePanel />
+		{@render DoseCreatePanel()}
 		{#if doses.length === 0}
 			<span class="mt-8 self-center">There are currently no doses</span>
 		{:else}
-			<DoseTable />
+			{@render DoseTable()}
 		{/if}
 	</div>
 	<div class="prose flex w-full flex-col">
