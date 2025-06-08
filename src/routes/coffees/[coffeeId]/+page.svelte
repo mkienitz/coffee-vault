@@ -53,21 +53,6 @@
 							<input hidden name="tubeNumber" value={dose.tubeNumber} />
 							<input
 								type="submit"
-								value="Consume"
-								onclick={() => {
-									$managementId = tubeName;
-								}}
-								formaction="?/consume"
-								class="btn btn-primary"
-							/>
-						</form>
-					</td>
-					<td class="text-center">
-						<form id="managementForm" method="POST" use:managementEnhance>
-							<input hidden name="drawer" value={dose.drawer} />
-							<input hidden name="tubeNumber" value={dose.tubeNumber} />
-							<input
-								type="submit"
 								value="Delete"
 								onclick={() => {
 									$managementId = tubeName;
