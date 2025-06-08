@@ -18,9 +18,8 @@
 		};
 	});
 
-
 	const initialState = $form;
-	let hasChanged = $derived($form !== initialState)
+	let hasChanged = $derived($form !== initialState);
 
 	const processColorMap: Record<Process, string> = {
 		washed: 'btn-success',
@@ -28,12 +27,14 @@
 		natural: 'btn-error',
 		advanced: 'btn-primary'
 	};
+
+	let deleteDialog: HTMLDialogElement | undefined = $state(undefined);
 </script>
 
-<div class="card w-fit shadow-xl">
+<div class="card prose w-fit shadow-xl">
 	<div class="card-body">
 		<div class="card-title flex flex-row items-center justify-start">
-			<button onclick={() => window.history.back()} class="btn btn-link text-primary-content">
+			<button onclick={() => window.history.back()} class="btn btn-link text-primary-content p-0">
 				<ChevronLeft />Back
 			</button>
 			<span class="text-primary-content text-xl">
@@ -164,7 +165,7 @@
 				<textarea name="notes" bind:value={$form.notes} class="textarea"></textarea>
 			</fieldset>
 		</form>
-		<div class="card-actions">
+		<div class="card-actions justify-end">
 			{#if mode === 'create'}
 				<input
 					type="submit"
@@ -182,13 +183,25 @@
 					disabled={!hasChanged}
 					class="btn btn-primary"
 				/>
-				<input
-					type="submit"
-					value="Delete"
-					form="coffeeForm"
-					formaction="?/delete"
-					class="btn btn-error"
-				/>
+				<button class="btn btn-error" onclick={() => deleteDialog!.showModal()}>Delete</button>
+				<dialog bind:this={deleteDialog} class="modal">
+					<div class="modal-box">
+						<h3>Are you sure?</h3>
+						<p class="py-4">This will delete the coffee permanently!</p>
+						<div class="modal-action">
+							<form method="dialog">
+								<button class="btn">Cancel</button>
+								<input
+									type="submit"
+									value="Delete"
+									form="coffeeForm"
+									formaction="?/delete"
+									class="btn btn-error"
+								/>
+							</form>
+						</div>
+					</div>
+				</dialog>
 			{/if}
 		</div>
 	</div>
