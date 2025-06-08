@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, countries, type TCountryCode } from 'countries-list';
-	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { ChevronLeft } from 'lucide-svelte';
 	import { type CoffeeSchema, type Process, processValues } from '$lib/zod-schemas';
 
@@ -17,6 +17,10 @@
 			label: country.name
 		};
 	});
+
+
+	const initialState = $form;
+	let hasChanged = $derived($form !== initialState)
 
 	const processColorMap: Record<Process, string> = {
 		washed: 'btn-success',
@@ -175,6 +179,7 @@
 					value="Update"
 					form="coffeeForm"
 					formaction="?/update"
+					disabled={!hasChanged}
 					class="btn btn-primary"
 				/>
 				<input
