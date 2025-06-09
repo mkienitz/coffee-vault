@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/libsql';
 import { brews, brewsRelations, coffees, coffeesRelations, doses, dosesRelations } from './schema';
-import type { CoffeeWithDosesAndBrews, DoseIdentifier } from '$lib/zod-schemas';
+import type { CoffeeWithDosesAndBrews, Dose, DoseIdentifier, EmptyDose } from '$lib/zod-schemas';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { getCurrentDateTime } from '$lib/utils';
 
@@ -92,6 +92,19 @@ async function clearDoseHelper(dbHandle: DBHandle, doseIdent: DoseIdentifier): P
 	if (res.length !== 1) {
 		throw new Error();
 	}
+}
+
+export async function getDose(doseIdent: DoseIdentifier): Promise<Dose | EmptyDose> {
+	const dose = await db.query.doses.findFirst({
+		where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
+	});
+	if (!dose) {
+		throw new Error();
+	}
+	if (!dose.coffeeId) {
+		return dose as EmptyDose;
+	}
+	return dose as Dose;
 }
 
 export async function clearDose(dose: DoseIdentifier): Promise<void> {

@@ -1,4 +1,4 @@
-import { addDose, clearDose, consumeDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
+import { addDose, clearDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -34,17 +34,6 @@ export const actions: Actions = {
 				form
 			});
 		}
-		return { form };
-	},
-	consume: async ({ request }) => {
-		const formData = await request.formData();
-		const form = await superValidate(formData, zod(doseManagementSchema));
-		if (!form.valid) {
-			return fail(400, {
-				form
-			});
-		}
-		await consumeDose(form.data);
 		return { form };
 	},
 	delete: async ({ request }) => {
