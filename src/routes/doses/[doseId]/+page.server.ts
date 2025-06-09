@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db, getCoffeeWithDosesAndBrews } from '$lib/server/db';
-import { coffees, doses } from '$lib/server/db/schema';
+import { doses } from '$lib/server/db/schema';
 import type { Drawer, TubeNumber, Dose } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -17,12 +17,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		where: and(eq(doses.drawer, drawer as Drawer), eq(doses.tubeNumber, tubeNumber as TubeNumber))
 	});
 	if (!dose) {
-		throw error(404, 'Dose with token not found.');
+		throw error(404, 'Dose not found.');
 	}
-	// const coffee = await db.query.coffees.findFirst({
-	// 	where: eq(coffees.id, dose.coffeeId!),
-	// 	with: { doses: true, brews: true }
-	// });
 	return {
 		coffee: await getCoffeeWithDosesAndBrews(dose.coffeeId!),
 		dose: dose as Dose

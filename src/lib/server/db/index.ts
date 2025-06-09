@@ -15,7 +15,7 @@ export const db = drizzle({
 // COFFEES
 export async function getCoffeeWithDosesAndBrews(
 	coffeeId: number
-): Promise<CoffeeWithDosesAndBrews> {
+): Promise<CoffeeWithDosesAndBrews | undefined> {
 	const coffee = await db.query.coffees.findFirst({
 		where: eq(coffees.id, coffeeId),
 		with: {
@@ -23,10 +23,7 @@ export async function getCoffeeWithDosesAndBrews(
 			brews: true
 		}
 	})!;
-	if (!coffee) {
-		throw new Error();
-	}
-	return coffee as CoffeeWithDosesAndBrews;
+	return coffee as CoffeeWithDosesAndBrews | undefined;
 }
 
 // DOSES
@@ -107,7 +104,7 @@ export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
 			where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
 		});
 		if (!dose) {
-			throw Error();
+			throw new Error();
 		}
 		await clearDoseHelper(tx, doseIdent);
 		await tx.insert(brews).values({

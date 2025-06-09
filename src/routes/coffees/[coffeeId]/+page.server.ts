@@ -1,5 +1,5 @@
 import { addDose, clearDose, consumeDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
-import { fail, type Actions } from '@sveltejs/kit';
+import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -7,8 +7,12 @@ import type { PageServerLoad } from './$types';
 import { doseCreationSchema, doseManagementSchema } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
+	const coffee = await getCoffeeWithDosesAndBrews(Number(params.coffeeId));
+	if (!coffee) {
+		throw error(404, 'Coffee not found');
+	}
 	return {
-		coffee: await getCoffeeWithDosesAndBrews(Number(params.coffeeId)),
+		coffee: coffee!,
 		creationForm: await superValidate({ weight: 12 }, zod(doseCreationSchema)),
 		managementForm: await superValidate(undefined, zod(doseManagementSchema))
 	};
