@@ -72,7 +72,7 @@
 
           packages.default = pkgs.buildNpmPackage {
             pname = "coffee-vault";
-            version = "0.0.4";
+            version = "0.0.5";
             src = ./.;
             npmDepsHash = "sha256-X5T6YRFEWnm3tdCjy8CUF5sOz99LppSCyO12i+WPJ5U=";
             nativeBuildInputs = [ pkgs.makeWrapper ];
