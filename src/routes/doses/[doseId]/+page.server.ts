@@ -1,16 +1,30 @@
 import { error, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { consumeDose, getCoffeeWithDosesAndBrews, getDose } from '$lib/server/db';
-import { drawerLetters, tubeNumbers, type DoseIdentifier } from '$lib/zod-schemas';
+import {
+	drawerLetters,
+	tubeNumbers,
+	type DoseIdentifier,
+	type Drawer,
+	type TubeNumber
+} from '$lib/zod-schemas';
 import { redirect } from 'sveltekit-flash-message/server';
 
 function getDoseIdentFromSlug(slug: string): DoseIdentifier {
-	const drawer = slug.at(0);
-	const tubeNumber = slug.at(1);
-	if (slug.length != 2 || !tubeNumbers.includes(tubeNumber!) || !drawerLetters.includes(drawer!)) {
+	const drawerStr = slug.at(0);
+	const tubeNumberStr = slug.at(1);
+	if (!drawerStr || !tubeNumberStr || slug.length !== 2) {
 		throw error(400, 'Invalid tube identifier');
 	}
-	return { drawer: drawer!, tubeNumber: tubeNumber! };
+	let drawer = drawerStr.toUpperCase() as Drawer;
+	let tubeNumber = tubeNumberStr as TubeNumber;
+	if (!tubeNumbers.includes(tubeNumber) || !drawerLetters.includes(drawer)) {
+		throw error(400, 'Invalid tube identifier');
+	}
+	if (drawerStr!.toLowerCase() === drawerStr!) {
+		console.warn(`ATTENTION: NFC tag for tube ${drawerStr}${tubeNumberStr} might be lower case!`);
+	}
+	return { drawer: drawer, tubeNumber: tubeNumber };
 }
 
 export const load: PageServerLoad = async ({ params }) => {
