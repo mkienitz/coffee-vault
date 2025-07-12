@@ -1,5 +1,5 @@
 import { coffees } from '$lib/server/db/schema';
-import { db } from '$lib/server/db';
+import { db, validateCoffeeWeight } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { error, fail, type Actions } from '@sveltejs/kit';
@@ -31,10 +31,23 @@ export const actions: Actions = {
 				form
 			});
 		}
-		await db
-			.update(coffees)
-			.set(form.data)
-			.where(eq(coffees.id, Number(params.coffeeId)));
+
+		// Validate weight against existing doses and brews
+		const coffeeId = Number(params.coffeeId);
+		const validation = await validateCoffeeWeight(coffeeId, form.data.weight);
+
+		if (!validation.success) {
+			return fail(400, {
+				form: {
+					...form,
+					errors: {
+						weight: [validation.error]
+					}
+				}
+			});
+		}
+
+		await db.update(coffees).set(form.data).where(eq(coffees.id, coffeeId));
 		setFlash({ type: 'success', message: 'Coffee successfully edited' }, cookies);
 		return { form };
 	},

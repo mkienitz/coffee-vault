@@ -7,7 +7,7 @@
 	let { data, mode }: { data: SuperValidated<Infer<CoffeeSchema>>; mode: 'create' | 'edit' } =
 		$props();
 
-	const { form, enhance } = superForm(data, {
+	const { form, enhance, errors } = superForm(data, {
 		resetForm: mode === 'create'
 	});
 
@@ -147,8 +147,11 @@
 					step="0.5"
 					bind:value={$form.weight}
 					required
-					class="input"
+					class="input {$errors.weight ? 'input-error' : ''}"
 				/>
+				{#if $errors.weight}
+					<span class="label-text-alt text-error">{$errors.weight}</span>
+				{/if}
 				<span class="label">Roasting Date</span>
 				<input name="roastingDate" type="date" bind:value={$form.roastingDate} class="input" />
 				<span class="label">Tasting Notes</span>

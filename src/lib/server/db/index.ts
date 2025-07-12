@@ -127,3 +127,47 @@ export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
 		});
 	});
 }
+
+type ValidateWeightResult =
+	| {
+			success: true;
+	  }
+	| {
+			success: false;
+			error: string;
+	  };
+
+export async function validateCoffeeWeight(
+	coffeeId: number,
+	newWeight: number
+): Promise<ValidateWeightResult> {
+	const coffee = await db.query.coffees.findFirst({
+		where: eq(coffees.id, coffeeId),
+		with: {
+			doses: true,
+			brews: true
+		}
+	});
+
+	if (!coffee) {
+		return {
+			success: false,
+			error: 'Coffee not found'
+		};
+	}
+
+	const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
+	const dosed = coffee.doses.reduce((acc, dose) => acc + (dose.weight || 0), 0);
+	const usedWeight = brewed + dosed;
+
+	if (newWeight < usedWeight) {
+		return {
+			success: false,
+			error: `Weight must be at least ${usedWeight}g (already used in doses and brews)`
+		};
+	}
+
+	return {
+		success: true
+	};
+}
