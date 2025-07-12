@@ -81,20 +81,20 @@
 	</th>
 {/snippet}
 
-<div>
-	<div class="flex w-full flex-row justify-between">
+<div class="mx-auto w-full max-w-screen-2xl">
+	<div class="mb-4 flex w-full flex-row justify-between gap-4">
 		<!-- FILTER CONTROLS -->
-		<div class="flex flex-row space-x-2">
+		<div class="flex flex-row flex-wrap gap-2">
 			<button
 				disabled={filters.length == 0}
-				class="btn btn-primary"
+				class="btn btn-primary btn-sm"
 				onclick={() => {
 					filters = [];
 				}}>Reset Filters</button
 			>
 			{#each filters as filter}
 				<button
-					class="btn hover:bg-error"
+					class="btn btn-sm hover:bg-error"
 					onclick={() => {
 						filters = filters.filter((f) => f !== filter);
 					}}
@@ -103,10 +103,10 @@
 				</button>
 			{/each}
 		</div>
-		<a href="/coffees/new" class="btn btn-success">Add Coffee</a>
+		<a href="/coffees/new" class="btn btn-success btn-sm sm:btn-md w-fit">Add Coffee</a>
 	</div>
-	<div class="overflow-x-auto">
-		<table class="table-pin-rows table">
+	<div class="w-full overflow-x-auto">
+		<table class="table-pin-rows table-zebra table w-full min-w-max">
 			<thead>
 				<tr>
 					{@render tableHead('name')}
@@ -121,11 +121,14 @@
 			</thead>
 			<tbody>
 				{#each sortedEntries as coffee (coffee.id)}
-					<tr class="hover:bg-base-300 content-center">
-						<th><a href="/coffees/{coffee.id}">{coffee.name}</a></th>
-						<td>
+					<tr class="hover">
+						<th class="whitespace-nowrap"
+							><a href="/coffees/{coffee.id}" class="link">{coffee.name}</a></th
+						>
+						<td class="whitespace-nowrap">
 							{#if coffee.country}
 								<button
+									class="btn btn-ghost btn-xs"
 									onclick={() => {
 										filters = [...filters, { key: 'country', value: coffee.country }];
 									}}
@@ -136,9 +139,10 @@
 								❔ Unknown
 							{/if}
 						</td>
-						<td>
+						<td class="whitespace-nowrap">
 							{#if coffee.varietals}
 								<button
+									class="btn btn-ghost btn-xs"
 									onclick={() => {
 										filters = [...filters, { key: 'varietals', value: coffee.varietals }];
 									}}>{coffee.varietals}</button
@@ -147,14 +151,15 @@
 								Unknown
 							{/if}
 						</td>
-						<td
+						<td class="whitespace-nowrap"
 							><button
+								class="btn btn-ghost btn-xs"
 								onclick={() => {
 									filters = [...filters, { key: 'roaster', value: coffee.roaster }];
 								}}>{coffee.roaster}</button
 							></td
 						>
-						<td>
+						<td class="whitespace-nowrap">
 							{#if coffee.process}
 								<div class="tooltip" data-tip={coffee.processDetails}>
 									<div class="badge badge-soft {processColorMap[coffee.process]}">
@@ -165,9 +170,9 @@
 								Unknown
 							{/if}
 						</td>
-						<td>{coffee.dosesRemaining}</td>
-						<td>{coffee.dosesBrewed}</td>
-						<td>{coffee.roastingDate ?? 'Unknown'}</td>
+						<td class="text-center whitespace-nowrap">{coffee.dosesRemaining}</td>
+						<td class="text-center whitespace-nowrap">{coffee.dosesBrewed}</td>
+						<td class="whitespace-nowrap">{coffee.roastingDate ?? 'Unknown'}</td>
 					</tr>
 				{/each}
 			</tbody>

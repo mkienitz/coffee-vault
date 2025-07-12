@@ -42,17 +42,21 @@
 {/snippet}
 
 <header>
-	<nav class="navbar bg-base-100 fixed top-0 z-50 h-16 shadow-sm">
+	<nav
+		class="navbar bg-base-100 fixed top-0 right-0 left-0 z-50 h-16 px-4 shadow-sm sm:px-6 lg:px-8"
+	>
 		<div class="navbar-start">
 			<div class="dropdown">
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
 					<Menu />
 				</div>
-				<ul class="menu dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+				<ul
+					class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+				>
 					{@render NavMenu()}
 				</ul>
 			</div>
-			<a href="/" class="btn btn-ghost font-mono text-2xl no-underline">CoffeeVault</a>
+			<a href="/" class="btn btn-ghost font-mono text-xl no-underline sm:text-2xl">CoffeeVault</a>
 		</div>
 		<div class="navbar-center hidden lg:flex">
 			<ul class="menu menu-horizontal px-1">
@@ -60,10 +64,10 @@
 			</ul>
 		</div>
 		<div class="navbar-end">
-			<a href="/login" class="btn">Login</a>
+			<a href="/login" class="btn btn-sm sm:btn-md">Login</a>
 		</div>
 	</nav>
 </header>
-<main class="mt-16 flex flex-col items-center pt-4">
+<main class="flex min-h-screen w-full flex-col items-center px-4 pt-20 pb-8 sm:px-6 lg:px-8">
 	{@render children()}
 </main>
