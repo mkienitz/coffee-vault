@@ -12,6 +12,7 @@ Coffee Vault NG is a SvelteKit application for tracking coffee inventory, doses,
 - When dealing with markup, ensure it works on phones, tablets and big screens
 - You can find additional information on DaisyUI using the MCP context7
 - You can find additional information on SvelteKit using the MCP svelte
+- You can find additional information on Drizzle ORM using the MCP context7
 
 ## Core Architecture
 

@@ -55,43 +55,41 @@ export async function updateCoffee(coffeeId: number, data: unknown): Promise<Cof
 	return coffeeSchema.parse(result);
 }
 
-type DeleteCoffeeResult = { success: true } | { success: false; error: string };
+export type DeleteCoffeeResult = { success: true } | { success: false; error: string };
 
 export async function deleteCoffee(coffeeId: number): Promise<DeleteCoffeeResult> {
-	// Check if coffee exists
-	const coffee = await db.query.coffees.findFirst({
-		where: eq(coffees.id, coffeeId),
-		with: {
-			doses: true,
-			brews: true
+	return await db.transaction(async (tx) => {
+		// Check if coffee exists
+		const coffee = await tx.query.coffees.findFirst({
+			where: eq(coffees.id, coffeeId),
+			with: {
+				doses: true,
+				brews: true
+			}
+		});
+
+		if (!coffee) {
+			throw new Error('Coffee not found');
 		}
+		// Check for existing doses
+		const activeDoses = coffee.doses.filter((d) => d.coffeeId !== null);
+		if (activeDoses.length > 0) {
+			return {
+				success: false,
+				error: 'Cannot delete coffee with existing doses'
+			};
+		}
+		// Check for existing brews
+		if (coffee.brews.length > 0) {
+			return {
+				success: false,
+				error: 'Cannot delete coffee with existing brew records'
+			};
+		}
+		// Safe to delete
+		await tx.delete(coffees).where(eq(coffees.id, coffeeId));
+		return { success: true };
 	});
-
-	if (!coffee) {
-		throw new Error('Coffee not found');
-	}
-
-	// Check for existing doses
-	const activeDoses = coffee.doses.filter((d) => d.coffeeId !== null);
-	if (activeDoses.length > 0) {
-		return {
-			success: false,
-			error: 'Cannot delete coffee with existing doses'
-		};
-	}
-
-	// Check for existing brews
-	if (coffee.brews.length > 0) {
-		return {
-			success: false,
-			error: 'Cannot delete coffee with existing brew records'
-		};
-	}
-
-	// Safe to delete
-	await db.delete(coffees).where(eq(coffees.id, coffeeId));
-
-	return { success: true };
 }
 
 export async function getCoffeeWithDosesAndBrews(
@@ -103,7 +101,7 @@ export async function getCoffeeWithDosesAndBrews(
 			doses: true,
 			brews: true
 		}
-	})!;
+	});
 	if (!coffee) {
 		return undefined;
 	}
@@ -121,53 +119,67 @@ export async function getCoffeeWithDosesAndBrews(
 }
 
 // DOSES
-type AddDoseResult = { success: true } | { success: false; error: string };
+export type AddDoseResult = { success: true } | { success: false; error: string };
 
 export async function addDose(coffeeId: number, weight: number): Promise<AddDoseResult> {
-	// Get coffee
-	const coffee = await db.query.coffees.findFirst({
-		where: eq(coffees.id, coffeeId),
-		with: {
-			doses: true,
-			brews: true
+	return await db.transaction(async (tx) => {
+		// Get coffee
+		const coffee = await tx.query.coffees.findFirst({
+			where: eq(coffees.id, coffeeId),
+			with: {
+				doses: true,
+				brews: true
+			}
+		});
+		if (!coffee) {
+			throw new Error('Coffee not found');
 		}
-	});
-	if (!coffee) {
-		throw new Error('Coffee not found');
-	}
-	// Check if enough coffee is left
-	const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
-	const dosed = coffee.doses.reduce((acc, dose) => acc + dose.weight!, 0);
-	const remainingCoffee = coffee.weight - brewed - dosed;
-	if (weight > remainingCoffee) {
+		// Check if enough coffee is left
+		const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
+		const dosed = coffee.doses.reduce((acc, dose) => acc + dose.weight!, 0);
+		const remainingCoffee = coffee.weight - brewed - dosed;
+		if (weight > remainingCoffee) {
+			return {
+				success: false,
+				error: 'Not enough coffee left'
+			};
+		}
+		// Find first empty dose
+		const dose = await tx.query.doses.findFirst({
+			where: isNull(doses.coffeeId)
+		});
+		if (!dose) {
+			return {
+				success: false,
+				error: 'No empty tube available'
+			};
+		}
+		// Update first empty dose
+		await tx
+			.update(doses)
+			.set({ weight, creationDate: getCurrentDateTime(), coffeeId: coffee.id })
+			.where(and(eq(doses.drawer, dose.drawer), eq(doses.tubeNumber, dose.tubeNumber)));
 		return {
-			success: false,
-			error: 'Not enough coffee left'
+			success: true
 		};
-	}
-	// Find first empty dose
-	const dose = await db.query.doses.findFirst({
-		where: isNull(doses.coffeeId)
 	});
-	if (!dose) {
-		return {
-			success: false,
-			error: 'No empty tube available'
-		};
-	}
-	// Update first empty dose
-	await db
-		.update(doses)
-		.set({ weight, creationDate: getCurrentDateTime(), coffeeId: coffee.id })
-		.where(and(eq(doses.drawer, dose.drawer), eq(doses.tubeNumber, dose.tubeNumber)));
-	return {
-		success: true
-	};
 }
 
-type DBHandle = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
-async function clearDoseHelper(dbHandle: DBHandle, doseIdent: DoseIdentifier): Promise<void> {
-	const res = await dbHandle
+export async function getDose(doseIdent: DoseIdentifier): Promise<Dose | EmptyDose> {
+	const dose = await db.query.doses.findFirst({
+		where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
+	});
+	if (!dose) {
+		throw new Error('Dose not found');
+	}
+	if (!dose.coffeeId) {
+		return dose as EmptyDose;
+	}
+	return doseSchema.parse(dose);
+}
+
+export async function clearDose(doseIdent: DoseIdentifier): Promise<void> {
+	const res = await db
 		.update(doses)
 		.set({ weight: null, creationDate: null, coffeeId: null })
 		.where(
@@ -181,25 +193,8 @@ async function clearDoseHelper(dbHandle: DBHandle, doseIdent: DoseIdentifier): P
 		)
 		.returning();
 	if (res.length !== 1) {
-		throw new Error();
+		throw new Error('Dose not found or already empty');
 	}
-}
-
-export async function getDose(doseIdent: DoseIdentifier): Promise<Dose | EmptyDose> {
-	const dose = await db.query.doses.findFirst({
-		where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
-	});
-	if (!dose) {
-		throw new Error();
-	}
-	if (!dose.coffeeId) {
-		return dose as EmptyDose;
-	}
-	return dose as Dose;
-}
-
-export async function clearDose(dose: DoseIdentifier): Promise<void> {
-	await clearDoseHelper(db, dose);
 }
 
 export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
@@ -208,12 +203,20 @@ export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
 			where: and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber))
 		});
 		if (!dose) {
-			throw new Error();
+			throw new Error('Dose not found');
 		}
-		await clearDoseHelper(tx, doseIdent);
+		if (!dose.coffeeId || !dose.weight) {
+			throw new Error('Dose is already empty');
+		}
+		// Clear the dose
+		await tx
+			.update(doses)
+			.set({ weight: null, creationDate: null, coffeeId: null })
+			.where(and(eq(doses.drawer, doseIdent.drawer), eq(doses.tubeNumber, doseIdent.tubeNumber)));
+		// Create brew record
 		await tx.insert(brews).values({
-			coffeeId: dose.coffeeId!,
-			weight: dose.weight!,
+			coffeeId: dose.coffeeId,
+			weight: dose.weight,
 			consumptionDate: getCurrentDateTime()
 		});
 	});
@@ -228,7 +231,7 @@ export async function getAllBrewsWithCoffees() {
 	}));
 }
 
-type ValidateWeightResult = { success: true } | { success: false; error: string };
+export type ValidateWeightResult = { success: true } | { success: false; error: string };
 
 export async function validateCoffeeWeight(
 	coffeeId: number,
@@ -241,14 +244,9 @@ export async function validateCoffeeWeight(
 			brews: true
 		}
 	});
-
 	if (!coffee) {
-		return {
-			success: false,
-			error: 'Coffee not found'
-		};
+		throw new Error('Coffee not found');
 	}
-
 	const brewed = coffee.brews.reduce((acc, brew) => acc + brew.weight, 0);
 	const dosed = coffee.doses.reduce((acc, dose) => acc + (dose.weight || 0), 0);
 	const usedWeight = brewed + dosed;
@@ -259,7 +257,6 @@ export async function validateCoffeeWeight(
 			error: `Weight must be at least ${usedWeight}g (already used in doses and brews)`
 		};
 	}
-
 	return {
 		success: true
 	};
