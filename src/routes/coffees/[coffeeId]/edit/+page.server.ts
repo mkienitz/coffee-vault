@@ -55,7 +55,11 @@ export const actions: Actions = {
 				form
 			});
 		}
-		await deleteCoffee(Number(params.coffeeId));
+		const result = await deleteCoffee(Number(params.coffeeId));
+		if (!result.success) {
+			setFlash({ type: 'error', message: result.error }, cookies);
+			return { form };
+		}
 		redirect('/', { type: 'success', message: 'Coffee successfully deleted' }, cookies);
 	}
 };

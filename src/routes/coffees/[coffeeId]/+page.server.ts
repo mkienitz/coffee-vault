@@ -27,9 +27,9 @@ export const actions: Actions = {
 				form
 			});
 		}
-		const { success, error } = await addDose(Number(params.coffeeId), form.data.weight);
-		if (!success) {
-			setFlash({ type: 'error', message: error! }, cookies);
+		const result = await addDose(Number(params.coffeeId), form.data.weight);
+		if (!result.success) {
+			setFlash({ type: 'error', message: result.error }, cookies);
 			return fail(400, {
 				form
 			});
