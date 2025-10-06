@@ -26,6 +26,15 @@ Coffee Vault NG is a SvelteKit application for tracking coffee inventory, doses,
   - `brews`: Consumption tracking when doses are consumed
 - **Database functions**: `src/lib/server/db/index.ts` contains all database operations
 
+### Data Validation & Type System
+
+- **Zod as Single Source of Truth**: `src/lib/zod-schemas.ts` defines all data validation schemas using Zod
+- **Type Derivation**: All TypeScript types (e.g., `Coffee`, `Dose`, `Brew`) are derived directly from Zod schemas, not from Drizzle schemas
+- **Two-Layer Validation**:
+  - Drizzle schema provides basic database-level constraints (NOT NULL, UNIQUE, etc.)
+  - Zod schemas enforce precise business logic constraints and validation rules
+- **Why Zod is Primary**: Drizzle cannot express all business constraints at the schema level, so Zod serves as the authoritative definition for all data structures and validation logic
+
 ### Key Domain Concepts
 
 - **Coffee**: Represents a bag/batch of coffee with weight tracking

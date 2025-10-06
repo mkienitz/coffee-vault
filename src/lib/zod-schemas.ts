@@ -11,24 +11,24 @@ const [c, ...cs] = Object.values(countries).map((c) => c.name);
 
 export const coffeeSchema = z.object({
 	name: z.string().min(1),
-	roaster: z.string().min(1).optional(),
-	varietals: z.string().min(1).optional(),
-	process: processSchema.optional(),
-	processDetails: z.string().min(1).optional(),
-	flavorProfile: z.string().min(1).optional(),
+	roaster: z.string().min(1).nullable(),
+	varietals: z.string().min(1).nullable(),
+	process: processSchema.nullable(),
+	processDetails: z.string().min(1).nullable(),
+	flavorProfile: z.string().min(1).nullable(),
 	country: z
 		.enum([c, ...cs], {
 			error: () => 'A valid country is required'
 		})
-		.optional(),
-	region: z.string().min(1).optional(),
-	farm: z.string().min(1).optional(),
-	producer: z.string().min(1).optional(),
-	elevation: z.string().min(1).optional(),
-	roastingDate: z.string().min(1).optional(),
+		.nullable(),
+	region: z.string().min(1).nullable(),
+	farm: z.string().min(1).nullable(),
+	producer: z.string().min(1).nullable(),
+	elevation: z.string().min(1).nullable(),
+	roastingDate: z.string().min(1).nullable(),
 	weight: z.number().positive(),
-	description: z.string().min(1).optional(),
-	notes: z.string().min(1).optional()
+	description: z.string().min(1).nullable(),
+	notes: z.string().min(1).nullable()
 });
 export type CoffeeSchema = typeof coffeeSchema;
 const coffeeSchemaWithId = coffeeSchema.extend({ id: z.number() });
