@@ -23,6 +23,8 @@
 		resetForm: false
 	});
 	const { enhance: managementEnhance, formId: managementId } = superForm(data.managementForm);
+
+	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 </script>
 
 {#snippet DoseTable()}
@@ -37,7 +39,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each doses as dose}
+			{#each doses as dose (dose.drawer + dose.tubeNumber)}
 				{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
 				<tr>
 					<td class="max-w-[5rem] text-center"
@@ -48,19 +50,37 @@
 						{dose.creationDate}
 					</td>
 					<td class="text-center">
-						<form id="managementForm" method="POST" use:managementEnhance>
-							<input hidden name="drawer" value={dose.drawer} />
-							<input hidden name="tubeNumber" value={dose.tubeNumber} />
-							<input
-								type="submit"
-								value="Delete"
-								onclick={() => {
-									$managementId = tubeName;
-								}}
-								formaction="?/delete"
-								class="btn btn-error"
-							/>
-						</form>
+						<button
+							class="btn btn-error"
+							onclick={() => deleteDialogs[tubeName]?.showModal()}
+						>
+							Delete
+						</button>
+						<dialog bind:this={deleteDialogs[tubeName]} class="modal">
+							<div class="modal-box text-left">
+								<h3>Are you sure?</h3>
+								<p class="py-4">This will delete the dose permanently!</p>
+								<div class="modal-action justify-end">
+									<form hidden id="managementForm-{tubeName}" method="POST" use:managementEnhance>
+										<input hidden name="drawer" value={dose.drawer} />
+										<input hidden name="tubeNumber" value={dose.tubeNumber} />
+									</form>
+									<form method="dialog">
+										<button class="btn">Cancel</button>
+										<input
+											type="submit"
+											value="Delete"
+											form="managementForm-{tubeName}"
+											formaction="?/delete"
+											onclick={() => {
+												$managementId = tubeName;
+											}}
+											class="btn btn-error"
+										/>
+									</form>
+								</div>
+							</div>
+						</dialog>
 					</td>
 				</tr>
 			{/each}
