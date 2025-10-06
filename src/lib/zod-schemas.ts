@@ -4,7 +4,7 @@ import { z } from 'zod';
 // COFFEE
 export const processValues = ['washed', 'natural', 'honey', 'advanced'] as const;
 const processSchema = z.enum([...processValues], {
-	errorMap: () => ({ message: 'A valid process category is required' })
+	error: () => 'A valid process category is required'
 });
 export type Process = z.infer<typeof processSchema>;
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
@@ -18,7 +18,7 @@ export const coffeeSchema = z.object({
 	flavorProfile: z.string().min(1).optional(),
 	country: z
 		.enum([c, ...cs], {
-			errorMap: () => ({ message: 'A valid country is required' })
+			error: () => 'A valid country is required'
 		})
 		.optional(),
 	region: z.string().min(1).optional(),

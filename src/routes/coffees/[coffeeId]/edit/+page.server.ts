@@ -4,9 +4,9 @@ import { eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { coffeeSchema } from '$lib/zod-schemas';
+import { coffeeSchema, type Coffee } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const coffee = await db.query.coffees.findFirst({

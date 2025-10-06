@@ -1,7 +1,7 @@
 import { addDose, clearDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
 import { doseCreationSchema, doseManagementSchema } from '$lib/zod-schemas';
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, 'Coffee not found');
 	}
 	return {
-		coffee: coffee!,
+		coffee: coffee,
 		creationForm: await superValidate({ weight: 12 }, zod(doseCreationSchema)),
 		managementForm: await superValidate(undefined, zod(doseManagementSchema))
 	};

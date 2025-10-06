@@ -2,7 +2,7 @@ import { coffees } from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { redirect } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
 import { coffeeSchema } from '$lib/zod-schemas';
