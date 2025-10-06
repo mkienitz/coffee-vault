@@ -50,10 +50,7 @@
 						{dose.creationDate}
 					</td>
 					<td class="text-center">
-						<button
-							class="btn btn-error"
-							onclick={() => deleteDialogs[tubeName]?.showModal()}
-						>
+						<button class="btn btn-error" onclick={() => deleteDialogs[tubeName]?.showModal()}>
 							Delete
 						</button>
 						<dialog bind:this={deleteDialogs[tubeName]} class="modal">

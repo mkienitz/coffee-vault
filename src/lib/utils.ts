@@ -13,5 +13,8 @@ export function getTubeName(dose: Dose) {
 }
 
 export function getCoffeeFlag(coffee: Coffee) {
+	if (!coffee.country) {
+		return '';
+	}
 	return getEmojiFlag(getCountryCode(coffee.country) as TCountryCode);
 }

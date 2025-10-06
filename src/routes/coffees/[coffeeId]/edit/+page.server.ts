@@ -1,31 +1,27 @@
-import { coffees } from '$lib/server/db/schema';
-import { db, validateCoffeeWeight } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
+import { getCoffee, updateCoffee, deleteCoffee, validateCoffeeWeight } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { coffeeSchema, type Coffee } from '$lib/zod-schemas';
+import { coffeeInsertionSchema } from '$lib/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const coffee = await db.query.coffees.findFirst({
-		where: eq(coffees.id, Number(params.coffeeId))
-	});
+	const coffee = await getCoffee(Number(params.coffeeId));
 
 	if (params.coffeeId && !coffee) {
 		throw error(404, 'Coffe not found.');
 	}
 
 	return {
-		form: await superValidate(coffee, zod(coffeeSchema))
+		form: await superValidate(coffee, zod(coffeeInsertionSchema))
 	};
 };
 
 export const actions: Actions = {
 	update: async ({ request, cookies, params }) => {
 		const formData = await request.formData();
-		const form = await superValidate(formData, zod(coffeeSchema));
+		const form = await superValidate(formData, zod(coffeeInsertionSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form
@@ -47,19 +43,19 @@ export const actions: Actions = {
 			});
 		}
 
-		await db.update(coffees).set(form.data).where(eq(coffees.id, coffeeId));
+		await updateCoffee(coffeeId, form.data);
 		setFlash({ type: 'success', message: 'Coffee successfully edited' }, cookies);
 		return { form };
 	},
 	delete: async ({ request, cookies, params }) => {
 		const formData = await request.formData();
-		const form = await superValidate(formData, zod(coffeeSchema));
+		const form = await superValidate(formData, zod(coffeeInsertionSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form
 			});
 		}
-		await db.delete(coffees).where(eq(coffees.id, Number(params.coffeeId)));
+		await deleteCoffee(Number(params.coffeeId));
 		redirect('/', { type: 'success', message: 'Coffee successfully deleted' }, cookies);
 	}
 };

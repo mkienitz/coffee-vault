@@ -1,7 +1,17 @@
 import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/libsql';
 import { brews, brewsRelations, coffees, coffeesRelations, doses, dosesRelations } from './schema';
-import type { CoffeeWithDosesAndBrews, Dose, DoseIdentifier, EmptyDose } from '$lib/zod-schemas';
+import {
+	coffeeSchema,
+	coffeeInsertionSchema,
+	doseSchema,
+	brewSchema,
+	type Coffee,
+	type CoffeeWithDosesAndBrews,
+	type Dose,
+	type DoseIdentifier,
+	type EmptyDose
+} from '$lib/zod-schemas';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { getCurrentDateTime } from '$lib/utils';
 
@@ -13,6 +23,42 @@ export const db = drizzle({
 });
 
 // COFFEES
+export async function createCoffee(data: unknown): Promise<Coffee> {
+	const validated = coffeeInsertionSchema.parse(data);
+	const [result] = await db.insert(coffees).values(validated).returning();
+	if (!result) {
+		throw new Error('Failed to create coffee');
+	}
+	return coffeeSchema.parse(result);
+}
+
+export async function getCoffee(coffeeId: number): Promise<Coffee | undefined> {
+	const result = await db.query.coffees.findFirst({
+		where: eq(coffees.id, coffeeId)
+	});
+	if (!result) {
+		return undefined;
+	}
+	return coffeeSchema.parse(result);
+}
+
+export async function updateCoffee(coffeeId: number, data: unknown): Promise<Coffee> {
+	const validated = coffeeInsertionSchema.parse(data);
+	const [result] = await db
+		.update(coffees)
+		.set(validated)
+		.where(eq(coffees.id, coffeeId))
+		.returning();
+	if (!result) {
+		throw new Error('Failed to update coffee');
+	}
+	return coffeeSchema.parse(result);
+}
+
+export async function deleteCoffee(coffeeId: number): Promise<void> {
+	await db.delete(coffees).where(eq(coffees.id, coffeeId));
+}
+
 export async function getCoffeeWithDosesAndBrews(
 	coffeeId: number
 ): Promise<CoffeeWithDosesAndBrews | undefined> {
@@ -23,7 +69,20 @@ export async function getCoffeeWithDosesAndBrews(
 			brews: true
 		}
 	})!;
-	return coffee as CoffeeWithDosesAndBrews | undefined;
+	if (!coffee) {
+		return undefined;
+	}
+	// Validate coffee, doses and brews
+	const validatedCoffee = coffeeSchema.parse(coffee);
+	const validatedDoses = coffee.doses
+		.filter((d) => d.coffeeId !== null)
+		.map((d) => doseSchema.parse(d));
+	const validatedBrews = coffee.brews.map((b) => brewSchema.parse(b));
+	return {
+		...validatedCoffee,
+		doses: validatedDoses,
+		brews: validatedBrews
+	};
 }
 
 // DOSES
@@ -136,6 +195,15 @@ type ValidateWeightResult =
 			success: false;
 			error: string;
 	  };
+
+// BREWS
+export async function getAllBrewsWithCoffees() {
+	const results = await db.query.brews.findMany({ with: { coffee: true } });
+	return results.map((brew) => ({
+		...brewSchema.parse(brew),
+		coffee: coffeeSchema.parse(brew.coffee)
+	}));
+}
 
 export async function validateCoffeeWeight(
 	coffeeId: number,

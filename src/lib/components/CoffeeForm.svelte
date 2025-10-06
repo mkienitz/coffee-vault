@@ -102,9 +102,7 @@
 				<legend class="fieldset-legend">Origin</legend>
 				<span class="label">Country</span>
 				<select name="country" bind:value={$form.country} class="select w-full max-w-xs">
-					<option value={null} disabled selected={$form.country === null}
-						>Select a country</option
-					>
+					<option value={null} disabled selected={$form.country === null}>Select a country</option>
 					{#each countryNames as countryName}
 						<option value={countryName.value}>
 							{countryName.value}
