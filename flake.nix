@@ -72,9 +72,9 @@
 
           packages.default = pkgs.buildNpmPackage {
             pname = "coffee-vault";
-            version = "0.0.6";
+            version = "0.0.7";
             src = ./.;
-            npmDepsHash = "sha256-X5T6YRFEWnm3tdCjy8CUF5sOz99LppSCyO12i+WPJ5U=";
+            npmDepsHash = "sha256-mFeQkT43Ulgdhzbxo+mTsBeA8Sebl+XQonFgqKlnrew=";
             nativeBuildInputs = [ pkgs.makeWrapper ];
             installPhase = ''
               runHook preInstall
