@@ -224,7 +224,10 @@ export async function consumeDose(doseIdent: DoseIdentifier): Promise<void> {
 
 // BREWS
 export async function getAllBrewsWithCoffees() {
-	const results = await db.query.brews.findMany({ with: { coffee: true } });
+	const results = await db.query.brews.findMany({
+		with: { coffee: true },
+		orderBy: (brews, { desc }) => [desc(brews.consumptionDate)]
+	});
 	return results.map((brew) => ({
 		...brewSchema.parse(brew),
 		coffee: coffeeSchema.parse(brew.coffee)
