@@ -9,28 +9,34 @@ const processSchema = z.enum([...processValues], {
 export type Process = z.infer<typeof processSchema>;
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 
+// Helper to convert empty strings to null
+const nullableString = z.preprocess(
+	(val) => (val === '' ? null : val),
+	z.string().min(1).nullable()
+);
+
 export const coffeeSchema = z
 	.object({
 		id: z.number(),
 		name: z.string().min(1),
-		roaster: z.string().min(1).nullable(),
-		varietals: z.string().min(1).nullable(),
+		roaster: nullableString,
+		varietals: nullableString,
 		process: processSchema.nullable(),
-		processDetails: z.string().min(1).nullable(),
-		flavorProfile: z.string().min(1).nullable(),
+		processDetails: nullableString,
+		flavorProfile: nullableString,
 		country: z
 			.enum([c, ...cs], {
 				error: () => 'A valid country is required'
 			})
 			.nullable(),
-		region: z.string().min(1).nullable(),
-		farm: z.string().min(1).nullable(),
-		producer: z.string().min(1).nullable(),
-		elevation: z.string().min(1).nullable(),
-		roastingDate: z.string().min(1).nullable(),
+		region: nullableString,
+		farm: nullableString,
+		producer: nullableString,
+		elevation: nullableString,
+		roastingDate: nullableString,
 		weight: z.number().positive(),
-		description: z.string().min(1).nullable(),
-		notes: z.string().min(1).nullable()
+		description: nullableString,
+		notes: nullableString
 	})
 	.brand('Coffee');
 export type Coffee = z.infer<typeof coffeeSchema>;
