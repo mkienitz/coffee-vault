@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Process } from '$lib/zod-schemas.js';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import { ArrowDownZa, ArrowUpAz, X } from 'lucide-svelte';
+	import { ArrowDownZa, ArrowUpAz, Plus, X } from 'lucide-svelte';
 
 	let { data } = $props();
 	const tableEntries = $state(data.tableEntries);
@@ -80,6 +80,12 @@
 		</button>
 	</th>
 {/snippet}
+
+<div class="fab">
+	<div class="tooltip tooltip-left" data-tip="Add new Coffee">
+		<a href="/coffees/new" class="btn btn-lg btn-circle btn-success"><Plus /></a>
+	</div>
+</div>
 
 <div class="mx-auto w-full max-w-screen-2xl">
 	<div class="mb-4 flex w-full flex-row justify-between gap-4">
