@@ -3,9 +3,38 @@
 	import { getFlash } from 'sveltekit-flash-message';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
-	import { Menu } from 'lucide-svelte';
+	import { Check, ChevronDown, Menu, Palette } from 'lucide-svelte';
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
+
+	// Theme selector
+	let prefersDark = $state(false);
+	onMount(() => {
+		const media = window.matchMedia('(prefers-color-scheme: dark)');
+		prefersDark = media.matches;
+		const listener = (e: MediaQueryListEvent) => {
+			prefersDark = e.matches;
+		};
+		media.addEventListener('change', listener);
+		// Remove listener upon unmount (should never happen)
+		return () => {
+			media.removeEventListener('change', listener);
+		};
+	});
+	$effect(() => {
+		if (!selectedTheme) {
+			selectedTheme = prefersDark ? 'dark' : 'light';
+		}
+	});
+
+	let selectedTheme = $state(data.selectedTheme);
+	$effect(() => {
+		if (browser && selectedTheme) {
+			document.cookie = `theme=${selectedTheme}; path=/; max-age=31536000; SameSite=Lax`;
+		}
+	});
 
 	// Toaster
 	const flash = getFlash(page);
@@ -63,7 +92,38 @@
 				{@render NavMenu()}
 			</ul>
 		</div>
-		<div class="navbar-end">
+		<div class="navbar-end gap-2">
+			<div class="dropdown dropdown-end">
+				<div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+					<Palette />
+					<ChevronDown />
+				</div>
+				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+				<ul
+					tabindex="-1"
+					class="menu dropdown-content bg-base-300 rounded-box z-[1] w-52 p-2 shadow-2xl"
+				>
+					{#each ['light', 'dark', 'coffee'] as theme}
+						<li>
+							<label class="flex cursor-pointer items-center gap-2">
+								<input
+									type="radio"
+									name="theme-dropdown"
+									class="theme-controller hidden"
+									value={theme}
+									bind:group={selectedTheme}
+								/>
+								<span class="flex-1 capitalize">{theme}</span>
+								<span class="flex h-4 w-4 items-center justify-center">
+									{#if selectedTheme === theme}
+										<Check class="h-4 w-4" />
+									{/if}
+								</span>
+							</label>
+						</li>
+					{/each}
+				</ul>
+			</div>
 			<a href="/login" class="btn btn-sm sm:btn-md">Login</a>
 		</div>
 	</nav>
