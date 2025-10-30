@@ -1,13 +1,14 @@
 import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 import type { Dose } from '$lib/zod-schemas';
-import * as _ from 'radash';
+import { group, unique } from 'radash';
 
 export const load: PageServerLoad = async () => {
 	const allDoses = (await db.query.doses.findMany()) as Dose[];
-	const totalWeight = allDoses.reduce((acc, dose) => acc + dose.weight, 0);
 	return {
-		doses: _.group(allDoses, (dose) => dose.drawer),
-		totalWeight
+		dosesByDrawer: group(allDoses, (dose) => dose.drawer),
+		totalCoffees: unique(allDoses.map((dose) => dose.coffeeId)).length,
+		totalDoses: allDoses.length,
+		totalWeight: allDoses.reduce((acc, dose) => acc + dose.weight, 0)
 	};
 };
