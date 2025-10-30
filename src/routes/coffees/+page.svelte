@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Process } from '$lib/zod-schemas.js';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { ArrowDownZa, ArrowUpAz, Plus, X } from 'lucide-svelte';
+	import { getProcessBadgeClass } from '$lib/utils';
 
 	let { data } = $props();
 	const tableEntries = $state(data.tableEntries);
@@ -49,14 +49,6 @@
 			}
 		})
 	);
-
-	// MISC
-	const processColorMap: Record<Process, string> = {
-		washed: 'badge-success',
-		honey: 'badge-warning',
-		natural: 'badge-error',
-		advanced: 'badge-primary'
-	};
 </script>
 
 {#snippet tableHead(fieldName: TableEntryKey, headerName: string | undefined = undefined)}
@@ -168,7 +160,7 @@
 						<td class="whitespace-nowrap">
 							{#if coffee.process}
 								<div class="tooltip" data-tip={coffee.processDetails}>
-									<div class="badge badge-soft {processColorMap[coffee.process]}">
+									<div class="badge badge-soft {getProcessBadgeClass(coffee.process)}">
 										{coffee.process}
 									</div>
 								</div>

@@ -1,5 +1,5 @@
 import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-import type { Coffee, Dose } from './zod-schemas';
+import type { Coffee, Dose, Process } from './zod-schemas';
 
 export function getCurrentDateTime() {
 	return new Intl.DateTimeFormat('en-DE', {
@@ -17,4 +17,17 @@ export function getCoffeeFlag(coffee: Coffee) {
 		return '';
 	}
 	return getEmojiFlag(getCountryCode(coffee.country) as TCountryCode);
+}
+
+export function getProcessBadgeClass(process: Process): string {
+	switch (process) {
+		case 'washed':
+			return 'badge-success';
+		case 'honey':
+			return 'badge-warning';
+		case 'natural':
+			return 'badge-error';
+		case 'advanced':
+			return 'badge-primary';
+	}
 }

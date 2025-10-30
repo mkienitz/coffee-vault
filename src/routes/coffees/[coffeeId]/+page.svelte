@@ -1,7 +1,8 @@
 <script lang="ts">
-	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
 	import type { Dose } from '$lib/zod-schemas';
 	import { superForm } from 'sveltekit-superforms';
+	import { getCoffeeFlag, getProcessBadgeClass } from '$lib/utils';
+	import { Trash, Plus } from 'lucide-svelte';
 
 	let { data } = $props();
 	let coffee = $state(data.coffee);
@@ -18,6 +19,27 @@
 			brews.reduce((acc, brew) => acc + brew.weight, 0) -
 			doses.reduce((acc, dose) => acc + dose.weight, 0)
 	);
+	const remainingWeight = $derived(
+		coffee.weight - brews.reduce((acc, brew) => acc + brew.weight, 0)
+	);
+
+	const preselectedDose = $derived(doses[0] ? `${doses[0].drawer}${doses[0].tubeNumber}` : null);
+
+	const progressBarColor = $derived.by(() => {
+		if (remainingWeight < 7) {
+			return 'text-error';
+		} else if (remainingWeight < 20) {
+			return 'text-warning';
+		} else if (remainingWeight < 0.3 * coffee.weight) {
+			return 'text-warning';
+		} else {
+			return 'text-success';
+		}
+	});
+
+	const originInfo = $derived(
+		[coffee.farm, coffee.region, coffee.country].filter((v) => v && v !== '').join(', ')
+	);
 
 	const { form: creationForm, enhance: creationEnhance } = superForm(data.creationForm, {
 		resetForm: false
@@ -27,125 +49,257 @@
 	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 </script>
 
-{#snippet DoseTable()}
-	<table class="table">
-		<thead>
-			<tr>
-				<th scope="col" class="text-center">Tube</th>
-				<th scope="col" class="text-center">Weight</th>
-				<th scope="col" class="text-center">Created</th>
-				<th scope="col"></th>
-				<th scope="col"></th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each doses as dose (dose.drawer + dose.tubeNumber)}
-				{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
-				<tr>
-					<td class="max-w-[5rem] text-center"
-						><a href="/doses/{tubeName}" class="link font-bold">{tubeName}</a></td
-					>
-					<td class="max-w-[5rem] text-center">{dose.weight}g</td>
-					<td class="text-center">
-						{dose.creationDate}
-					</td>
-					<td class="text-center">
-						<button class="btn btn-error" onclick={() => deleteDialogs[tubeName]?.showModal()}>
-							Delete
-						</button>
-						<dialog bind:this={deleteDialogs[tubeName]} class="modal">
-							<div class="modal-box text-left">
-								<h3>Are you sure?</h3>
-								<p class="py-4">This will delete the dose permanently!</p>
-								<div class="modal-action justify-end">
-									<form hidden id="managementForm-{tubeName}" method="POST" use:managementEnhance>
-										<input hidden name="drawer" value={dose.drawer} />
-										<input hidden name="tubeNumber" value={dose.tubeNumber} />
-									</form>
-									<form method="dialog">
-										<button class="btn">Cancel</button>
-										<input
-											type="submit"
-											value="Delete"
-											form="managementForm-{tubeName}"
-											formaction="?/delete"
-											onclick={() => {
-												$managementId = tubeName;
-											}}
-											class="btn btn-error"
-										/>
-									</form>
-								</div>
+{#snippet InfoCard(label: string, value: string)}
+	<div class="card bg-base-100">
+		<div class="card-body gap-1 p-4">
+			<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{label}</h3>
+			<p class="text-sm font-medium">{value}</p>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet TubeBadge(name: string)}
+	<div
+		class="bg-base-200 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
+	>
+		{name}
+	</div>
+{/snippet}
+
+{#snippet DeleteDialog(tubeName: string, drawer: string, tubeNumber: number)}
+	<dialog bind:this={deleteDialogs[tubeName]} class="modal">
+		<div class="modal-box text-left">
+			<h3>Are you sure?</h3>
+			<p class="py-4">This will delete the dose permanently!</p>
+			<div class="modal-action justify-end">
+				<form hidden id="managementForm-{tubeName}" method="POST" use:managementEnhance>
+					<input hidden name="drawer" value={drawer} />
+					<input hidden name="tubeNumber" value={tubeNumber} />
+				</form>
+				<form method="dialog">
+					<button class="btn">Cancel</button>
+					<input
+						type="submit"
+						value="Delete"
+						form="managementForm-{tubeName}"
+						formaction="?/delete"
+						onclick={() => {
+							$managementId = tubeName;
+						}}
+						class="btn btn-error"
+					/>
+				</form>
+			</div>
+		</div>
+	</dialog>
+{/snippet}
+
+{#snippet CollapsibleSection(title: string, content: string, fullWidth: boolean = false)}
+	<div
+		class="bg-base-100 sm:collapse-open collapse-arrow collapse sm:[&_.collapse-title]:after:hidden {fullWidth
+			? 'sm:col-span-2'
+			: ''}"
+	>
+		<input type="checkbox" class="peer sm:hidden" />
+		<div class="collapse-title p-4 pb-2">
+			<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
+		</div>
+		<div class="collapse-content px-4 pt-0">
+			<p class="text-sm leading-relaxed">{content}</p>
+		</div>
+	</div>
+{/snippet}
+
+<div class="w-full max-w-6xl space-y-8">
+	<!-- Title Bar -->
+	<div class="flex items-start justify-between gap-4">
+		<div class="min-w-0 flex-1 space-y-1">
+			<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
+				{`${getCoffeeFlag(coffee)} ${coffee.name}`}
+			</h1>
+			<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+				<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
+				{#if coffee.roastingDate}
+					<span class="hidden sm:inline">•</span>
+					<span>{coffee.roastingDate}</span>
+				{/if}
+			</div>
+		</div>
+		<a href="/coffees/{coffee.id}/edit" class="btn btn-outline btn-sm shrink-0">Edit</a>
+	</div>
+
+	<!-- Stats Grid -->
+	<div class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:items-start">
+		<div
+			class="col-span-full grid grid-cols-2 gap-4 {preselectedDose
+				? 'sm:col-span-2'
+				: 'sm:col-span-3'}"
+		>
+			{@render InfoCard('Varietals', coffee.varietals ?? 'Unknown')}
+			<div class="card bg-base-100">
+				<div class="card-body gap-1 p-4">
+					<div class="flex items-center gap-2">
+						<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
+							Process
+						</h3>
+						{#if coffee.process}
+							<div class="badge badge-sm {getProcessBadgeClass(coffee.process)}">
+								{coffee.process}
 							</div>
-						</dialog>
-					</td>
-				</tr>
-			{/each}
-		</tbody>
-	</table>
-{/snippet}
+						{/if}
+					</div>
+					<p class="text-sm font-medium">{coffee.processDetails ?? 'Unknown'}</p>
+				</div>
+			</div>
+			{@render InfoCard('Origin', originInfo === '' ? 'Unknown' : originInfo)}
+			{#if coffee.flavorProfile}
+				{@render InfoCard('Flavor', coffee.flavorProfile)}
+			{/if}
+		</div>
 
-{#snippet DoseCreatePanel()}
-	<div class="flex place-content-between items-center">
-		<span>Left to dose: {leftToDose}g</span>
-		<form id="creationForm" method="POST" use:creationEnhance class="space-x-2">
-			<label class="input max-w-fit">
-				<input
-					name="weight"
-					type="number"
-					min="1"
-					max="20"
-					placeholder="12.5"
-					step="0.5"
-					bind:value={$creationForm.weight}
-					class="max-w-[3.5rem]"
-				/>
-				<span class="label">g</span>
-			</label>
-			<input
-				type="submit"
-				value="Add Dose"
-				form="creationForm"
-				formaction="?/add"
-				disabled={$creationForm.weight > leftToDose}
-				class="btn btn-success"
-			/>
-		</form>
-	</div>
-{/snippet}
-
-<div class="grid grid-cols-1 justify-items-center space-y-8">
-	<CoffeeCard {coffee} {doses} {brews} />
-	<div class="prose flex w-full flex-col">
-		<h2>Doses</h2>
-		{@render DoseCreatePanel()}
-		{#if doses.length === 0}
-			<span class="mt-8 self-center">There are currently no doses</span>
-		{:else}
-			{@render DoseTable()}
+		{#if preselectedDose}
+			<div class="card bg-base-100">
+				<div class="card-body gap-1 p-4 sm:items-center sm:justify-center">
+					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
+						Next Dose
+					</h3>
+					<a href="/doses/{preselectedDose}" class="link self-start sm:self-auto">
+						<div
+							class="border-primary bg-base-200 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border-[0.25rem]"
+						>
+							<span class="font-mono text-xl font-bold">{preselectedDose}</span>
+						</div>
+					</a>
+				</div>
+			</div>
 		{/if}
+
+		<div class="card bg-base-100">
+			<div class="card-body gap-1 p-4 sm:items-center sm:justify-center">
+				<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">Remaining</h3>
+				<div
+					class="radial-progress {progressBarColor} self-start sm:self-auto"
+					style="--value:{(remainingWeight / coffee.weight) *
+						100}; --size:4.5rem; --thickness:0.25rem;"
+					aria-valuenow={remainingWeight}
+					role="progressbar"
+				>
+					<div class="text-base-content flex flex-col items-center">
+						<span class="text-lg font-bold">{remainingWeight}g</span>
+						<span class="text-base-content/60 text-xs">of {coffee.weight}g</span>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="prose flex w-full flex-col">
-		<h2>Brews</h2>
-		{#if brews.length === 0}
-			<span class="self-center">There are no recorded brews</span>
-		{:else}
-			<table class="table">
-				<thead>
-					<tr>
-						<th scope="col" class="text-center">Weight</th>
-						<th scope="col" class="text-center">Brewed on</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each brews as brew}
-						<tr>
-							<td class="max-w-[5rem] text-center">{brew.weight}g</td>
-							<td class="text-center">{brew.consumptionDate}</td>
-						</tr>
+
+	{#if coffee.producer}
+		{@render InfoCard('Producer', coffee.producer)}
+	{/if}
+
+	{#if coffee.description || coffee.notes}
+		<div class="grid gap-4 sm:grid-cols-2">
+			{#if coffee.description}
+				{@render CollapsibleSection('Description', coffee.description, !coffee.notes)}
+			{/if}
+			{#if coffee.notes}
+				{@render CollapsibleSection('Notes', coffee.notes, !coffee.description)}
+			{/if}
+		</div>
+	{/if}
+
+	<div class="grid gap-8 lg:grid-cols-[1fr_auto_1fr]">
+		<!-- Doses -->
+		<div class="space-y-4">
+			<div class="flex items-center justify-between">
+				<h2 class="text-2xl font-bold">Doses</h2>
+				<span
+					class="text-sm {$creationForm.weight > leftToDose
+						? 'text-error'
+						: 'text-base-content/60'}"
+				>
+					{leftToDose}g left
+				</span>
+			</div>
+			<ul class="list bg-base-100 rounded-box shadow-sm">
+				<li class="list-row">
+					<form id="creationForm" method="POST" use:creationEnhance class="contents">
+						<div class="bg-base-200 flex h-12 w-12 items-center justify-center rounded-full">
+							<Plus class="h-6 w-6" />
+						</div>
+						<div class="list-col-grow flex items-center">
+							<label class="input input-bordered input-sm w-fit">
+								<input
+									name="weight"
+									type="number"
+									min="1"
+									max="20"
+									placeholder="12.5"
+									step="0.5"
+									bind:value={$creationForm.weight}
+								/>
+								<span class="label">g</span>
+							</label>
+						</div>
+						<button
+							type="submit"
+							formaction="?/add"
+							disabled={$creationForm.weight > leftToDose}
+							class="btn btn-circle btn-ghost btn-sm text-success disabled:text-base-content/30"
+						>
+							<Plus />
+						</button>
+					</form>
+				</li>
+				{#if doses.length === 0}
+					<li class="p-12 text-center">
+						<p class="text-base-content/60">No doses yet. Add your first dose above!</p>
+					</li>
+				{:else}
+					{#each doses as dose (dose.drawer + dose.tubeNumber)}
+						{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
+						<li class="list-row items-center">
+							<a href="/doses/{tubeName}">
+								{@render TubeBadge(tubeName)}
+							</a>
+							<div class="list-col-grow">
+								<div class="text-sm font-medium">{dose.weight}g</div>
+								<div class="text-base-content/60 text-xs">{dose.creationDate}</div>
+							</div>
+							<button
+								class="btn btn-circle btn-ghost btn-sm text-error"
+								onclick={() => deleteDialogs[tubeName]?.showModal()}
+							>
+								<Trash />
+							</button>
+							{@render DeleteDialog(tubeName, dose.drawer, Number(dose.tubeNumber))}
+						</li>
 					{/each}
-				</tbody>
-			</table>
-		{/if}
+				{/if}
+			</ul>
+		</div>
+
+		<div class="divider divider-horizontal hidden lg:flex"></div>
+
+		<!-- Brews -->
+		<div class="space-y-4">
+			<h2 class="text-2xl font-bold">Brews</h2>
+			<ul class="list bg-base-100 rounded-box shadow-sm">
+				{#if brews.length === 0}
+					<li class="p-12 text-center">
+						<p class="text-base-content/60">There are no recorded brews</p>
+					</li>
+				{:else}
+					{#each brews as brew}
+						<li class="list-row">
+							<div class="list-col-grow">
+								<div class="text-sm font-medium">{brew.weight}g</div>
+								<div class="text-base-content/60 text-xs">{brew.consumptionDate}</div>
+							</div>
+						</li>
+					{/each}
+				{/if}
+			</ul>
+		</div>
 	</div>
 </div>
