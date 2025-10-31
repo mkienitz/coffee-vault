@@ -1,15 +1,31 @@
 <script lang="ts">
 	import { getCoffeeFlag } from '$lib/utils';
+	import { sum, unique } from 'radash';
 	let { data } = $props();
+	const totalBrews = $derived(data.brews.length);
+	const totalCoffees = $derived(unique(data.brews.map((brew) => brew.coffeeId)).length);
+	const totalWeight = $derived(sum(data.brews.map((brew) => brew.weight)));
 </script>
 
 <div class="flex flex-col items-center">
-	<h2 class="mb-8 text-2xl font-bold">All Brews</h2>
 	{#if data.brews.length === 0}
 		<span class="self-center">There are no recoded brews</span>
 	{:else}
-		<p>{data.brews.length} brews recorded so far!</p>
-		<table class="mt-8 table max-w-fit">
+		<div class="stats mb-8 shadow">
+			<div class="stat place-items-center">
+				<div class="stat-title">Total Brews</div>
+				<div class="stat-value text-3xl">{totalBrews}</div>
+			</div>
+			<div class="stat place-items-center">
+				<div class="stat-title">Coffees Brewed</div>
+				<div class="stat-value text-3xl">{totalCoffees}</div>
+			</div>
+			<div class="stat place-items-center">
+				<div class="stat-title">Grams Brewed</div>
+				<div class="stat-value text-3xl">{totalWeight}g</div>
+			</div>
+		</div>
+		<table class="table max-w-fit">
 			<thead>
 				<tr>
 					<th scope="col">Coffee</th>
