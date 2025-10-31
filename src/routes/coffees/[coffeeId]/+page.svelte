@@ -101,7 +101,7 @@
 			: ''}"
 	>
 		<input type="checkbox" class="peer sm:hidden" />
-		<div class="collapse-title p-4 pb-2">
+		<div class="collapse-title p-4 pb-2 sm:!cursor-auto">
 			<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
 		</div>
 		<div class="collapse-content px-4 pt-0">
@@ -211,23 +211,19 @@
 	<div class="grid gap-8 lg:grid-cols-[1fr_auto_1fr]">
 		<!-- Doses -->
 		<div class="space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-2xl font-bold">Doses</h2>
-				<span
-					class="text-sm {$creationForm.weight > leftToDose
-						? 'text-error'
-						: 'text-base-content/60'}"
-				>
-					{leftToDose}g left
-				</span>
-			</div>
+			<h2 class="text-2xl font-bold">Doses</h2>
 			<ul class="list bg-base-100 rounded-box shadow-sm">
-				<li class="list-row">
+				<li class="list-row items-center">
 					<form id="creationForm" method="POST" use:creationEnhance class="contents">
-						<div class="bg-base-200 flex h-12 w-12 items-center justify-center rounded-full">
+						<div
+							class="flex h-12 w-12 items-center justify-center rounded-full {$creationForm.weight >
+							leftToDose
+								? 'bg-base-300 text-base-content/30'
+								: 'bg-base-200'}"
+						>
 							<Plus class="h-6 w-6" />
 						</div>
-						<div class="list-col-grow flex items-center">
+						<div class="list-col-grow flex items-center gap-2">
 							<label class="input input-bordered input-sm w-fit">
 								<input
 									name="weight"
@@ -240,6 +236,13 @@
 								/>
 								<span class="label">g</span>
 							</label>
+							<span
+								class="text-sm {$creationForm.weight > leftToDose
+									? 'text-error'
+									: 'text-base-content/60'}"
+							>
+								{leftToDose}g left
+							</span>
 						</div>
 						<button
 							type="submit"
@@ -284,22 +287,30 @@
 		<!-- Brews -->
 		<div class="space-y-4">
 			<h2 class="text-2xl font-bold">Brews</h2>
-			<ul class="list bg-base-100 rounded-box shadow-sm">
-				{#if brews.length === 0}
-					<li class="p-12 text-center">
-						<p class="text-base-content/60">There are no recorded brews</p>
-					</li>
-				{:else}
-					{#each brews as brew}
-						<li class="list-row">
-							<div class="list-col-grow">
-								<div class="text-sm font-medium">{brew.weight}g</div>
-								<div class="text-base-content/60 text-xs">{brew.consumptionDate}</div>
-							</div>
-						</li>
-					{/each}
-				{/if}
-			</ul>
+			{#if brews.length === 0}
+				<div class="bg-base-100 rounded-box p-12 text-center shadow-sm">
+					<p class="text-base-content/60">There are no recorded brews</p>
+				</div>
+			{:else}
+				<div class="overflow-x-auto">
+					<table class="bg-base-100 table">
+						<thead>
+							<tr>
+								<th>Weight</th>
+								<th>Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each brews as brew}
+								<tr>
+									<td>{brew.weight}g</td>
+									<td>{brew.consumptionDate}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
