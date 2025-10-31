@@ -29,12 +29,12 @@
 		<div class="stat-value text-3xl">{data.totalDoses}</div>
 	</div>
 	<div class="stat place-items-center">
-		<div class="stat-title">Total Weight</div>
-		<div class="stat-value text-3xl">{data.totalWeight}g</div>
-	</div>
-	<div class="stat place-items-center">
 		<div class="stat-title">Unique Coffees</div>
 		<div class="stat-value text-3xl">{data.totalCoffees}</div>
+	</div>
+	<div class="stat place-items-center">
+		<div class="stat-title">Total Weight</div>
+		<div class="stat-value text-3xl">{data.totalWeight}g</div>
 	</div>
 </div>
 
