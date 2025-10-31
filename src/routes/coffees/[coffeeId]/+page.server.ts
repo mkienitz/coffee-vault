@@ -1,4 +1,4 @@
-import { addDose, clearDose, getCoffeeWithDosesAndBrews } from '$lib/server/db';
+import { addDose, clearDose, getCoffeeWithDosesAndBrews, getFreeDose } from '$lib/server/db';
 import { error, fail, type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
@@ -11,8 +11,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	if (!coffee) {
 		throw error(404, 'Coffee not found');
 	}
+	const nextFreeDose = await getFreeDose();
 	return {
 		coffee: coffee,
+		nextFreeDose,
 		creationForm: await superValidate({ weight: 12 }, zod(doseCreationSchema)),
 		managementForm: await superValidate(undefined, zod(doseManagementSchema))
 	};

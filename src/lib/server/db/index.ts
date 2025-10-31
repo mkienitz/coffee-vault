@@ -119,6 +119,19 @@ export async function getCoffeeWithDosesAndBrews(
 }
 
 // DOSES
+export async function getFreeDose(): Promise<DoseIdentifier | null> {
+	const dose = await db.query.doses.findFirst({
+		where: isNull(doses.coffeeId)
+	});
+	if (!dose) {
+		return null;
+	}
+	return {
+		drawer: dose.drawer,
+		tubeNumber: dose.tubeNumber
+	};
+}
+
 export type AddDoseResult = { success: true } | { success: false; error: string };
 
 export async function addDose(coffeeId: number, weight: number): Promise<AddDoseResult> {
@@ -144,7 +157,7 @@ export async function addDose(coffeeId: number, weight: number): Promise<AddDose
 				error: 'Not enough coffee left'
 			};
 		}
-		// Find first empty dose
+		// Find first empty dose (within transaction for safety)
 		const dose = await tx.query.doses.findFirst({
 			where: isNull(doses.coffeeId)
 		});

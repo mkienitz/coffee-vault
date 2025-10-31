@@ -2,7 +2,7 @@
 	import type { Dose } from '$lib/zod-schemas';
 	import { superForm } from 'sveltekit-superforms';
 	import { getCoffeeFlag, getProcessBadgeClass } from '$lib/utils';
-	import { Trash, Plus } from 'lucide-svelte';
+	import { Plus, Trash2 } from 'lucide-svelte';
 
 	let { data } = $props();
 	let coffee = $state(data.coffee);
@@ -215,40 +215,51 @@
 			<ul class="list bg-base-100 rounded-box shadow-sm">
 				<li class="list-row items-center">
 					<form id="creationForm" method="POST" use:creationEnhance class="contents">
-						<div
-							class="flex h-12 w-12 items-center justify-center rounded-full {$creationForm.weight >
-							leftToDose
-								? 'bg-base-300 text-base-content/30'
-								: 'bg-base-200'}"
-						>
-							<Plus class="h-6 w-6" />
-						</div>
-						<div class="list-col-grow flex items-center gap-2">
-							<label class="input input-bordered input-sm w-fit">
-								<input
-									name="weight"
-									type="number"
-									min="1"
-									max="20"
-									placeholder="12.5"
-									step="0.5"
-									bind:value={$creationForm.weight}
-								/>
-								<span class="label">g</span>
-							</label>
-							<span
-								class="text-sm {$creationForm.weight > leftToDose
-									? 'text-error'
-									: 'text-base-content/60'}"
+						{#if data.nextFreeDose}
+							<div
+								class="bg-base-200 text-base-content/30 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
 							>
-								{leftToDose}g left
-							</span>
-						</div>
+								{data.nextFreeDose.drawer}{data.nextFreeDose.tubeNumber}
+							</div>
+						{:else}
+							<div
+								class="bg-error text-error-content/30 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
+							>
+								--
+							</div>
+						{/if}
+						{#if data.nextFreeDose}
+							<div class="list-col-grow flex items-center gap-2">
+								<label class="input input-bordered input-sm w-fit">
+									<input
+										name="weight"
+										type="number"
+										min="1"
+										max="20"
+										placeholder="12.5"
+										step="0.5"
+										bind:value={$creationForm.weight}
+									/>
+									<span class="label">g</span>
+								</label>
+								<span
+									class="text-sm {$creationForm.weight > leftToDose
+										? 'text-error'
+										: 'text-base-content/60'}"
+								>
+									{leftToDose}g left
+								</span>
+							</div>
+						{:else}
+							<div class="list-col-grow">
+								<span class="text-error text-sm">No empty tubes available</span>
+							</div>
+						{/if}
 						<button
 							type="submit"
 							formaction="?/add"
-							disabled={$creationForm.weight > leftToDose}
-							class="btn btn-circle btn-ghost btn-sm text-success disabled:text-base-content/30"
+							disabled={!data.nextFreeDose || $creationForm.weight > leftToDose}
+							class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 						>
 							<Plus />
 						</button>
@@ -270,10 +281,10 @@
 								<div class="text-base-content/60 text-xs">{dose.creationDate}</div>
 							</div>
 							<button
-								class="btn btn-circle btn-ghost btn-sm text-error"
+								class="btn btn-circle btn-ghost text-error btn-sm"
 								onclick={() => deleteDialogs[tubeName]?.showModal()}
 							>
-								<Trash />
+								<Trash2 />
 							</button>
 							{@render DeleteDialog(tubeName, dose.drawer, Number(dose.tubeNumber))}
 						</li>
