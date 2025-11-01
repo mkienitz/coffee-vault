@@ -1,114 +1,32 @@
 <script lang="ts">
 	import type { Dose } from '$lib/zod-schemas';
-	import { superForm } from 'sveltekit-superforms';
 	import { getCoffeeFlag, getProcessBadgeClass } from '$lib/utils';
-	import { Plus, Trash2 } from 'lucide-svelte';
+	import DoseList from './DoseList.svelte';
+	import BrewTable from './BrewTable.svelte';
+	import { sum, first } from 'radash';
+	import { getTubeName } from '$lib/utils';
 
 	let { data } = $props();
-	let coffee = $state(data.coffee);
-
-	$effect(() => {
-		coffee = data.coffee;
-	});
+	let coffee = $derived(data.coffee);
 
 	const doses = $derived(coffee.doses as Dose[]);
-	// TODO: sort with recents on top
-	const brews = $derived(coffee.brews);
-	const leftToDose = $derived(
-		coffee.weight -
-			brews.reduce((acc, brew) => acc + brew.weight, 0) -
-			doses.reduce((acc, dose) => acc + dose.weight, 0)
-	);
-	const remainingWeight = $derived(
-		coffee.weight - brews.reduce((acc, brew) => acc + brew.weight, 0)
-	);
 
-	const preselectedDose = $derived(doses[0] ? `${doses[0].drawer}${doses[0].tubeNumber}` : null);
+	const remainingWeight = $derived(coffee.weight - sum(coffee.brews, (brew) => brew.weight));
+
+	const leftToDose = $derived(remainingWeight - sum(doses, (dose) => dose.weight));
+	const firstDose = $derived(first(doses));
 
 	const progressBarColor = $derived.by(() => {
-		if (remainingWeight < 7) {
-			return 'text-error';
-		} else if (remainingWeight < 20) {
-			return 'text-warning';
-		} else if (remainingWeight < 0.3 * coffee.weight) {
-			return 'text-warning';
-		} else {
-			return 'text-success';
-		}
+		if (remainingWeight < 7) return 'text-error';
+		if (remainingWeight < 20) return 'text-warning';
+		if (remainingWeight < 0.3 * coffee.weight) return 'text-warning';
+		return 'text-success';
 	});
 
 	const originInfo = $derived(
 		[coffee.farm, coffee.region, coffee.country].filter((v) => v && v !== '').join(', ')
 	);
-
-	const { form: creationForm, enhance: creationEnhance } = superForm(data.creationForm, {
-		resetForm: false
-	});
-	const { enhance: managementEnhance, formId: managementId } = superForm(data.managementForm);
-
-	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 </script>
-
-{#snippet InfoCard(label: string, value: string)}
-	<div class="card bg-base-100">
-		<div class="card-body gap-1 p-4">
-			<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{label}</h3>
-			<p class="text-sm font-medium">{value}</p>
-		</div>
-	</div>
-{/snippet}
-
-{#snippet TubeBadge(name: string)}
-	<div
-		class="bg-base-200 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
-	>
-		{name}
-	</div>
-{/snippet}
-
-{#snippet DeleteDialog(tubeName: string, drawer: string, tubeNumber: number)}
-	<dialog bind:this={deleteDialogs[tubeName]} class="modal">
-		<div class="modal-box text-left">
-			<h3>Are you sure?</h3>
-			<p class="py-4">This will delete the dose permanently!</p>
-			<div class="modal-action justify-end">
-				<form hidden id="managementForm-{tubeName}" method="POST" use:managementEnhance>
-					<input hidden name="drawer" value={drawer} />
-					<input hidden name="tubeNumber" value={tubeNumber} />
-				</form>
-				<form method="dialog">
-					<button class="btn">Cancel</button>
-					<input
-						type="submit"
-						value="Delete"
-						form="managementForm-{tubeName}"
-						formaction="?/delete"
-						onclick={() => {
-							$managementId = tubeName;
-						}}
-						class="btn btn-error"
-					/>
-				</form>
-			</div>
-		</div>
-	</dialog>
-{/snippet}
-
-{#snippet CollapsibleSection(title: string, content: string, fullWidth: boolean = false)}
-	<div
-		class="bg-base-100 sm:collapse-open collapse-arrow collapse sm:[&_.collapse-title]:after:hidden {fullWidth
-			? 'sm:col-span-2'
-			: ''}"
-	>
-		<input type="checkbox" class="peer sm:hidden" />
-		<div class="collapse-title p-4 pb-2 sm:!cursor-auto">
-			<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
-		</div>
-		<div class="collapse-content px-4 pt-0">
-			<p class="text-sm leading-relaxed">{content}</p>
-		</div>
-	</div>
-{/snippet}
 
 <div class="w-full max-w-6xl space-y-8">
 	<!-- Title Bar -->
@@ -129,11 +47,18 @@
 	</div>
 
 	<!-- Stats Grid -->
+	{#snippet InfoCard(label: string, value: string)}
+		<div class="card bg-base-100">
+			<div class="card-body gap-1 p-4">
+				<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{label}</h3>
+				<p class="text-sm font-medium">{value}</p>
+			</div>
+		</div>
+	{/snippet}
+
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:items-start">
 		<div
-			class="col-span-full grid grid-cols-2 gap-4 {preselectedDose
-				? 'sm:col-span-2'
-				: 'sm:col-span-3'}"
+			class="col-span-full grid grid-cols-2 gap-4 {firstDose ? 'sm:col-span-2' : 'sm:col-span-3'}"
 		>
 			{@render InfoCard('Varietals', coffee.varietals ?? 'Unknown')}
 			<div class="card bg-base-100">
@@ -157,17 +82,18 @@
 			{/if}
 		</div>
 
-		{#if preselectedDose}
+		{#if firstDose}
+			{@const tubeName = getTubeName(firstDose)}
 			<div class="card bg-base-100">
 				<div class="card-body gap-1 p-4 sm:items-center sm:justify-center">
 					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
 						Next Dose
 					</h3>
-					<a href="/doses/{preselectedDose}" class="link self-start sm:self-auto">
+					<a href="/doses/{tubeName}" class="link self-start sm:self-auto">
 						<div
 							class="border-primary bg-base-200 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border-[0.25rem]"
 						>
-							<span class="font-mono text-xl font-bold">{preselectedDose}</span>
+							<span class="font-mono text-xl font-bold">{tubeName}</span>
 						</div>
 					</a>
 				</div>
@@ -198,6 +124,22 @@
 	{/if}
 
 	{#if coffee.description || coffee.notes}
+		{#snippet CollapsibleSection(title: string, content: string, fullWidth: boolean = false)}
+			<div
+				class="bg-base-100 sm:collapse-open collapse-arrow collapse sm:[&_.collapse-title]:after:hidden {fullWidth
+					? 'sm:col-span-2'
+					: ''}"
+			>
+				<input type="checkbox" class="peer sm:hidden" />
+				<div class="collapse-title p-4 pb-2 sm:!cursor-auto">
+					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
+				</div>
+				<div class="collapse-content px-4 pt-0">
+					<p class="text-sm leading-relaxed">{content}</p>
+				</div>
+			</div>
+		{/snippet}
+
 		<div class="grid gap-4 sm:grid-cols-2">
 			{#if coffee.description}
 				{@render CollapsibleSection('Description', coffee.description, !coffee.notes)}
@@ -212,85 +154,13 @@
 		<!-- Doses -->
 		<div class="space-y-4">
 			<h2 class="text-2xl font-bold">Doses</h2>
-			<ul class="list bg-base-100 rounded-box shadow-sm">
-				<li class="list-row items-center">
-					<form id="creationForm" method="POST" use:creationEnhance class="contents">
-						{#if data.nextFreeDose}
-							<div
-								class="bg-base-200 text-base-content/30 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
-							>
-								{data.nextFreeDose.drawer}{data.nextFreeDose.tubeNumber}
-							</div>
-						{:else}
-							<div
-								class="bg-error text-error-content/30 flex h-12 w-12 items-center justify-center rounded-full font-mono text-lg font-bold"
-							>
-								--
-							</div>
-						{/if}
-						{#if data.nextFreeDose}
-							<div class="list-col-grow flex items-center gap-2">
-								<label class="input input-bordered input-sm w-fit">
-									<input
-										name="weight"
-										type="number"
-										min="1"
-										max="20"
-										placeholder="12.5"
-										step="0.5"
-										bind:value={$creationForm.weight}
-									/>
-									<span class="label">g</span>
-								</label>
-								<span
-									class="text-sm {$creationForm.weight > leftToDose
-										? 'text-error'
-										: 'text-base-content/60'}"
-								>
-									{leftToDose}g left
-								</span>
-							</div>
-						{:else}
-							<div class="list-col-grow">
-								<span class="text-error text-sm">No empty tubes available</span>
-							</div>
-						{/if}
-						<button
-							type="submit"
-							formaction="?/add"
-							disabled={!data.nextFreeDose || $creationForm.weight > leftToDose}
-							class="btn btn-circle btn-ghost btn-sm enabled:text-success"
-						>
-							<Plus />
-						</button>
-					</form>
-				</li>
-				{#if doses.length === 0}
-					<li class="p-12 text-center">
-						<p class="text-base-content/60">No doses yet. Add your first dose above!</p>
-					</li>
-				{:else}
-					{#each doses as dose (dose.drawer + dose.tubeNumber)}
-						{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
-						<li class="list-row items-center">
-							<a href="/doses/{tubeName}">
-								{@render TubeBadge(tubeName)}
-							</a>
-							<div class="list-col-grow">
-								<div class="text-sm font-medium">{dose.weight}g</div>
-								<div class="text-base-content/60 text-xs">{dose.creationDate}</div>
-							</div>
-							<button
-								class="btn btn-circle btn-ghost text-error btn-sm"
-								onclick={() => deleteDialogs[tubeName]?.showModal()}
-							>
-								<Trash2 />
-							</button>
-							{@render DeleteDialog(tubeName, dose.drawer, Number(dose.tubeNumber))}
-						</li>
-					{/each}
-				{/if}
-			</ul>
+			<DoseList
+				{doses}
+				{leftToDose}
+				nextFreeDose={data.nextFreeDose}
+				creationForm={data.creationForm}
+				managementForm={data.managementForm}
+			/>
 		</div>
 
 		<div class="divider divider-horizontal hidden lg:flex"></div>
@@ -298,30 +168,7 @@
 		<!-- Brews -->
 		<div class="space-y-4">
 			<h2 class="text-2xl font-bold">Brews</h2>
-			{#if brews.length === 0}
-				<div class="bg-base-100 rounded-box p-12 text-center shadow-sm">
-					<p class="text-base-content/60">There are no recorded brews</p>
-				</div>
-			{:else}
-				<div class="overflow-x-auto">
-					<table class="bg-base-100 table">
-						<thead>
-							<tr>
-								<th>Weight</th>
-								<th>Date</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each brews as brew}
-								<tr>
-									<td>{brew.weight}g</td>
-									<td>{brew.consumptionDate}</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
-			{/if}
+			<BrewTable brews={coffee.brews} />
 		</div>
 	</div>
 </div>

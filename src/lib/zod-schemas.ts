@@ -56,7 +56,8 @@ export const doseManagementSchema = z.object({
 	drawer: drawerSchema,
 	tubeNumber: tubeNumberSchema
 });
-export type DoseIdentifier = z.infer<typeof doseManagementSchema>;
+export type DoseManagementSchema = z.infer<typeof doseManagementSchema>;
+export type DoseIdentifier = DoseManagementSchema;
 
 export const doseSchema = doseManagementSchema
 	.extend({
@@ -73,6 +74,7 @@ export type EmptyDose = DoseIdentifier & {
 };
 
 export const doseCreationSchema = doseSchema.pick({ weight: true });
+export type DoseCreationSchema = z.infer<typeof doseCreationSchema>;
 
 // BREWS
 export const brewSchema = z
