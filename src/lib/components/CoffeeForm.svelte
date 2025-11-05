@@ -31,138 +31,170 @@
 	let deleteDialog: HTMLDialogElement | undefined = $state(undefined);
 </script>
 
-<div class="card prose w-fit shadow-xl">
+<div class="card w-full max-w-2xl shadow-xl">
 	<div class="card-body">
-		<div class="card-title flex flex-row items-center justify-start">
-			<button onclick={() => window.history.back()} class="btn btn-link p-0">
+		<div class="relative mb-4">
+			<button onclick={() => window.history.back()} class="btn btn-link absolute left-0 p-0">
 				<ChevronLeft />Back
 			</button>
-			<span class="text-xl">
+			<h2 class="text-center text-xl font-bold">
 				{mode === 'create' ? 'Add a new Coffee' : 'Edit existing Coffee'}
-			</span>
+			</h2>
 		</div>
-		<form id="coffeeForm" method="POST" use:enhance class="flex flex-col space-y-4">
-			<label class="form-control w-full max-w-xs">
-				<span class="text">Name</span>
+		<form id="coffeeForm" method="POST" use:enhance class="space-y-4">
+			<div class="form-control">
+				<span class="label-text mb-1">Name</span>
 				<input
 					name="name"
 					type="text"
 					placeholder="Coffee Name"
 					bind:value={$form.name}
 					required
-					class="input"
+					class="input w-full"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Roaster
+			</div>
+			<div class="form-control">
+				<span class="label-text mb-1">Roaster</span>
 				<input
 					name="roaster"
 					type="text"
 					placeholder="Roaster"
 					bind:value={$form.roaster}
-					class="input"
+					class="input w-full"
 				/>
-			</label>
-			<label class="form-control w-full max-w-xs">
-				Varietals
+			</div>
+			<div class="form-control">
+				<span class="label-text mb-1">Varietals</span>
 				<input
 					name="varietals"
 					type="text"
 					placeholder="Varietals"
 					bind:value={$form.varietals}
-					class="input"
+					class="input w-full"
 				/>
-			</label>
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend">Process</legend>
-				<span class="label">Category</span>
-				<div class="join">
-					{#each processValues as process}
-						<input
-							type="radio"
-							name="process"
-							class={['join-item btn', $form.process == process && processColorMap[process]]}
-							aria-label={process}
-							value={process}
-							bind:group={$form.process}
-						/>
-					{/each}
+			</div>
+			<fieldset class="space-y-2">
+				<legend class="mb-2 text-base font-semibold">Process</legend>
+				<div class="form-control">
+					<span class="label-text mb-1">Category</span>
+					<div class="join w-full">
+						{#each processValues as process}
+							<input
+								type="radio"
+								name="process"
+								class={[
+									'join-item btn btn-sm flex-1',
+									$form.process == process && processColorMap[process]
+								]}
+								aria-label={process}
+								value={process}
+								bind:group={$form.process}
+							/>
+						{/each}
+					</div>
 				</div>
-				<span class="label">Details</span>
-				<input
-					name="processDetails"
-					type="text"
-					placeholder="the process as stated on the bag"
-					bind:value={$form.processDetails}
-					aria-label="Process Details"
-					class="input"
-				/>
+				<div class="form-control">
+					<span class="label-text mb-1">Details</span>
+					<input
+						name="processDetails"
+						type="text"
+						placeholder="the process as stated on the bag"
+						bind:value={$form.processDetails}
+						aria-label="Process Details"
+						class="input w-full"
+					/>
+				</div>
 			</fieldset>
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend">Origin</legend>
-				<span class="label">Country</span>
-				<select name="country" bind:value={$form.country} class="select w-full max-w-xs">
-					<option value={null} disabled selected={$form.country === null}>Select a country</option>
-					{#each countryNames as countryName}
-						<option value={countryName.value}>
-							{countryName.value}
-							{getEmojiFlag(getCountryCode(countryName.value) as TCountryCode)}
-						</option>
-					{/each}
-				</select>
-				<span class="label">Region</span>
-				<input
-					name="region"
-					type="text"
-					placeholder="Where in the country was the coffee grown?"
-					bind:value={$form.region}
-					class="input"
-				/>
-				<span class="label">Farm</span>
-				<input
-					name="farm"
-					type="text"
-					placeholder="What's the name of the farm or station?"
-					bind:value={$form.farm}
-					class="input"
-				/>
-				<span class="label">Elevation</span>
-				<input
-					name="elevation"
-					type="text"
-					placeholder="e.g. 1800m"
-					bind:value={$form.elevation}
-					class="input"
-				/>
+			<fieldset class="space-y-2">
+				<legend class="mb-2 text-base font-semibold">Origin</legend>
+				<div class="form-control">
+					<span class="label-text mb-1">Country</span>
+					<select name="country" bind:value={$form.country} class="select w-full">
+						<option value={null} disabled selected={$form.country === null}>Select a country</option
+						>
+						{#each countryNames as countryName}
+							<option value={countryName.value}>
+								{countryName.value}
+								{getEmojiFlag(getCountryCode(countryName.value) as TCountryCode)}
+							</option>
+						{/each}
+					</select>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Region</span>
+					<input
+						name="region"
+						type="text"
+						placeholder="Where in the country was the coffee grown?"
+						bind:value={$form.region}
+						class="input w-full"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Farm</span>
+					<input
+						name="farm"
+						type="text"
+						placeholder="What's the name of the farm or station?"
+						bind:value={$form.farm}
+						class="input w-full"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Elevation</span>
+					<input
+						name="elevation"
+						type="text"
+						placeholder="e.g. 1800m"
+						bind:value={$form.elevation}
+						class="input w-full"
+					/>
+				</div>
 			</fieldset>
-			<fieldset class="fieldset">
-				<legend class="fieldset-legend">Other</legend>
-				<span class="label">Weight</span>
-				<input
-					name="weight"
-					type="number"
-					step="0.5"
-					bind:value={$form.weight}
-					required
-					class="input {$errors.weight ? 'input-error' : ''}"
-				/>
-				{#if $errors.weight}
-					<span class="label-text-alt text-error">{$errors.weight}</span>
-				{/if}
-				<span class="label">Roasting Date</span>
-				<input name="roastingDate" type="date" bind:value={$form.roastingDate} class="input" />
-				<span class="label">Tasting Notes</span>
-				<input
-					name="flavorProfile"
-					type="text"
-					placeholder="Add some tasting notes"
-					bind:value={$form.flavorProfile}
-					class="input"
-				/>
-				<span class="label">Description</span>
-				<textarea name="description" bind:value={$form.description} class="textarea"></textarea>
-				<span class="label">Notes</span>
-				<textarea name="notes" bind:value={$form.notes} class="textarea"></textarea>
+			<fieldset class="space-y-2">
+				<legend class="mb-2 text-base font-semibold">Other</legend>
+				<div class="form-control">
+					<span class="label-text mb-1">Weight</span>
+					<input
+						name="weight"
+						type="number"
+						step="0.5"
+						bind:value={$form.weight}
+						required
+						class="input w-full {$errors.weight ? 'input-error' : ''}"
+					/>
+					{#if $errors.weight}
+						<span class="label-text-alt text-error">{$errors.weight}</span>
+					{/if}
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Roasting Date</span>
+					<input
+						name="roastingDate"
+						type="date"
+						bind:value={$form.roastingDate}
+						class="input w-full"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Tasting Notes</span>
+					<input
+						name="flavorProfile"
+						type="text"
+						placeholder="Add some tasting notes"
+						bind:value={$form.flavorProfile}
+						class="input w-full"
+					/>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Description</span>
+					<textarea name="description" bind:value={$form.description} class="textarea w-full"
+					></textarea>
+				</div>
+				<div class="form-control">
+					<span class="label-text mb-1">Notes</span>
+					<textarea name="notes" bind:value={$form.notes} class="textarea w-full"></textarea>
+				</div>
 			</fieldset>
 		</form>
 		<div class="card-actions justify-end">
