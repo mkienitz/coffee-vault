@@ -34,10 +34,10 @@
 <div class="card prose w-fit shadow-xl">
 	<div class="card-body">
 		<div class="card-title flex flex-row items-center justify-start">
-			<button onclick={() => window.history.back()} class="btn btn-link text-primary-content p-0">
+			<button onclick={() => window.history.back()} class="btn btn-link p-0">
 				<ChevronLeft />Back
 			</button>
-			<span class="text-primary-content text-xl">
+			<span class="text-xl">
 				{mode === 'create' ? 'Add a new Coffee' : 'Edit existing Coffee'}
 			</span>
 		</div>
