@@ -135,7 +135,7 @@
 					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
 				</div>
 				<div class="collapse-content px-4 pt-0">
-					<p class="text-sm leading-relaxed">{content}</p>
+					<p class="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
 				</div>
 			</div>
 		{/snippet}
