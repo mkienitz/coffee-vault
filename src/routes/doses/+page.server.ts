@@ -8,7 +8,7 @@ export const load: PageServerLoad = async () => {
 	return {
 		dosesByDrawer: group(allDoses, (dose) => dose.drawer),
 		totalCoffees: unique(allDoses.map((dose) => dose.coffeeId)).length,
-		totalDoses: allDoses.length,
+		totalDoses: allDoses.filter((dose) => dose.coffeeId !== null).length,
 		totalWeight: allDoses.reduce((acc, dose) => acc + dose.weight, 0)
 	};
 };
