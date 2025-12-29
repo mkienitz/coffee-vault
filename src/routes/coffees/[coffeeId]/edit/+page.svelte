@@ -1,7 +1,8 @@
 <script lang="ts">
 	import CoffeeForm from '$lib/components/CoffeeForm.svelte';
+	import type { PageProps } from './$types';
 
-	let { data } = $props();
+	let { params }: PageProps = $props();
 </script>
 
-<CoffeeForm data={data.form} mode="edit" />
+<CoffeeForm mode="update" coffeeId={Number(params.coffeeId)} />

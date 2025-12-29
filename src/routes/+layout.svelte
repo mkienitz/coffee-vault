@@ -3,9 +3,13 @@
 	import { getFlash } from 'sveltekit-flash-message';
 	import { toast, Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
-	import { Check, ChevronDown, Menu, Palette } from 'lucide-svelte';
+	import Check from 'lucide-svelte/icons/check';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import Menu from 'lucide-svelte/icons/menu';
+	import Palette from 'lucide-svelte/icons/palette';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	const { children, data } = $props();
 
@@ -29,7 +33,7 @@
 		}
 	});
 
-	let selectedTheme = $state(data.selectedTheme);
+	let selectedTheme = $derived(data.selectedTheme);
 	$effect(() => {
 		if (browser && selectedTheme) {
 			document.cookie = `theme=${selectedTheme}; path=/; max-age=31536000; SameSite=Lax`;
@@ -54,20 +58,19 @@
 
 <Toaster />
 
-{#snippet NavElem(pathname: string)}
-	{@const path = `/${pathname.toLowerCase()}`}
+{#snippet NavElem(name: string, path: string)}
 	<li>
 		<a href={path} class="text-lg {path === page.url.pathname ? 'font-bold underline' : ''}"
-			>{pathname}</a
+			>{name}</a
 		>
 	</li>
 {/snippet}
 
 {#snippet NavMenu()}
-	{@render NavElem('Coffees')}
-	{@render NavElem('Doses')}
-	{@render NavElem('Brews')}
-	{@render NavElem('Mystery')}
+	{@render NavElem('Coffees', resolve('/'))}
+	{@render NavElem('Table', resolve('/coffees'))}
+	{@render NavElem('Doses', resolve('/doses'))}
+	{@render NavElem('Brews', resolve('/brews'))}
 {/snippet}
 
 <header>
@@ -79,13 +82,13 @@
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
 					<Menu />
 				</div>
-				<ul
-					class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-				>
+				<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
 					{@render NavMenu()}
 				</ul>
 			</div>
-			<a href="/" class="btn btn-ghost font-mono text-xl no-underline sm:text-2xl">CoffeeVault</a>
+			<a href={resolve('/')} class="btn btn-ghost font-mono text-xl no-underline sm:text-2xl"
+				>CoffeeVault</a
+			>
 		</div>
 		<div class="navbar-center hidden lg:flex">
 			<ul class="menu menu-horizontal px-1">
@@ -101,7 +104,7 @@
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 				<ul
 					tabindex="-1"
-					class="menu dropdown-content bg-base-300 rounded-box z-[1] w-52 p-2 shadow-2xl"
+					class="menu dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl"
 				>
 					{#each ['light', 'dark', 'coffee'] as theme}
 						<li>
@@ -124,7 +127,7 @@
 					{/each}
 				</ul>
 			</div>
-			<a href="/login" class="btn btn-sm sm:btn-md">Login</a>
+			<!-- <a href="/login" class="btn btn-sm sm:btn-md">Login</a> -->
 		</div>
 	</nav>
 </header>

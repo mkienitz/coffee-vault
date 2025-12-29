@@ -1,6 +1,8 @@
 <script lang="ts">
-	import type { Drawer } from '$lib/zod-schemas.js';
-	let { data } = $props();
+	import { type Drawer } from '$lib/types';
+	import { getDoseOverviewData } from './data.remote';
+
+	const data = $derived(await getDoseOverviewData());
 </script>
 
 {#snippet DrawerVis(drawer: Drawer)}

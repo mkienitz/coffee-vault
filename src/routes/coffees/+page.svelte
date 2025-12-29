@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
-	import { ArrowDownZa, ArrowUpAz, Plus, X } from 'lucide-svelte';
-	import { getProcessBadgeClass } from '$lib/utils';
+	import ArrowDownZA from 'lucide-svelte/icons/arrow-down-z-a';
+	import ArrowUpAZ from 'lucide-svelte/icons/arrow-up-a-z';
+	import Plus from 'lucide-svelte/icons/plus';
+	import X from 'lucide-svelte/icons/x';
+	import { getProcessBadgeClass, formatDate } from '$lib/utils';
+	import { getData } from './data.remote';
 
-	let { data } = $props();
-	const tableEntries = $state(data.tableEntries);
+	const tableEntries = await getData();
 
 	type TableEntry = (typeof tableEntries)[number];
 	type TableEntryKey = keyof TableEntry;
@@ -21,7 +24,7 @@
 	// SORTING
 	let sortedBy: { key: TableEntryKey; ascending: boolean } = $state({
 		key: 'roastingDate',
-		ascending: true
+		ascending: false
 	});
 
 	let sortedEntries = $derived(
@@ -64,9 +67,9 @@
 			>{headerName ?? fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
 			{#if sortedBy.key === fieldName}
 				{#if sortedBy.ascending}
-					<ArrowUpAz />
+					<ArrowUpAZ />
 				{:else}
-					<ArrowDownZa />
+					<ArrowDownZA />
 				{/if}
 			{/if}
 		</button>
@@ -170,7 +173,9 @@
 						</td>
 						<td class="text-center whitespace-nowrap">{coffee.dosesRemaining}</td>
 						<td class="text-center whitespace-nowrap">{coffee.dosesBrewed}</td>
-						<td class="whitespace-nowrap">{coffee.roastingDate ?? 'Unknown'}</td>
+						<td class="whitespace-nowrap"
+							>{coffee.roastingDate ? formatDate(coffee.roastingDate) : 'Unknown'}</td
+						>
 					</tr>
 				{/each}
 			</tbody>

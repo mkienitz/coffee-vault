@@ -1,7 +1,7 @@
+import { query } from '$app/server';
 import { db } from '$lib/server/db';
-import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const getData = query(async () => {
 	const tableEntries = (
 		await db.query.coffees.findMany({
 			with: {
@@ -14,7 +14,5 @@ export const load: PageServerLoad = async () => {
 		dosesRemaining: doses.length,
 		dosesBrewed: brews.length
 	}));
-	return {
-		tableEntries
-	};
-};
+	return tableEntries;
+});

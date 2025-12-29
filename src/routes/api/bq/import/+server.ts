@@ -1,7 +1,7 @@
+/*
 import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { coffees } from '$lib/server/db/schema';
-import { coffeeSchema } from '$lib/zod-schemas';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const bqData = await request.json();
@@ -40,3 +40,4 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 	return new Response();
 };
+*/

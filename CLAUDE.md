@@ -10,7 +10,7 @@ Coffee Vault NG is a SvelteKit application for tracking coffee inventory, doses,
 
 - Use Svelte 5 runes and no deprecated Svelte 4 syntax
 - When dealing with markup, ensure it works on phones, tablets and big screens
-- You can find additional information on DaisyUI using the MCP context7
+- **ALWAYS use MCP context7 for DaisyUI questions** - Never rely on memory alone for DaisyUI component examples or documentation
 - You can find additional information on SvelteKit using the MCP svelte
 - You can find additional information on Drizzle ORM using the MCP context7
 
@@ -29,12 +29,12 @@ Coffee Vault NG is a SvelteKit application for tracking coffee inventory, doses,
 
 ### Data Validation & Type System
 
-- **Zod as Single Source of Truth**: `src/lib/zod-schemas.ts` defines all data validation schemas using Zod
-- **Type Derivation**: All TypeScript types (e.g., `Coffee`, `Dose`, `Brew`) are derived directly from Zod schemas, not from Drizzle schemas
+- **Valibot as Single Source of Truth**: `src/lib/validation/` defines all data validation schemas using Valibot
+- **Type Derivation**: All TypeScript types (e.g., `Coffee`, `Dose`, `Brew`) are derived directly from Valibot schemas, not from Drizzle schemas
 - **Two-Layer Validation**:
   - Drizzle schema provides basic database-level constraints (NOT NULL, UNIQUE, etc.)
-  - Zod schemas enforce precise business logic constraints and validation rules
-- **Why Zod is Primary**: Drizzle cannot express all business constraints at the schema level, so Zod serves as the authoritative definition for all data structures and validation logic
+  - Valibot schemas enforce precise business logic constraints and validation rules
+- **Why Valibot is Primary**: Drizzle cannot express all business constraints at the schema level, so Valibot serves as the authoritative definition for all data structures and validation logic
 
 ### Key Domain Concepts
 
@@ -46,7 +46,7 @@ Coffee Vault NG is a SvelteKit application for tracking coffee inventory, doses,
 ### Form Handling & Validation
 
 - **Superforms**: Used for form handling with server-side validation
-- **Zod schemas**: `src/lib/zod-schemas.ts` defines all validation schemas
+- **Valibot schemas**: `src/lib/validation/` defines all validation schemas
 - **Flash messages**: User feedback via sveltekit-flash-message and svelte-french-toast
 
 ### UI Components
@@ -94,7 +94,7 @@ All routes use `+page.server.ts` files for:
 
 - Database operations via Drizzle
 - Form actions with Superforms
-- Server-side validation with Zod schemas
+- Server-side validation with Valibot schemas
 
 ### Component Organization
 
@@ -105,7 +105,7 @@ All routes use `+page.server.ts` files for:
 ## Development Notes
 
 - Database schema changes require migration generation via `drizzle-kit generate`
-- All forms use Superforms with Zod validation
+- All forms use Superforms with Valibot validation
 - Physical dose management uses drawer/tube coordinate system
 - Coffee weight tracking accounts for doses and brews to show remaining coffee
 - NFC tags storing an URL to /doses/\[doseId\] are used for dose identification in the physical system

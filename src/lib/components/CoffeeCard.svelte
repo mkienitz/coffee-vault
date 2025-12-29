@@ -1,90 +1,100 @@
 <script lang="ts">
-	import { type Coffee, type Dose, type Brew } from '$lib/zod-schemas';
-	import { getCoffeeFlag } from '$lib/utils';
+	import { getProcessBadgeClass, formatRoastDate } from '$lib/utils';
+	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
+	import { getCoffeeCardData } from './CoffeeCard.remote';
+	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
 
-	const { coffee, doses, brews }: { coffee: Coffee; doses: Dose[]; brews: Brew[] } = $props();
+	interface Props {
+		coffeeId: number;
+	}
+	const { coffeeId }: Props = $props();
 
-	const remainingWeight = $derived(
-		coffee.weight - brews.reduce((acc, brew) => acc + brew.weight, 0)
+	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(
+		await getCoffeeCardData(coffeeId)
 	);
 
-	const progressBarColor = $derived.by(() => {
-		if (remainingWeight < 7) {
-			return 'text-red-500';
-		} else if (remainingWeight < 20) {
-			return 'text-orange-500';
-		} else if (remainingWeight < 0.3 * coffee.weight) {
-			return 'text-yellow-500';
+	const doseCountColor = $derived.by(() => {
+		let originalDoses = remainingDoses + dosesBrewed;
+		if (remainingDoses <= 1) {
+			return 'badge-error';
+		} else if (remainingDoses <= 0.4 * originalDoses) {
+			return 'badge-warning';
 		} else {
-			return 'text-green-500';
+			return 'badge-success';
 		}
 	});
-	const originInfo = [coffee.farm, coffee.region, coffee.country]
-		.filter((v) => v && v !== '')
-		.join(', ');
 </script>
 
-<div class="card flex max-h-fit w-[400px] flex-col shadow-xl">
-	<div class="card-body flex flex-col space-y-8">
-		<div class="card-title flex flex-col space-y-1">
-			<div class="flex w-[100%] flex-row items-center justify-between">
-				<a href="/coffees/{coffee.id}" class="text-2xl">
-					{`${getCoffeeFlag(coffee)} ${coffee.name}`}
-				</a>
-				<a href="/coffees/{coffee.id}/edit" class="link h-fit w-fit p-0">Edit</a>
+<a
+	href="/coffees/{coffee.id}"
+	class="card border-base-300/50 bg-base-100 border shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {(await getRemainingWeight(
+		coffeeId
+	)) < 5
+		? 'opacity-50 grayscale'
+		: ''}"
+>
+	<div class="card-body relative p-6">
+		<!-- Header with flag, name, roaster, and tube indicator -->
+		<div class="mb-4 flex items-center gap-3">
+			<div class="text-2xl leading-none">
+				{#if coffee.country}
+					{getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)}
+				{:else}
+					❔
+				{/if}
 			</div>
-			<div class="flex w-[100%] flex-row items-center justify-between">
-				<small class="text-base-content/70">{coffee.roaster ?? 'Unknown Roaster'}</small>
-				<small class="text-base-content/70">{coffee.roastingDate ?? 'Unknown Roasting Date'}</small>
+			<div class="min-w-0 flex-1">
+				<h3 class="card-title text-lg leading-tight">{coffee.name}</h3>
+				<p class="text-sm opacity-70">{coffee.roaster}</p>
+			</div>
+			<div class="indicator shrink-0">
+				<span
+					class="indicator-item badge {doseCountColor} flex size-5 -translate-x-1 -translate-y-1 items-center justify-center rounded-full p-0 text-xs font-bold"
+				>
+					{remainingDoses}
+				</span>
+				<div
+					class="border-primary bg-base-200 flex h-12 w-12 items-center justify-center rounded-full border-2 {nextTube
+						? ''
+						: 'text-base-content/30'}"
+				>
+					<span class="font-mono text-sm font-bold">
+						{nextTube ?? '--'}
+					</span>
+				</div>
 			</div>
 		</div>
-		<div class="flex grow flex-col space-y-4 py-0">
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Origin</div>
-				<div class="text-base-content/70 text-sm">
-					{originInfo === '' ? 'Unknown' : originInfo}
-				</div>
-			</div>
-			{#if coffee.producer}
-				<div class="flex flex-col space-y-1">
-					<div class="font-bold">Producer</div>
-					<div class="text-base-content/70 text-sm">{coffee.producer}</div>
+
+		<!-- Coffee details -->
+		<div class="space-y-2 text-sm">
+			{#if coffee.process || coffee.varietals}
+				<div class="flex flex-wrap items-center gap-2">
+					{#if coffee.process}
+						<span class="badge {getProcessBadgeClass(coffee.process)}">
+							{coffee.process}
+						</span>
+					{/if}
+					{#if coffee.varietals}
+						<span>{coffee.varietals}</span>
+					{/if}
 				</div>
 			{/if}
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Varietals</div>
-				<div class="text-base-content/70 text-sm">{coffee.varietals ?? 'Unknown'}</div>
-			</div>
-			<div class="flex flex-col space-y-1">
-				<div class="font-bold">Process</div>
-				<div class="text-base-content/70 text-sm">{coffee.processDetails ?? 'Unknown'}</div>
-			</div>
+
 			{#if coffee.flavorProfile}
-				<div class="flex flex-col space-y-1">
-					<div class="font-bold">Flavor Profile</div>
-					<div class="text-base-content/70 text-sm">{coffee.flavorProfile}</div>
+				<div class="mt-2">
+					<div class="text-xs font-semibold tracking-wide uppercase opacity-60">Flavor Notes</div>
+					<div class="mt-0.5">{coffee.flavorProfile}</div>
 				</div>
-			{/if}
-			{#if coffee.description}
-				<div class="flex flex-col space-y-1">
-					<div class="font-bold">Description</div>
-					<div class="text-base-content/70 text-sm">{coffee.description}</div>
-				</div>
-			{/if}
-			{#if coffee.notes}
-				<div class="flex flex-col space-y-1">
-					<div class="font-bold">Notes</div>
-					<div class="text-base-content/70 text-sm">{coffee.notes}</div>
-				</div>
+			{:else if !coffee.process && !coffee.varietals}
+				<div class="text-xs italic opacity-40">No details available</div>
 			{/if}
 		</div>
-		<div class="flex flex-row items-center space-x-2 self-end">
-			<progress
-				class="progress w-[160px] {progressBarColor}"
-				value={remainingWeight}
-				max={coffee.weight}
-			></progress>
-			<div class="text-base-content/70 text-sm">{remainingWeight}/{coffee.weight}g</div>
-		</div>
+
+		<!-- Roasting date in bottom right corner -->
+		{#if coffee.roastingDate}
+			<div class="text-base-content/40 absolute right-3 bottom-2 text-xs font-light">
+				{formatRoastDate(coffee.roastingDate)}
+			</div>
+		{/if}
 	</div>
-</div>
+</a>

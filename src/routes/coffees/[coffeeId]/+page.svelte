@@ -1,39 +1,35 @@
 <script lang="ts">
-	import type { Dose } from '$lib/zod-schemas';
 	import { getCoffeeFlag, getProcessBadgeClass } from '$lib/utils';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';
-	import { sum, first } from 'radash';
-	import { getTubeName } from '$lib/utils';
+	import FreeformDoseList from './FreeformDoseList.svelte';
+	import type { PageProps } from './$types';
+	import { getCoffee } from '$lib/data.remote';
+	import { getNextDose, getRemainingWeight } from './data.remote';
 
-	let { data } = $props();
-	let coffee = $derived(data.coffee);
+	let { params }: PageProps = $props();
+	const coffeeId = $derived(Number(params.coffeeId));
 
-	const doses = $derived(coffee.doses as Dose[]);
-
-	const remainingWeight = $derived(coffee.weight - sum(coffee.brews, (brew) => brew.weight));
-
-	const leftToDose = $derived(remainingWeight - sum(doses, (dose) => dose.weight));
-	const firstDose = $derived(first(doses));
-
-	const progressBarColor = $derived.by(() => {
+	function progressBarColor(remainingWeight: number, totalWeight: number) {
 		if (remainingWeight < 7) return 'text-error';
 		if (remainingWeight < 20) return 'text-warning';
-		if (remainingWeight < 0.3 * coffee.weight) return 'text-warning';
+		if (remainingWeight < 0.3 * totalWeight) return 'text-warning';
 		return 'text-success';
-	});
-
-	const originInfo = $derived(
-		[coffee.farm, coffee.region, coffee.country].filter((v) => v && v !== '').join(', ')
-	);
+	}
 </script>
 
-<div class="w-full max-w-6xl space-y-8">
+{#snippet CoffeePanel()}
+	{@const coffee = await getCoffee(coffeeId)}
+	{@const remainingWeight = await getRemainingWeight(coffee.id)}
+	{@const nextDose = await getNextDose(coffee.id)}
+	{@const originInfo = [coffee.farm, coffee.region, coffee.country]
+		.filter((v) => v && v !== '')
+		.join(', ')}
 	<!-- Title Bar -->
 	<div class="flex items-start justify-between gap-4">
 		<div class="min-w-0 flex-1 space-y-1">
 			<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
-				{`${getCoffeeFlag(coffee)} ${coffee.name}`}
+				{`${getCoffeeFlag(coffee.country)} ${coffee.name}`}
 			</h1>
 			<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
 				<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
@@ -58,9 +54,11 @@
 
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:items-start">
 		<div
-			class="col-span-full grid grid-cols-2 gap-4 {firstDose ? 'sm:col-span-2' : 'sm:col-span-3'}"
+			class="col-span-full grid grid-cols-2 gap-4 {nextDose ? 'sm:col-span-2' : 'sm:col-span-3'}"
 		>
-			{@render InfoCard('Varietals', coffee.varietals ?? 'Unknown')}
+			{#if coffee.varietals}
+				{@render InfoCard('Varietals', coffee.varietals)}
+			{/if}
 			<div class="card bg-base-100">
 				<div class="card-body gap-1 p-4">
 					<div class="flex items-center gap-2">
@@ -76,14 +74,16 @@
 					<p class="text-sm font-medium">{coffee.processDetails ?? 'Unknown'}</p>
 				</div>
 			</div>
-			{@render InfoCard('Origin', originInfo === '' ? 'Unknown' : originInfo)}
+			{#if originInfo !== ''}
+				{@render InfoCard('Origin', originInfo)}
+			{/if}
 			{#if coffee.flavorProfile}
 				{@render InfoCard('Flavor', coffee.flavorProfile)}
 			{/if}
 		</div>
 
-		{#if firstDose}
-			{@const tubeName = getTubeName(firstDose)}
+		{#if nextDose}
+			{@const tubeName = `${nextDose.drawer}${nextDose.tubeNumber}`}
 			<div class="card bg-base-100">
 				<div class="card-body gap-1 p-4 sm:items-center sm:justify-center">
 					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
@@ -91,7 +91,7 @@
 					</h3>
 					<a href="/doses/{tubeName}" class="link self-start sm:self-auto">
 						<div
-							class="border-primary bg-base-200 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border-[0.25rem]"
+							class="border-primary bg-base-200 flex h-20 w-20 items-center justify-center rounded-full border-[0.25rem]"
 						>
 							<span class="font-mono text-xl font-bold">{tubeName}</span>
 						</div>
@@ -99,12 +99,16 @@
 				</div>
 			</div>
 		{/if}
+		<!-- TODO: add alternative placeholder if there is no next dose -->
 
 		<div class="card bg-base-100">
 			<div class="card-body gap-1 p-4 sm:items-center sm:justify-center">
 				<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">Remaining</h3>
 				<div
-					class="radial-progress {progressBarColor} self-start sm:self-auto"
+					class="radial-progress {progressBarColor(
+						remainingWeight,
+						coffee.weight
+					)} self-start sm:self-auto"
 					style="--value:{(remainingWeight / coffee.weight) *
 						100}; --size:4.5rem; --thickness:0.25rem;"
 					aria-valuenow={remainingWeight}
@@ -117,6 +121,29 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- <div class="card bg-base-100"> -->
+		<!-- 	<div class="card-body gap-1 p-4 sm:items-center sm:justify-center"> -->
+		<!-- 		<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase"> -->
+		<!-- 			Left to Dose -->
+		<!-- 		</h3> -->
+		<!-- 		<div -->
+		<!-- 			class="radial-progress {progressBarColor( -->
+		<!-- 				leftToDose, -->
+		<!-- 				remainingWeight -->
+		<!-- 			)} self-start sm:self-auto" -->
+		<!-- 			style="--value:{(leftToDose / remainingWeight) * -->
+		<!-- 				100}; --size:4.5rem; --thickness:0.25rem;" -->
+		<!-- 			aria-valuenow={leftToDose} -->
+		<!-- 			role="progressbar" -->
+		<!-- 		> -->
+		<!-- 			<div class="text-base-content flex flex-col items-center"> -->
+		<!-- 				<span class="text-lg font-bold">{leftToDose}g</span> -->
+		<!-- 				<span class="text-base-content/60 text-xs">of {remainingWeight}g</span> -->
+		<!-- 			</div> -->
+		<!-- 		</div> -->
+		<!-- 	</div> -->
+		<!-- </div> -->
 	</div>
 
 	{#if coffee.producer}
@@ -131,7 +158,7 @@
 					: ''}"
 			>
 				<input type="checkbox" class="peer sm:hidden" />
-				<div class="collapse-title p-4 pb-2 sm:!cursor-auto">
+				<div class="collapse-title p-4 pb-2 sm:cursor-auto!">
 					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{title}</h3>
 				</div>
 				<div class="collapse-content px-4 pt-0">
@@ -149,26 +176,31 @@
 			{/if}
 		</div>
 	{/if}
+{/snippet}
 
-	<div class="grid gap-8 lg:grid-cols-[1fr_auto_1fr]">
+<div class="w-full max-w-6xl space-y-8">
+	{@render CoffeePanel()}
+	<div class="grid gap-8 lg:grid-cols-[1fr_auto_1fr_auto_1fr]">
 		<!-- Doses -->
 		<div class="space-y-4">
-			<h2 class="text-2xl font-bold">Doses</h2>
-			<DoseList
-				{doses}
-				{leftToDose}
-				nextFreeDose={data.nextFreeDose}
-				creationForm={data.creationForm}
-				managementForm={data.managementForm}
-			/>
+			<h2 class="text-2xl font-bold">Tubes</h2>
+			<DoseList {coffeeId} />
 		</div>
 
-		<div class="divider divider-horizontal hidden lg:flex"></div>
+		<div class="divider lg:divider-horizontal"></div>
+
+		<!-- Free-form Doses -->
+		<div class="space-y-4">
+			<h2 class="text-2xl font-bold">Other Doses</h2>
+			<FreeformDoseList {coffeeId} />
+		</div>
+
+		<div class="divider lg:divider-horizontal"></div>
 
 		<!-- Brews -->
 		<div class="space-y-4">
 			<h2 class="text-2xl font-bold">Brews</h2>
-			<BrewTable brews={coffee.brews} />
+			<BrewTable {coffeeId} />
 		</div>
 	</div>
 </div>

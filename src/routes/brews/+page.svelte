@@ -1,14 +1,11 @@
 <script lang="ts">
-	import { getCoffeeFlag } from '$lib/utils';
-	import { sum, unique } from 'radash';
-	let { data } = $props();
-	const totalBrews = $derived(data.brews.length);
-	const totalCoffees = $derived(unique(data.brews.map((brew) => brew.coffeeId)).length);
-	const totalWeight = $derived(sum(data.brews.map((brew) => brew.weight)));
+	import { getCoffeeFlag, formatDateTime } from '$lib/utils';
+	import { getBrewPageData } from './data.remote';
+	const { totalBrews, totalCoffees, totalWeight, brews } = await getBrewPageData();
 </script>
 
 <div class="flex flex-col items-center">
-	{#if data.brews.length === 0}
+	{#if totalBrews === 0}
 		<span class="self-center">There are no recoded brews</span>
 	{:else}
 		<div class="stats mb-8 shadow">
@@ -34,15 +31,18 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.brews as brew}
+				{#each brews as brew}
 					<tr>
 						<th
-							><a href="/coffees/{brew.coffee.id}"
-								>{getCoffeeFlag(brew.coffee)} {brew.coffee.name}</a
-							></th
+							><a href="/coffees/{brew.coffeeId}">
+								{#if brew.coffee.country}
+									{getCoffeeFlag(brew.coffee.country)}
+								{/if}
+								{brew.coffee.name}
+							</a></th
 						>
-						<td class="max-w-[5rem]">{brew.weight}g</td>
-						<td>{brew.consumptionDate}</td>
+						<td class="max-w-20">{brew.weight}g</td>
+						<td>{formatDateTime(brew.consumptionDate)}</td>
 					</tr>
 				{/each}
 			</tbody>

@@ -1,7 +1,17 @@
-import { integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+	integer,
+	primaryKey,
+	real,
+	sqliteTable,
+	text,
+	check,
+	index
+} from 'drizzle-orm/sqlite-core';
 import { countries } from 'countries-list';
-import { relations } from 'drizzle-orm';
-import { processValues } from '../../zod-schemas';
+import { relations, sql } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
+import { getCurrentDateTime } from '../../utils';
+import { processValues } from '../../constants';
 
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const coffees = sqliteTable('coffees', {
@@ -25,7 +35,8 @@ export const coffees = sqliteTable('coffees', {
 
 export const coffeesRelations = relations(coffees, ({ many }) => ({
 	doses: many(doses),
-	brews: many(brews)
+	brews: many(brews),
+	freeFormDoses: many(freeFormDoses)
 }));
 
 export const doses = sqliteTable(
@@ -37,7 +48,14 @@ export const doses = sqliteTable(
 		weight: real(),
 		coffeeId: integer().references(() => coffees.id)
 	},
-	(doses) => [primaryKey({ columns: [doses.drawer, doses.tubeNumber] })]
+	(doses) => [
+		primaryKey({ columns: [doses.drawer, doses.tubeNumber] }),
+		check(
+			'dose_data_consistency',
+			sql`(${doses.coffeeId} IS NULL AND ${doses.weight} IS NULL AND ${doses.creationDate} IS NULL) OR (${doses.coffeeId} IS NOT NULL AND ${doses.weight} IS NOT NULL AND ${doses.creationDate} IS NOT NULL)`
+		),
+		index('doses_coffeeId_idx').on(doses.coffeeId)
+	]
 );
 
 export const dosesRelations = relations(doses, ({ one }) => ({
@@ -47,18 +65,48 @@ export const dosesRelations = relations(doses, ({ one }) => ({
 	})
 }));
 
-export const brews = sqliteTable('brews', {
-	id: integer().primaryKey({ autoIncrement: true }).notNull(),
-	coffeeId: integer()
-		.references(() => coffees.id)
-		.notNull(),
-	consumptionDate: text().notNull(),
-	weight: real().notNull()
-});
+export const brews = sqliteTable(
+	'brews',
+	{
+		id: integer().primaryKey({ autoIncrement: true }).notNull(),
+		coffeeId: integer()
+			.references(() => coffees.id)
+			.notNull(),
+		consumptionDate: text()
+			.$defaultFn(() => getCurrentDateTime())
+			.notNull(),
+		weight: real().notNull()
+	},
+	(brews) => [index('brews_coffeeId_idx').on(brews.coffeeId)]
+);
 
 export const brewsRelations = relations(brews, ({ one }) => ({
 	coffee: one(coffees, {
 		fields: [brews.coffeeId],
+		references: [coffees.id]
+	})
+}));
+
+export const freeFormDoses = sqliteTable(
+	'freeFormDoses',
+	{
+		id: text()
+			.$defaultFn(() => randomUUID())
+			.primaryKey(),
+		creationDate: text()
+			.$defaultFn(() => getCurrentDateTime())
+			.notNull(),
+		weight: real().notNull(),
+		coffeeId: integer()
+			.references(() => coffees.id)
+			.notNull()
+	},
+	(freeFormDoses) => [index('freeFormDoses_coffeeId_idx').on(freeFormDoses.coffeeId)]
+);
+
+export const freeFormDosesRelations = relations(freeFormDoses, ({ one }) => ({
+	coffee: one(coffees, {
+		fields: [freeFormDoses.coffeeId],
 		references: [coffees.id]
 	})
 }));

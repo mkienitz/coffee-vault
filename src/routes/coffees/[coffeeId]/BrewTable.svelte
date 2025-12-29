@@ -1,11 +1,13 @@
 <script lang="ts">
-	import type { Brew } from '$lib/zod-schemas';
+	import { getBrews } from './data.remote';
+	import { formatDateTime } from '$lib/utils';
 
 	interface Props {
-		brews: Brew[];
+		coffeeId: number;
 	}
+	let { coffeeId }: Props = $props();
 
-	let { brews }: Props = $props();
+	const brews = $derived(await getBrews(coffeeId));
 </script>
 
 {#if brews.length === 0}
@@ -22,10 +24,10 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each brews as brew}
+				{#each brews as brew (brew.id)}
 					<tr>
 						<td>{brew.weight}g</td>
-						<td>{brew.consumptionDate}</td>
+						<td>{formatDateTime(brew.consumptionDate)}</td>
 					</tr>
 				{/each}
 			</tbody>

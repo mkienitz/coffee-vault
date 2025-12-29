@@ -1,6 +1,6 @@
 {
 	"name": "cv",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -21,25 +21,22 @@
 		"@types/qrcode": "^1.5.5",
 		"@typescript-eslint/eslint-plugin": "^8.2.0",
 		"@typescript-eslint/parser": "^8.2.0",
-		"autoprefixer": "^10.4.16",
-		"clsx": "^2.1.1",
 		"countries-list": "^3.1.1",
 		"daisyui": "^5.0.0",
 		"drizzle-kit": "^0.31.1",
-		"drizzle-orm": "^0.44.2",
-		"drizzle-zod": "^0.8.2",
+		"drizzle-orm": "^0.45.1",
+		"drizzle-valibot": "^0.4.2",
 		"globals": "^16.0.0",
-		"lucide-svelte": "^0.544.0",
+		"lucide-svelte": "^0.562.0",
 		"mode-watcher": "^1.0.7",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
-		"prettier-plugin-tailwindcss": "^0.6.5",
+		"prettier-plugin-tailwindcss": "^0.7.2",
 		"qrcode": "^1.5.4",
 		"svelte": "^5.0.0-next.240",
 		"svelte-check": "^4.0.5",
 		"svelte-french-toast": "^2.0.0-alpha.0",
 		"sveltekit-flash-message": "^2.4.4",
-		"sveltekit-superforms": "^2.23.1",
 		"tailwind-merge": "^3.0.2",
 		"tailwind-variants": "^3.1.1",
 		"tailwindcss": "^4.0.9",
@@ -47,13 +44,14 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^7.1.9",
-		"yaml": "^2.7.1",
-		"zod": "^4.1.11"
+		"yaml": "^2.7.1"
 	},
 	"type": "module",
 	"dependencies": {
 		"@libsql/client": "^0.15.8",
 		"@sveltejs/adapter-node": "^5.2.11",
-		"radash": "^12.1.0"
+		"radash": "^12.1.0",
+		"sv": "^0.11.2",
+		"valibot": "^1.2.0"
 	}
 }
