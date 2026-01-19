@@ -12,7 +12,7 @@ import * as v from 'valibot';
  */
 export const freeFormDoseSchema = v.object({
 	id: v.pipe(v.string(), v.uuid()),
-	weight: v.pipe(v.number(), v.minValue(0)),
+	weight: v.pipe(v.number('Weight must be a number'), v.minValue(1, 'Weight must be >= 1g')),
 	creationDate: v.string(),
 	coffeeId: v.number()
 });

@@ -12,7 +12,7 @@ import * as v from 'valibot';
  */
 export const brewSchema = v.object({
 	id: v.number(),
-	weight: v.pipe(v.number(), v.minValue(0)),
+	weight: v.pipe(v.number('Weight must be a number'), v.minValue(1)),
 	consumptionDate: v.string(),
 	coffeeId: v.number()
 });

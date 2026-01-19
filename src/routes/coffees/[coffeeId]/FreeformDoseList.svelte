@@ -36,6 +36,7 @@
 					<input {...creationForm.fields.weight.as('number')} />
 					<span class="label">g</span>
 				</label>
+				<!-- TDODO: Replace with issue once derived schemas work -->
 				<span
 					class="text-sm {creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))
 						? 'text-error'
@@ -45,7 +46,8 @@
 				</span>
 			</div>
 			<button
-				disabled={creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
+				disabled={!creationForm.fields.weight.value() ||
+					creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
 				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 			>
 				<Plus />
@@ -61,7 +63,7 @@
 			{@const deleteForm = deleteFreeFormDose.for(dose.id)}
 			<li class="list-row items-center">
 				<a href="/freeFormDoses/{dose.id}">
-					{dose.id.slice(0, 8)}...
+					<span class="font-mono">{dose.id.slice(0, 8)}…</span>
 				</a>
 				<div class="list-col-grow">
 					<div class="text-sm font-medium">{dose.weight}g</div>

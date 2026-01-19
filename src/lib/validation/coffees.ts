@@ -43,7 +43,7 @@ export const coffeeSchema = v.object({
 	producer: optionalString,
 	elevation: optionalString,
 	roastingDate: optionalString,
-	weight: v.pipe(v.number('A number is required'), v.minValue(0, 'Weight must be positive')),
+	weight: v.pipe(v.number('Weight must be a number'), v.minValue(1, 'Weight must be >= 1g')),
 	description: optionalString,
 	notes: optionalString
 });
