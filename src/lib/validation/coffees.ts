@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { countryValues, processValues } from '$lib/constants';
+import { coffeeFilterColumns, countryValues, processValues } from '$lib/constants';
 
 // ============================================================================
 // HELPERS
@@ -69,3 +69,6 @@ export const coffeeManagementSchema = v.object({
 	...v.omit(coffeeSchema, ['id']).entries,
 	mode: v.optional(v.picklist(['create', 'update', 'delete']))
 });
+
+// TODO: Comment
+export const coffeeFilterSchema = v.pick(coffeeSchema, coffeeFilterColumns);

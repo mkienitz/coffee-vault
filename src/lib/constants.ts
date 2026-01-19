@@ -9,6 +9,8 @@ export const processValues = ['washed', 'natural', 'honey', 'advanced'] as const
 const [c, ...cs] = Object.values(countries).map((c) => c.name);
 export const countryValues = [c, ...cs] as const;
 
+export const coffeeFilterColumns = ['process', 'country', 'varietals', 'roaster'] as const;
+
 // ============================================================================
 // DOSE CONSTANTS
 // ============================================================================
