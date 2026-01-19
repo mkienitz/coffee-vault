@@ -43,18 +43,6 @@ function getDoseIdentFromSlug(slug: string) {
 	return { drawer, tubeNumber };
 }
 
-// COFFEES
-export const getAllCoffeeIds = query(async () => {
-	return (
-		await db.query.coffees.findMany({
-			columns: {
-				id: true
-			},
-			orderBy: (coffees, { desc }) => [desc(coffees.roastingDate)]
-		})
-	).map((coffee) => coffee.id);
-});
-
 export const getCoffee = query(v.number(), async (coffeeId) => {
 	const coffee = await db.query.coffees.findFirst({
 		where: eq(coffees.id, coffeeId)

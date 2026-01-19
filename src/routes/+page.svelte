@@ -15,14 +15,10 @@
 	type FilterSettings = v.InferOutput<typeof coffeeFilterSchema>;
 	let filterSettings: FilterSettings = $state({});
 	let newFilterSettings: FilterSettings = $state({});
-	$effect(() => {
-		$inspect.trace();
-		newFilterSettings;
-	});
+
+	// Data
 	const dataPromise = $derived(getFilteredIdsAndData(filterSettings));
 	const data = $derived(await dataPromise);
-
-	const cId = $props.id()
 </script>
 
 <div class="fab">
@@ -61,11 +57,11 @@
 	<div class="modal-box">
 		<h3 class="text-lg font-bold">Filter Settings</h3>
 		<div class="modal-action flex flex-col">
-			<form class="flex flex-col gap-2">
+			<form class="flex w-full flex-col gap-2">
 				{#each coffeeFilterColumns as filterColumn}
 					{@const availableValues = data.availableValues[filterColumn]}
-					<div class="flex gap-4 self-start">
-						<select class="select" bind:value={newFilterSettings[filterColumn]}>
+					<div class="flex w-full gap-2">
+						<select class="select flex-1" bind:value={newFilterSettings[filterColumn]}>
 							<option disabled value={undefined}>Select {filterColumn}</option>
 							<!-- Enumerate current values for this column -->
 							{#each availableValues as availableValue}
@@ -73,7 +69,7 @@
 							{/each}
 						</select>
 						<button
-							class="btn"
+							class="btn w-20"
 							onclick={(e) => {
 								e.preventDefault();
 								newFilterSettings[filterColumn] = undefined;
@@ -83,7 +79,7 @@
 				{/each}
 				<!-- state should only be updated upon pressing Apply -->
 			</form>
-			<form method="dialog">
+			<form method="dialog" class="flex justify-end gap-2">
 				<button class="btn">Cancel</button>
 				<button
 					class="btn btn-primary"
