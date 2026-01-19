@@ -7,10 +7,10 @@
 	}
 	let { coffeeId }: Props = $props();
 
-	const brews = $derived(await getBrews(coffeeId));
+	const brews = $derived(getBrews(coffeeId));
 </script>
 
-{#if brews.length === 0}
+{#if (await brews).length === 0}
 	<div class="bg-base-100 rounded-box p-12 text-center shadow-sm">
 		<p class="text-base-content/60">There are no recorded brews</p>
 	</div>
@@ -24,7 +24,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each brews as brew (brew.id)}
+				{#each await brews as brew (brew.id)}
 					<tr>
 						<td>{brew.weight}g</td>
 						<td>{formatDateTime(brew.consumptionDate)}</td>

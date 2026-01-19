@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getProcessBadgeClass, formatRoastDate } from '$lib/utils';
+	import { formatRoastDate, getProcessBadgeClass } from '$lib/utils';
 	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
 	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
@@ -9,9 +9,11 @@
 	}
 	const { coffeeId }: Props = $props();
 
-	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(
-		await getCoffeeCardData(coffeeId)
-	);
+	const cardDataPromise = $derived(getCoffeeCardData(coffeeId));
+	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(await cardDataPromise);
+
+	const remainingWeightPromise = $derived(getRemainingWeight(coffeeId));
+	const remainingWeight = $derived(await remainingWeightPromise);
 
 	const doseCountColor = $derived.by(() => {
 		let originalDoses = remainingDoses + dosesBrewed;
@@ -27,9 +29,8 @@
 
 <a
 	href="/coffees/{coffee.id}"
-	class="card border-base-300/50 bg-base-100 border shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {(await getRemainingWeight(
-		coffeeId
-	)) < 5
+	class="card border-base-300/50 bg-base-100 border shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {remainingWeight <
+	5
 		? 'opacity-50 grayscale'
 		: ''}"
 >
@@ -49,12 +50,12 @@
 			</div>
 			<div class="indicator shrink-0">
 				<span
-					class="indicator-item badge {doseCountColor} flex size-5 -translate-x-1 -translate-y-1 items-center justify-center rounded-full p-0 text-xs font-bold"
+					class="indicator-item badge badge-soft {doseCountColor} flex size-4 -translate-x-1 -translate-y-1 items-center justify-center rounded-full p-0 text-xs font-bold"
 				>
 					{remainingDoses}
 				</span>
 				<div
-					class="border-primary bg-base-200 flex h-12 w-12 items-center justify-center rounded-full border-2 {nextTube
+					class="border-base-100 bg-base-200 flex h-14 w-14 items-center justify-center rounded-full border-2 {nextTube
 						? ''
 						: 'text-base-content/30'}"
 				>
@@ -70,7 +71,7 @@
 			{#if coffee.process || coffee.varietals}
 				<div class="flex flex-wrap items-center gap-2">
 					{#if coffee.process}
-						<span class="badge {getProcessBadgeClass(coffee.process)}">
+						<span class="badge badge-soft {getProcessBadgeClass(coffee.process)}">
 							{coffee.process}
 						</span>
 					{/if}

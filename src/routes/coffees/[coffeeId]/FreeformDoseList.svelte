@@ -16,6 +16,7 @@
 
 	let { coffeeId }: Props = $props();
 	const doses = $derived(getFreeFormDoses(coffeeId));
+	const creationForm = $derived(createFreeFormDose.for(coffeeId));
 
 	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 </script>
@@ -23,21 +24,20 @@
 <ul class="list bg-base-100 rounded-box shadow-sm">
 	<li class="list-row items-center">
 		<form
-			{...createFreeFormDose.preflight(freeFormDoseCreationSchema).enhance(async ({ submit }) => {
+			{...creationForm.preflight(freeFormDoseCreationSchema).enhance(async ({ submit }) => {
 				await submit();
 			})}
-			oninput={() => createFreeFormDose.validate({ preflightOnly: true })}
+			oninput={() => creationForm.validate({ preflightOnly: true })}
 			class="contents"
 		>
 			<div class="list-col-grow flex items-center gap-2">
-				<input hidden {...createFreeFormDose.fields.coffeeId.as('number')} value={coffeeId} />
+				<input hidden {...creationForm.fields.coffeeId.as('number')} value={coffeeId} />
 				<label class="input has-[input[aria-invalid=true]]:input-error w-fit">
-					<input {...createFreeFormDose.fields.weight.as('number')} />
+					<input {...creationForm.fields.weight.as('number')} />
 					<span class="label">g</span>
 				</label>
 				<span
-					class="text-sm {createFreeFormDose.fields.weight.value() >
-					(await getCoffeeLeftToDose(coffeeId))
+					class="text-sm {creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))
 						? 'text-error'
 						: 'text-base-content/60'}"
 				>
@@ -45,7 +45,7 @@
 				</span>
 			</div>
 			<button
-				disabled={createFreeFormDose.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
+				disabled={creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
 				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 			>
 				<Plus />
