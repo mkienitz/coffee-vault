@@ -66,7 +66,7 @@
 							Process
 						</h3>
 						{#if coffee.process}
-							<div class="badge badge-sm {getProcessBadgeClass(coffee.process)}">
+							<div class="badge badge-sm badge-soft {getProcessBadgeClass(coffee.process)}">
 								{coffee.process}
 							</div>
 						{/if}

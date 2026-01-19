@@ -71,12 +71,12 @@ export function getCoffeeFlag(country: string | undefined) {
 export function getProcessBadgeClass(process: Process): string {
 	switch (process) {
 		case 'washed':
-			return 'badge-success';
+			return 'badge-info';
 		case 'honey':
-			return 'badge-warning';
+			return 'badge-accent';
 		case 'natural':
-			return 'badge-error';
-		case 'advanced':
 			return 'badge-primary';
+		case 'advanced':
+			return 'badge-secondary';
 	}
 }

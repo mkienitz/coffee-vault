@@ -18,10 +18,10 @@
 	});
 
 	const processColorMap: Record<string, string> = {
-		washed: 'checked:btn-success',
-		honey: 'checked:btn-warning',
-		natural: 'checked:btn-error',
-		advanced: 'checked:btn-primary'
+		washed: 'checked:btn-info',
+		honey: 'checked:btn-accent',
+		natural: 'checked:btn-primary',
+		advanced: 'checked:btn-secondary'
 	};
 
 	const manageFormPromise = $derived.by(async () => {
