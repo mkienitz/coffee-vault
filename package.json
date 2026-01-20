@@ -50,6 +50,7 @@
 	"dependencies": {
 		"@libsql/client": "^0.15.8",
 		"@sveltejs/adapter-node": "^5.2.11",
+		"flag-icons": "^7.5.0",
 		"radash": "^12.1.0",
 		"sv": "^0.11.2",
 		"valibot": "^1.2.0"

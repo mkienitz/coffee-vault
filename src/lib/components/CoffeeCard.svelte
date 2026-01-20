@@ -39,7 +39,8 @@
 		<div class="mb-4 flex items-center gap-3">
 			<div class="text-2xl leading-none">
 				{#if coffee.country}
-					{getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)}
+					{@const code = new String(getCountryCode(coffee.country)).toLowerCase()}
+					<span class="fi fi-{code}"></span>
 				{:else}
 					❔
 				{/if}
