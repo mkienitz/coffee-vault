@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { formatRoastDate, getProcessBadgeClass } from '$lib/utils';
-	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
+	import { getCountryCode } from 'countries-list';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
 	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
+	import type { Process } from '$lib/types';
+	import 'flag-icons/css/flag-icons.min.css';
 
 	interface Props {
 		coffeeId: number;
@@ -25,18 +27,33 @@
 			return 'badge-success';
 		}
 	});
+
+	function getCardClass(process: Process): string {
+		switch (process) {
+			case 'washed':
+				return 'card-info';
+			case 'honey':
+				return 'card-accent';
+			case 'natural':
+				return 'card-primary';
+			case 'advanced':
+				return 'card-secondary';
+		}
+	}
 </script>
 
 <a
 	href="/coffees/{coffee.id}"
-	class="card border-base-300/50 bg-base-100 border shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {remainingWeight <
+	class="card card-soft text-base-content {coffee.process
+		? getCardClass(coffee.process)
+		: ''} shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {remainingWeight <
 	5
 		? 'opacity-50 grayscale'
 		: ''}"
 >
-	<div class="card-body relative p-6">
+	<div class="card-body relative">
 		<!-- Header with flag, name, roaster, and tube indicator -->
-		<div class="mb-4 flex items-center gap-3">
+		<div class="flex items-center gap-3">
 			<div class="text-2xl leading-none">
 				{#if coffee.country}
 					{@const code = new String(getCountryCode(coffee.country)).toLowerCase()}
@@ -46,7 +63,7 @@
 				{/if}
 			</div>
 			<div class="min-w-0 flex-1">
-				<h3 class="card-title text-lg leading-tight">{coffee.name}</h3>
+				<h3 class="card-title text-md leading-tight">{coffee.name}</h3>
 				<p class="text-sm opacity-70">{coffee.roaster}</p>
 			</div>
 			<div class="indicator shrink-0">
@@ -84,7 +101,7 @@
 
 			{#if coffee.flavorProfile}
 				<div class="mt-2">
-					<div class="text-xs font-semibold tracking-wide uppercase opacity-60">Flavor Notes</div>
+					<div class="text-xs font-semibold tracking-wide uppercase opacity-60">Tastes Like</div>
 					<div class="mt-0.5">{coffee.flavorProfile}</div>
 				</div>
 			{:else if !coffee.process && !coffee.varietals}

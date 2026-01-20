@@ -6,3 +6,62 @@
 		dark --prefersdark,
 		coffee;
 }
+
+/* Custom card color variants */
+@layer components {
+	/* Color variant classes - set the card color variable */
+	.card-primary {
+		--card-color: var(--color-primary);
+		--card-content-color: var(--color-primary-content);
+	}
+
+	.card-secondary {
+		--card-color: var(--color-secondary);
+		--card-content-color: var(--color-secondary-content);
+	}
+
+	.card-accent {
+		--card-color: var(--color-accent);
+		--card-content-color: var(--color-accent-content);
+	}
+
+	.card-neutral {
+		--card-color: var(--color-neutral);
+		--card-content-color: var(--color-neutral-content);
+	}
+
+	.card-info {
+		--card-color: var(--color-info);
+		--card-content-color: var(--color-info-content);
+	}
+
+	.card-success {
+		--card-color: var(--color-success);
+		--card-content-color: var(--color-success-content);
+	}
+
+	.card-warning {
+		--card-color: var(--color-warning);
+		--card-content-color: var(--color-warning-content);
+	}
+
+	.card-error {
+		--card-color: var(--color-error);
+		--card-content-color: var(--color-error-content);
+	}
+
+	/* Soft modifier - applies subtle background and border */
+	.card-soft {
+		color: var(--card-color, var(--color-base-content));
+		background-color: color-mix(
+			in oklab,
+			var(--card-color, var(--color-base-content)) 12%,
+			var(--color-base-100)
+		);
+		border-color: color-mix(
+			in oklab,
+			var(--card-color, var(--color-base-content)) 16%,
+			var(--color-base-100)
+		);
+	}
+}
