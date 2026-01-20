@@ -6,7 +6,9 @@ import { countries } from 'countries-list';
 
 export const processValues = ['washed', 'natural', 'honey', 'advanced'] as const;
 
-const [c, ...cs] = Object.values(countries).map((c) => c.name);
+const [c, ...cs] = Object.values(countries)
+	.map((c) => c.name)
+	.toSorted();
 export const countryValues = [c, ...cs] as const;
 
 export const coffeeFilterColumns = ['process', 'country', 'varietals', 'roaster'] as const;
