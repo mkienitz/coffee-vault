@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatRoastDate, getProcessBadgeClass } from '$lib/utils';
+	import { formatRoastDate, getCountryFlag, getProcessBadgeClass } from '$lib/utils';
 	import { getCountryCode } from 'countries-list';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
 	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
@@ -54,14 +54,11 @@
 	<div class="card-body relative">
 		<!-- Header with flag, name, roaster, and tube indicator -->
 		<div class="flex items-center gap-3">
-			<div class="text-2xl leading-none">
-				{#if coffee.country}
-					{@const code = new String(getCountryCode(coffee.country)).toLowerCase()}
-					<span class="fi fi-{code}"></span>
-				{:else}
-					❔
-				{/if}
-			</div>
+			{#if coffee.country}
+				<span class="fi text-3xl fi-{getCountryFlag(coffee.country)}"></span>
+			{:else}
+				<span>?</span>
+			{/if}
 			<div class="min-w-0 flex-1">
 				<h3 class="card-title text-md leading-tight">{coffee.name}</h3>
 				<p class="text-sm opacity-70">{coffee.roaster}</p>

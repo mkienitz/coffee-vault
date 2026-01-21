@@ -61,11 +61,15 @@ export function getTubeName(dose: Pick<Dose, 'drawer' | 'tubeNumber'>) {
 	return `${dose.drawer}${dose.tubeNumber}`;
 }
 
-export function getCoffeeFlag(country: string | undefined) {
+export function getCountryFlagEmoji(country: string | undefined) {
 	if (!country) {
 		return '';
 	}
 	return getEmojiFlag(getCountryCode(country) as TCountryCode);
+}
+
+export function getCountryFlag(country: string) {
+	return new String(getCountryCode(country)).toLowerCase();
 }
 
 export function getProcessBadgeClass(process: Process): string {

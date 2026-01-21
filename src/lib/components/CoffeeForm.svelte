@@ -5,6 +5,7 @@
 	import { countryValues, processValues } from '$lib/constants';
 	import FormDebug from './FormDebug.svelte';
 	import { coffeeManagementSchema } from '$lib/validation';
+	import { getCountryFlagEmoji } from '$lib/utils';
 
 	interface Props {
 		mode: 'update' | 'create';
@@ -114,7 +115,7 @@
 					{#each countryNames as countryName}
 						<option value={countryName.value}>
 							{countryName.value}
-							{getEmojiFlag(getCountryCode(countryName.value) as TCountryCode)}
+							{getCountryFlagEmoji(countryName.value)}
 						</option>
 					{/each}
 				</select>
@@ -230,4 +231,4 @@
 		{@render Form()}
 	</div>
 </div>
-<FormDebug form={await manageFormPromise} />
+<!-- <FormDebug form={await manageFormPromise} /> -->

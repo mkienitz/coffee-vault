@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getCoffeeFlag, getProcessBadgeClass } from '$lib/utils';
+	import { getCountryFlag, getProcessBadgeClass } from '$lib/utils';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';
 	import FreeformDoseList from './FreeformDoseList.svelte';
@@ -28,8 +28,11 @@
 	<!-- Title Bar -->
 	<div class="flex items-start justify-between gap-4">
 		<div class="min-w-0 flex-1 space-y-1">
-			<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
-				{`${getCoffeeFlag(coffee.country)} ${coffee.name}`}
+			<h1 class="text-2xl font-bold sm:text-3xl">
+				{#if coffee.country}
+					<span class="fi fi-{getCountryFlag(coffee.country)}"></span>
+				{/if}
+				{coffee.name}
 			</h1>
 			<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
 				<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
