@@ -5,6 +5,7 @@
 	import Funnel from 'lucide-svelte/icons/funnel';
 	import Coffee from 'lucide-svelte/icons/coffee';
 	import ArrowDownUp from 'lucide-svelte/icons/arrow-down-up';
+	import X from 'lucide-svelte/icons/x';
 	import { coffeeFilterSchema } from '$lib/validation';
 	import * as v from 'valibot';
 	import { coffeeFilterColumns } from '$lib/constants';
@@ -21,28 +22,37 @@
 	const data = $derived(await dataPromise);
 </script>
 
-<div class="fab">
+<div class="fab fab-flower">
 	<!-- a focusable div with tabindex is necessary to work on all browsers. role="button" is necessary for accessibility -->
 	<div tabindex="0" role="button" class="btn btn-lg btn-circle btn-secondary">
 		<Coffee />
 	</div>
 
 	<!-- buttons that show up when FAB is open -->
-	<button class="btn btn-lg btn-circle">
-		<a href="/coffees/new" class="btn btn-lg btn-circle btn-success"><Plus /></a>
+	<button class="fab-main-action btn btn-lg btn-circle">
+		<X />
 	</button>
-	<button class="btn btn-lg btn-circle">
-		<ArrowDownUp />
-	</button>
-	<button
-		class="btn btn-lg btn-circle"
-		onclick={() => {
-			newFilterSettings = { ...filterSettings };
-			filterDialog?.showModal();
-		}}
-	>
-		<Funnel />
-	</button>
+	<div class="tooltip tooltip-left" data-tip="Add new Coffee">
+		<button class="btn btn-lg btn-circle">
+			<a href="/coffees/new" class="btn btn-lg btn-circle btn-success"><Plus /></a>
+		</button>
+	</div>
+	<div class="tooltip tooltip-left" data-tip="Sort">
+		<button class="btn btn-lg btn-circle">
+			<ArrowDownUp />
+		</button>
+	</div>
+	<div class="tooltip" data-tip="Filter">
+		<button
+			class="btn btn-lg btn-circle"
+			onclick={() => {
+				newFilterSettings = { ...filterSettings };
+				filterDialog?.showModal();
+			}}
+		>
+			<Funnel />
+		</button>
+	</div>
 </div>
 
 <div class="mx-auto w-full max-w-screen-2xl p-4">
