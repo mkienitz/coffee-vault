@@ -1,6 +1,6 @@
 {
-	"name": "cv",
-	"version": "0.0.13",
+	"name": "coffee-vault",
+	"version": "0.0.14",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
