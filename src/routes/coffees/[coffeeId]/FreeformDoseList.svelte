@@ -36,7 +36,7 @@
 					<input {...creationForm.fields.weight.as('number')} />
 					<span class="label">g</span>
 				</label>
-				<!-- TDODO: Replace with issue once derived schemas work -->
+				<!-- TDODO: Add issue rendering once derived schemas work -->
 				<span
 					class="text-sm {creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))
 						? 'text-error'

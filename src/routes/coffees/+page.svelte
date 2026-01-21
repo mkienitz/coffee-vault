@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
+	import 'flag-icons/css/flag-icons.min.css';
 	import ArrowDownZA from 'lucide-svelte/icons/arrow-down-z-a';
 	import ArrowUpAZ from 'lucide-svelte/icons/arrow-up-a-z';
 	import Plus from 'lucide-svelte/icons/plus';
 	import X from 'lucide-svelte/icons/x';
-	import { getProcessBadgeClass, formatDate } from '$lib/utils';
+	import { getProcessBadgeClass, formatDate, getCountryFlag } from '$lib/utils';
 	import { getData } from './data.remote';
 
 	const tableEntries = await getData();
@@ -134,7 +134,8 @@
 										filters = [...filters, { key: 'country', value: coffee.country }];
 									}}
 								>
-									{`${getEmojiFlag(getCountryCode(coffee.country) as TCountryCode)} ${coffee.country}`}
+									<span class="fi fi-{getCountryFlag(coffee.country)}"></span>
+									{coffee.country}
 								</button>
 							{:else}
 								❔ Unknown

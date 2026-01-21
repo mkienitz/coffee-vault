@@ -1,4 +1,5 @@
 <script lang="ts">
+	import 'flag-icons/css/flag-icons.min.css';
 	import { getCountryFlag, getProcessBadgeClass } from '$lib/utils';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';

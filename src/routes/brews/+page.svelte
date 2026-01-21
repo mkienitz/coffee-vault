@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { getCoffeeFlag, formatDateTime } from '$lib/utils';
+	import { formatDateTime, getCountryFlag } from '$lib/utils';
 	import { getBrewPageData } from './data.remote';
+	import 'flag-icons/css/flag-icons.min.css';
+
 	const { totalBrews, totalCoffees, totalWeight, brews } = await getBrewPageData();
 </script>
 
@@ -36,7 +38,7 @@
 						<th
 							><a href="/coffees/{brew.coffeeId}">
 								{#if brew.coffee.country}
-									{getCoffeeFlag(brew.coffee.country)}
+									<span class="fi fi-{getCountryFlag(brew.coffee.country)}"></span>
 								{/if}
 								{brew.coffee.name}
 							</a></th

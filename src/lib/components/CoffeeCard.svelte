@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { formatRoastDate, getCountryFlag, getProcessBadgeClass } from '$lib/utils';
-	import { getCountryCode } from 'countries-list';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
 	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
 	import type { Process } from '$lib/types';
