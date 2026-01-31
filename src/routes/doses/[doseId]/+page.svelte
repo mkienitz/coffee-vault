@@ -42,7 +42,7 @@
 
 <div class="flex flex-col items-center space-y-8">
 	{#if dose.coffeeId}
-		<CoffeeCard coffeeId={dose.coffeeId} />
+		<CoffeeCard coffeeId={dose.coffeeId} overrideTube={params.doseId} />
 		<span>This tube holds {dose.weight!}g of coffee</span>
 		{@render ConsumeButton()}
 	{:else}

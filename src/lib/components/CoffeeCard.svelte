@@ -7,11 +7,13 @@
 
 	interface Props {
 		coffeeId: number;
+		overrideTube?: string;
 	}
-	const { coffeeId }: Props = $props();
+	const { coffeeId, overrideTube }: Props = $props();
 
 	const cardDataPromise = $derived(getCoffeeCardData(coffeeId));
 	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(await cardDataPromise);
+	const tube = $derived(overrideTube ?? nextTube);
 
 	const remainingWeightPromise = $derived(getRemainingWeight(coffeeId));
 	const remainingWeight = $derived(await remainingWeightPromise);
@@ -69,12 +71,12 @@
 					{remainingDoses}
 				</span>
 				<div
-					class="border-base-100 bg-base-200 flex h-14 w-14 items-center justify-center rounded-full border-2 {nextTube
+					class="border-base-100 bg-base-200 flex h-14 w-14 items-center justify-center rounded-full border-2 {tube
 						? ''
 						: 'text-base-content/30'}"
 				>
 					<span class="font-mono text-sm font-bold">
-						{nextTube ?? '--'}
+						{tube ?? '--'}
 					</span>
 				</div>
 			</div>
