@@ -18,7 +18,6 @@
   outputs =
     inputs@{
       flake-parts,
-      devshell,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -74,7 +73,7 @@
             pname = "coffee-vault";
             inherit ((lib.importJSON ./package.json)) version;
             src = ./.;
-            npmDepsHash = "sha256-+9ri8aERAWsuWokzMXyesiHawEKsxh3hNV8kus5flLY=";
+            npmDepsHash = "sha256-A/EmGO+m2QvBefhbCkmDQanvsVzE5gehtUzkTBh/S9g=";
             nativeBuildInputs = [ pkgs.makeWrapper ];
             installPhase = ''
               runHook preInstall
