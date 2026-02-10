@@ -20,7 +20,8 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 		if (!result) {
 			error(400, 'Bad request');
 		}
-	} else if (mode === 'create' && coffee.id === undefined) {
+		// TODO fix the following -1 vs. undefined issue
+	} else if (mode === 'create' && coffee.id === -1) {
 		// Create coffee
 		const [result] = await db.insert(coffees).values(coffee).returning();
 		if (!result) {

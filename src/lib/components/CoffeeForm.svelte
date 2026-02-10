@@ -26,6 +26,7 @@
 	};
 
 	const manageFormPromise = $derived.by(async () => {
+		// TODO fix the -1 issue
 		const manageForm = manageCoffee.for(coffeeId ?? -1);
 		if (coffeeId) {
 			const coffee = await getCoffee(coffeeId);
