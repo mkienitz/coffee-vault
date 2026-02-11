@@ -11,7 +11,7 @@ import {
 	freeFormDoseCreationSchema
 } from '$lib/validation';
 import { error, redirect } from '@sveltejs/kit';
-import { and, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { sum } from 'radash';
 import * as v from 'valibot';
 
@@ -252,25 +252,38 @@ export const getCoffeeLeftToDose = query(v.number(), async (coffeeId) => {
 	);
 });
 
-export const getRemainingWeight = query(v.number(), async (coffeeId) => {
-	const coffee = await db.query.coffees.findFirst({
-		where: eq(coffees.id, coffeeId),
-		columns: {
-			weight: true
-		},
-		with: {
-			brews: {
-				columns: {
-					weight: true
+export const getRemainingWeight = query.batch(v.number(), async (coffeeIds) => {
+	const allResults = (
+		await db.query.coffees.findMany({
+			where: inArray(coffees.id, coffeeIds),
+			columns: {
+				id: true,
+				weight: true
+			},
+			with: {
+				brews: {
+					columns: {
+						weight: true
+					}
 				}
 			}
-		}
+		})
+	).map(({ id, weight, brews }) => {
+		return {
+			coffeeId: id,
+			remainingWeight: weight - sum(brews, (brew) => brew.weight)
+		};
 	});
-	if (!coffee) {
-		error(404, 'Not found');
-	}
-	const { weight, brews } = coffee;
-	return weight - sum(brews, (brew) => brew.weight);
+
+	const lookup = new Map(allResults.map((res) => [res.coffeeId, res.remainingWeight]));
+
+	return (coffeeId) => {
+		const remainingWeight = lookup.get(coffeeId);
+		if (!remainingWeight) {
+			error(404, 'Not found');
+		}
+		return remainingWeight;
+	};
 });
 
 // BREWS
