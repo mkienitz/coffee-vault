@@ -20,8 +20,7 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 		if (!result) {
 			error(400, 'Bad request');
 		}
-		// TODO fix the following -1 vs. undefined issue
-	} else if (mode === 'create' && coffee.id === -1) {
+	} else if (mode === 'create' && coffee.id === undefined) {
 		// Create coffee
 		const [result] = await db.insert(coffees).values(coffee).returning();
 		if (!result) {
@@ -80,86 +79,3 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 		error(400, 'Bad request');
 	}
 });
-
-/*
-export const createCoffee = form(coffeeCreationSchema, async (coffee) => {
-	// coffee is already validated by the form() function
-	// Drizzle automatically converts undefined → NULL
-	const [result] = await db.insert(coffees).values(coffee).returning();
-	if (!result) {
-		error(400, 'Bad request');
-	}
-	// Convert null → undefined and validate with domain schema
-	const newCoffee = v.parse(coffeeSelectDbSchema, result);
-	redirect(
-		303,
-		`/coffees/${newCoffee.id}`
-		// { type: 'success', message: 'Coffee successfully added' },
-		// cookies
-	);
-});
-
-export const updateCoffee = form(coffeeUpdateSchema, async (coffee) => {
-	// coffee is already validated by the form() function
-	// Convert undefined → null so Drizzle sets NULL instead of skipping fields
-	const dbData = v.parse(coffeeUpdateDbSchema, coffee);
-	const [result] = await db
-		.update(coffees)
-		.set(dbData)
-		.where(eq(coffees.id, coffee.id))
-		.returning();
-	if (!result) {
-		error(400, 'Bad request');
-	}
-	// await sleep(2000);
-	// Convert null → undefined and validate with domain schema
-	// return v.parse(coffeeSelectDbSchema, result);
-});
-
-export const deleteCoffee = form(v.object({ coffeeId: v.number() }), async ({ coffeeId }) => {
-	return await db.transaction(async (tx) => {
-		// Check if coffee exists
-		const coffee = await tx.query.coffees.findFirst({
-			where: eq(coffees.id, coffeeId),
-			columns: {
-				id: true
-			},
-			with: {
-				doses: {
-					columns: {
-						tubeNumber: true,
-						drawer: true
-					}
-				},
-				brews: {
-					columns: {
-						id: true
-					}
-				},
-				freeFormDoses: {
-					columns: {
-						id: true
-					}
-				}
-			}
-		});
-
-		if (!coffee) {
-			error(404, 'Not found');
-		}
-		// Check dependent data
-		if (coffee.doses.length > 0) {
-			error(400, 'Coffee has active doses');
-		}
-		// TODO: on delete cascade?
-		if (coffee.brews.length > 0) {
-			error(400, 'Coffee has existing brews');
-		}
-		if (coffee.freeFormDoses.length > 0) {
-			error(400, 'Coffee has active free-form doses');
-		}
-		// Safe to delete
-		await tx.delete(coffees).where(eq(coffees.id, coffeeId));
-	});
-});
-*/

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getCountryCode, getEmojiFlag, type TCountryCode } from 'countries-list';
 	import { manageCoffee } from './CoffeeForm.remote';
 	import { getCoffee } from '$lib/data.remote';
 	import { countryValues, processValues } from '$lib/constants';
@@ -26,8 +25,7 @@
 	};
 
 	const manageFormPromise = $derived.by(async () => {
-		// TODO fix the -1 issue
-		const manageForm = manageCoffee.for(coffeeId ?? -1);
+		const manageForm = coffeeId ? manageCoffee.for(coffeeId) : manageCoffee;
 		if (coffeeId) {
 			const coffee = await getCoffee(coffeeId);
 			manageForm.fields.set(coffee);
@@ -40,12 +38,19 @@
 	let deleteDialog: HTMLDialogElement | undefined = $state(undefined);
 </script>
 
+<FormDebug form={await manageFormPromise} />
+
 {#snippet Form()}
 	{@const manageForm = await manageFormPromise}
 	{@const clientValidator = () =>
 		manageForm.validate({ preflightOnly: true, includeUntouched: true })}
 	<form
-		{...manageForm.preflight(coffeeManagementSchema).enhance(async ({ submit }) => await submit())}
+		{...manageForm.preflight(coffeeManagementSchema).enhance(async ({ form, submit }) => {
+			await submit();
+			if (mode === 'create') {
+				form.reset();
+			}
+		})}
 		id={`${cId}-manageForm`}
 		onfocusout={clientValidator}
 		oninput={clientValidator}
