@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import { getFlash } from 'sveltekit-flash-message';
-	import { toast, Toaster } from 'svelte-french-toast';
+	// import { getFlash } from 'sveltekit-flash-message';
+	// import { toast, Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
 	import Check from 'lucide-svelte/icons/check';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
@@ -41,22 +41,24 @@
 	});
 
 	// Toaster
-	const flash = getFlash(page);
-	$effect(() => {
-		if ($flash) {
-			switch ($flash.type) {
-				case 'success':
-					toast.success($flash.message);
-					break;
-				case 'error':
-					toast.error($flash.message);
-					break;
-			}
-		}
-	});
+	// TODO Use custom toaster
+	// const flash = getFlash(page);
+	// $effect(() => {
+	// 	if ($flash) {
+	// 		switch ($flash.type) {
+	// 			case 'success':
+	// 				toast.success($flash.message);
+	// 				break;
+	// 			case 'error':
+	// 				toast.error($flash.message);
+	// 				break;
+	// 		}
+	// 	}
+	// });
 </script>
 
-<Toaster />
+<!-- TODO Use custom toaster -->
+<!-- <Toaster /> -->
 
 {#snippet NavElem(name: string, path: string)}
 	<li>
