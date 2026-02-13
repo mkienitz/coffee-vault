@@ -60,7 +60,7 @@
 				</div>
 			{:else}
 				<div
-					class="bg-error text-error-content/30 flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-mono text-lg font-bold"
+					class="bg-error/30 text-error-content/60 flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-mono text-lg font-bold"
 				>
 					--
 				</div>
