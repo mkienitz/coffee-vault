@@ -26,8 +26,8 @@
 		"drizzle-kit": "^0.31.1",
 		"drizzle-orm": "^0.45.1",
 		"drizzle-valibot": "^0.4.2",
-		"globals": "^16.0.0",
-		"lucide-svelte": "^0.562.0",
+		"globals": "^17.3.0",
+		"lucide-svelte": "^0.563.0",
 		"mode-watcher": "^1.0.7",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
@@ -48,11 +48,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@libsql/client": "^0.15.8",
+		"@libsql/client": "^0.17.0",
 		"@sveltejs/adapter-node": "^5.2.11",
 		"flag-icons": "^7.5.0",
 		"radash": "^12.1.0",
-		"sv": "^0.11.2",
+		"sv": "^0.12.1",
 		"valibot": "^1.2.0"
 	}
 }
