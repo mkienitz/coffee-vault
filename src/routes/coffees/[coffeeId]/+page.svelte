@@ -35,24 +35,23 @@
 	{@const originInfo = [coffee.farm, coffee.region, coffee.country]
 		.filter((v) => v && v !== '')
 		.join(', ')}
+
 	<!-- Title Bar -->
-	<div class="flex items-start justify-between gap-4">
-		<div class="min-w-0 flex-1 space-y-1">
-			<h1 class="flex space-x-3 text-2xl font-bold sm:text-3xl">
-				{#if coffee.country}
-					<span class="fi fi-{getCountryFlag(coffee.country)}"></span>
-				{/if}
-				<span>{coffee.name}</span>
-			</h1>
-			<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-				<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
-				{#if coffee.roastingDate}
-					<span class="hidden sm:inline">•</span>
-					<span>{coffee.roastingDate}</span>
-				{/if}
-			</div>
+	<div class="min-w-0 flex-1 space-y-1">
+		<h1 class="flex items-center space-x-3 text-2xl font-bold sm:text-3xl">
+			{#if coffee.country}
+				<span class="fi fi-{getCountryFlag(coffee.country)}"></span>
+			{/if}
+			<span>{coffee.name}</span>
+			<a href="/coffees/{coffee.id}/edit"><Pencil class="text-base-content/60" /></a>
+		</h1>
+		<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+			<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
+			{#if coffee.roastingDate}
+				<span class="hidden sm:inline">•</span>
+				<span>{coffee.roastingDate}</span>
+			{/if}
 		</div>
-		<a href="/coffees/{coffee.id}/edit"><Pencil /></a>
 	</div>
 
 	<!-- Stats Grid -->
@@ -195,7 +194,10 @@
 	<div class="tabs tabs-lift tabs-xl">
 		<label class="tab">
 			<input type="radio" name="coffee-tab" checked={true} />
-			Tubes ({(await getDoses(coffeeId)).length})
+			<div class="flex items-center space-x-2">
+				<span>Tubes</span>
+				<span class="badge badge-xs">{(await getDoses(coffeeId)).length}</span>
+			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">
 			<DoseList {coffeeId} />
@@ -203,7 +205,10 @@
 
 		<label class="tab">
 			<input type="radio" name="coffee-tab" />
-			Other Doses ({(await getFreeFormDoses(coffeeId)).length})
+			<div class="flex items-center space-x-2">
+				<span>Other Doses</span>
+				<span class="badge badge-xs">{(await getFreeFormDoses(coffeeId)).length}</span>
+			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">
 			<FreeformDoseList {coffeeId} />
@@ -211,7 +216,10 @@
 
 		<label class="tab">
 			<input type="radio" name="coffee-tab" />
-			Brews ({(await getBrews(coffeeId)).length})
+			<div class="flex items-center space-x-2">
+				<span>Brews</span>
+				<span class="badge badge-xs">{(await getBrews(coffeeId)).length}</span>
+			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">
 			<BrewTable {coffeeId} />
