@@ -15,8 +15,7 @@
 	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(await cardDataPromise);
 	const tube = $derived(overrideTube ?? nextTube);
 
-	const remainingWeightPromise = $derived(getRemainingWeight(coffeeId));
-	const remainingWeight = $derived(await remainingWeightPromise);
+	const remainingWeight = $derived(getRemainingWeight(coffeeId));
 
 	const doseCountColor = $derived.by(() => {
 		let originalDoses = remainingDoses + dosesBrewed;
@@ -47,7 +46,7 @@
 	href="/coffees/{coffee.id}"
 	class="card card-soft text-base-content {coffee.process
 		? getCardClass(coffee.process)
-		: ''} shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {remainingWeight <
+		: ''} shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {(await remainingWeight) <
 	5
 		? 'opacity-50 grayscale'
 		: ''}"
