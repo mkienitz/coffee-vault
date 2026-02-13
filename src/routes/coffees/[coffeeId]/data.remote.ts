@@ -279,8 +279,8 @@ export const getRemainingWeight = query.batch(v.number(), async (coffeeIds) => {
 
 	return (coffeeId) => {
 		const remainingWeight = lookup.get(coffeeId);
-		if (!remainingWeight) {
-			error(404, 'Not found');
+		if (remainingWeight === undefined) {
+			error(404, 'Not found 10');
 		}
 		return remainingWeight;
 	};
