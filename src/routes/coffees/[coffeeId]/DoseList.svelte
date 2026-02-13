@@ -68,9 +68,9 @@
 					<span class="text-error text-sm">No empty tubes available</span>
 				</div>
 			{/if}
-			<!-- TODO when using getFreeDoseId() in the disabled expression, we get mutation error -->
 			<button
-				disabled={creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
+				disabled={creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId)) ||
+					(await getFreeDoseId()) === null}
 				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 			>
 				<Plus />
