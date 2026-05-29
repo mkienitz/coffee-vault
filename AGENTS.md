@@ -1,0 +1,2 @@
+- Always use bleeding edge Svelte 5 & SvelteKit with remote function features.
+- If unsure, use web search.
