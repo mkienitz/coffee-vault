@@ -46,14 +46,14 @@
         {
           devshells.default = {
             devshell.startup.pre-commit.text = config.pre-commit.installationScript;
-            packages = with pkgs; [
-              nil
-              sqlite
-              nodejs_22
-              nodePackages."@tailwindcss/language-server"
-              nodePackages.tailwindcss
-              nodePackages.typescript-language-server
-              nodePackages.svelte-language-server
+            packages = [
+              pkgs.nil
+              pkgs.sqlite
+              pkgs.nodejs_22
+              pkgs.tailwindcss-language-server
+              pkgs.tailwindcss
+              pkgs.typescript-language-server
+              pkgs.svelte-language-server
             ];
             env = [
               {
