@@ -189,7 +189,7 @@
 	</div>
 {/snippet}
 
-<div class="w-full max-w-6xl space-y-8">
+<div class="w-full max-w-6xl space-y-8 flex flex-col items-center">
 	{@render CoffeePanel()}
 	<div class="tabs tabs-lift tabs-xl">
 		<label class="tab">
@@ -206,7 +206,7 @@
 		<label class="tab">
 			<input type="radio" name="coffee-tab" />
 			<div class="flex items-center space-x-2">
-				<span>Other Doses</span>
+				<span>Bags</span>
 				<span class="badge badge-xs">{(await getFreeFormDoses(coffeeId)).length}</span>
 			</div>
 		</label>
