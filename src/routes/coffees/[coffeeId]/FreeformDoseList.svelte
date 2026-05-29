@@ -9,6 +9,7 @@
 	} from './data.remote';
 	import { formatDateTime } from '$lib/utils';
 	import { freeFormDoseCreationSchema } from '$lib/validation';
+	import * as v from 'valibot';
 
 	interface Props {
 		coffeeId: number;
@@ -17,14 +18,27 @@
 	let { coffeeId }: Props = $props();
 	const doses = $derived(getFreeFormDoses(coffeeId));
 	const creationForm = $derived(createFreeFormDose.for(coffeeId));
+	const coffeeLeftToDosePromise = $derived(getCoffeeLeftToDose(coffeeId));
 
 	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
+	const coffeeLeftToDose = $derived(await coffeeLeftToDosePromise);
+
+	const clientSideCreationSchema = $derived(
+		v.object({
+			...freeFormDoseCreationSchema.entries,
+			weight: v.pipe(
+				freeFormDoseCreationSchema.entries.weight,
+				v.maxValue(coffeeLeftToDose, `Weight must be <= ${coffeeLeftToDose}g`)
+			)
+		})
+	);
+	$inspect('schema', clientSideCreationSchema, 'left', coffeeLeftToDose);
 </script>
 
 <ul class="list bg-base-100 rounded-box shadow-sm">
 	<li class="list-row items-center">
 		<form
-			{...creationForm.preflight(freeFormDoseCreationSchema).enhance(async ({ submit }) => {
+			{...creationForm.preflight(clientSideCreationSchema).enhance(async ({ submit }) => {
 				await submit();
 			})}
 			oninput={() => creationForm.validate({ preflightOnly: true })}
@@ -36,18 +50,15 @@
 					<input {...creationForm.fields.weight.as('number')} />
 					<span class="label">g</span>
 				</label>
-				<!-- TDODO: Add issue rendering once derived schemas work -->
-				<span
-					class="text-sm {creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))
-						? 'text-error'
-						: 'text-base-content/60'}"
-				>
-					{await getCoffeeLeftToDose(coffeeId)}g left
-				</span>
+				{#each creationForm.fields.weight.issues() as issue}
+					<span class="text-error text-sm">{issue.message}</span>
+				{:else}
+					<span class="text-base-content/60 text-sm">{coffeeLeftToDose}g left</span>
+				{/each}
 			</div>
 			<button
 				disabled={!creationForm.fields.weight.value() ||
-					creationForm.fields.weight.value() > (await getCoffeeLeftToDose(coffeeId))}
+					creationForm.fields.weight.issues() != undefined}
 				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 			>
 				<Plus />
