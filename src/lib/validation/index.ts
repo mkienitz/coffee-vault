@@ -2,4 +2,4 @@
 export * from './coffees';
 export * from './doses';
 export * from './brews';
-export * from './freeformdoses';
+export * from './bags';

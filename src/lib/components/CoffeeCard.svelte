@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { formatRoastDate, getCountryFlag, getProcessBadgeClass } from '$lib/utils';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
-	import { getRemainingWeight } from '../../routes/coffees/[coffeeId]/data.remote';
+	import { getRemainingWeight } from '$lib/inventory.remote';
 	import type { Process } from '$lib/types';
 	import 'flag-icons/css/flag-icons.min.css';
 
@@ -15,7 +15,7 @@
 	const { coffee, remainingDoses, dosesBrewed, nextTube } = $derived(await cardDataPromise);
 	const tube = $derived(overrideTube ?? nextTube);
 
-	const remainingWeight = $derived(getRemainingWeight(coffeeId));
+	const remainingWeight = $derived(await getRemainingWeight(coffeeId));
 
 	const doseCountColor = $derived.by(() => {
 		let originalDoses = remainingDoses + dosesBrewed;
@@ -46,7 +46,7 @@
 	href="/coffees/{coffee.id}"
 	class="card card-soft text-base-content {coffee.process
 		? getCardClass(coffee.process)
-		: ''} shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {(await remainingWeight) <
+		: ''} shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl {remainingWeight <
 	5
 		? 'opacity-50 grayscale'
 		: ''}"

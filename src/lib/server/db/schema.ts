@@ -36,7 +36,7 @@ export const coffees = sqliteTable('coffees', {
 export const coffeesRelations = relations(coffees, ({ many }) => ({
 	doses: many(doses),
 	brews: many(brews),
-	freeFormDoses: many(freeFormDoses)
+	bags: many(bags)
 }));
 
 export const doses = sqliteTable(
@@ -87,8 +87,8 @@ export const brewsRelations = relations(brews, ({ one }) => ({
 	})
 }));
 
-export const freeFormDoses = sqliteTable(
-	'freeFormDoses',
+export const bags = sqliteTable(
+	'bags',
 	{
 		id: text()
 			.$defaultFn(() => randomUUID())
@@ -101,12 +101,12 @@ export const freeFormDoses = sqliteTable(
 			.references(() => coffees.id)
 			.notNull()
 	},
-	(freeFormDoses) => [index('freeFormDoses_coffeeId_idx').on(freeFormDoses.coffeeId)]
+	(bags) => [index('bags_coffeeId_idx').on(bags.coffeeId)]
 );
 
-export const freeFormDosesRelations = relations(freeFormDoses, ({ one }) => ({
+export const bagsRelations = relations(bags, ({ one }) => ({
 	coffee: one(coffees, {
-		fields: [freeFormDoses.coffeeId],
+		fields: [bags.coffeeId],
 		references: [coffees.id]
 	})
 }));

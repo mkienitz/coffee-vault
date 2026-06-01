@@ -49,7 +49,7 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 							id: true
 						}
 					},
-					freeFormDoses: {
+					bags: {
 						columns: {
 							id: true
 						}
@@ -68,8 +68,8 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 			if (dbData.brews.length > 0) {
 				error(400, 'Coffee has existing brews');
 			}
-			if (dbData.freeFormDoses.length > 0) {
-				error(400, 'Coffee has active free-form doses');
+			if (dbData.bags.length > 0) {
+				error(400, 'Coffee has active bags');
 			}
 			// Safe to delete
 			await tx.delete(coffees).where(eq(coffees.id, coffee.id!));

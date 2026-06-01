@@ -3,35 +3,57 @@
 	import { getCountryFlag, getProcessBadgeClass } from '$lib/utils';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';
-	import FreeformDoseList from './FreeformDoseList.svelte';
+	import BagList from './BagList.svelte';
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import type { PageProps } from './$types';
 	import { getCoffee } from '$lib/data.remote';
-	import {
-		getBrews,
-		getCoffeeLeftToDose,
-		getDoses,
-		getFreeFormDoses,
-		getNextDose,
-		getRemainingWeight
-	} from './data.remote';
+	import { getBrews } from '$lib/brews.remote';
+	import { getRemainingWeight, getUndosedWeight } from '$lib/inventory.remote';
+	import { getBags } from '$lib/bags.remote';
+	import { getNextTube, getTubes } from '$lib/tubes.remote';
 
 	let { params }: PageProps = $props();
 	const coffeeId = $derived(Number(params.coffeeId));
+	const coffeeQuery = $derived(getCoffee(coffeeId));
+	const remainingWeightQuery = $derived(getRemainingWeight(coffeeId));
+	const undosedWeightQuery = $derived(getUndosedWeight(coffeeId));
+	const nextTubeQuery = $derived(getNextTube(coffeeId));
+	const tubesQuery = $derived(getTubes(coffeeId));
+	const bagsQuery = $derived(getBags(coffeeId));
+	const brewsQuery = $derived(getBrews(coffeeId));
 
-	function progressBarColor(remainingWeight: number, totalWeight: number) {
-		if (remainingWeight < 7) return 'text-error';
-		if (remainingWeight < 20) return 'text-warning';
-		if (remainingWeight < 0.3 * totalWeight) return 'text-warning';
+	function clamp(value: number, min: number, max: number) {
+		return Math.min(Math.max(value, min), max);
+	}
+
+	function progressValue(weight: number, totalWeight: number) {
+		if (!Number.isFinite(weight) || !Number.isFinite(totalWeight) || totalWeight <= 0) {
+			return 0;
+		}
+		return clamp((weight / totalWeight) * 100, 0, 100);
+	}
+
+	function progressBarColor(weight: number, totalWeight: number) {
+		if (weight < 7) return 'text-error';
+		if (weight < 20) return 'text-warning';
+		if (weight < 0.3 * totalWeight) return 'text-warning';
 		return 'text-success';
+	}
+
+	function progressBackground(value: number) {
+		return `conic-gradient(currentColor ${value}%, color-mix(in oklab, currentColor 15%, transparent) 0)`;
+	}
+
+	function formatWeight(weight: number) {
+		return Number.isInteger(weight) ? String(weight) : weight.toFixed(1);
 	}
 </script>
 
 {#snippet CoffeePanel()}
-	{@const coffee = await getCoffee(coffeeId)}
-	{@const remainingWeight = await getRemainingWeight(coffee.id)}
-	{@const leftToDose = await getCoffeeLeftToDose(coffee.id)}
-	{@const nextDose = await getNextDose(coffee.id)}
+	{@const coffee = await coffeeQuery}
+	{@const remainingWeight = await remainingWeightQuery}
+	{@const undosedWeight = await undosedWeightQuery}
+	{@const nextTube = await nextTubeQuery}
 	{@const originInfo = [coffee.farm, coffee.region, coffee.country]
 		.filter((v) => v && v !== '')
 		.join(', ')}
@@ -66,7 +88,7 @@
 
 	<div class="grid grid-cols-2 gap-4">
 		<div
-			class="col-span-full grid grid-cols-2 gap-4 {nextDose ? 'sm:col-span-2' : 'sm:col-span-3'}"
+			class="col-span-full grid grid-cols-2 gap-4 {nextTube ? 'sm:col-span-2' : 'sm:col-span-3'}"
 		>
 			{#if coffee.varietals}
 				{@render InfoCard('Varietals', coffee.varietals)}
@@ -127,12 +149,38 @@
 		</div>
 	{/if}
 
+	{#snippet WeightProgress(label: string, weight: number, totalWeight: number)}
+		{@const value = progressValue(weight, totalWeight)}
+		<div class="stat place-items-center">
+			<div class="stat-title font-medium tracking-wide uppercase">{label}</div>
+			<div class="stat-value">
+				<div
+					class="relative grid size-18 shrink-0 place-items-center rounded-full {progressBarColor(
+						weight,
+						totalWeight
+					)}"
+					style:background={progressBackground(value)}
+					aria-valuemin="0"
+					aria-valuemax={totalWeight}
+					aria-valuenow={weight}
+					role="progressbar"
+				>
+					<div class="bg-base-100 absolute inset-1 rounded-full"></div>
+					<div class="text-base-content relative flex flex-col items-center">
+						<span class="text-lg font-bold">{formatWeight(weight)}g</span>
+						<span class="text-base-content/60 text-xs">of {formatWeight(totalWeight)}g</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/snippet}
+
 	<div class="stats w-full shadow">
 		<div class="stat place-items-center">
 			<div class="stat-title font-medium tracking-wide uppercase">Next Dose</div>
 			<div class="stat-value">
-				{#if nextDose}
-					{@const tubeName = `${nextDose.drawer}${nextDose.tubeNumber}`}
+				{#if nextTube}
+					{@const tubeName = `${nextTube.drawer}${nextTube.tubeNumber}`}
 					<a href="/doses/{tubeName}" class="link">
 						<div
 							class="border-primary bg-base-200 flex h-20 w-20 items-center justify-center rounded-full border-[0.25rem]"
@@ -152,51 +200,19 @@
 			<!-- <div class="stat-desc">Jan 1st - Feb 1st</div> -->
 		</div>
 
-		<div class="stat place-items-center">
-			<div class="stat-title font-medium tracking-wide uppercase">Remaining</div>
-			<div class="stat-value">
-				<div
-					class="radial-progress {progressBarColor(remainingWeight, coffee.weight)}"
-					style="--value:{(remainingWeight / coffee.weight) *
-						100}; --size:4.5rem; --thickness:0.25rem;"
-					aria-valuenow={remainingWeight}
-					role="progressbar"
-				>
-					<div class="text-base-content flex flex-col items-center">
-						<span class="text-lg font-bold">{remainingWeight}g</span>
-						<span class="text-base-content/60 text-xs">of {coffee.weight}g</span>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="stat place-items-center">
-			<div class="stat-title font-medium tracking-wide uppercase">Undosed</div>
-			<div class="stat-value">
-				<div
-					class="radial-progress {progressBarColor(leftToDose, coffee.weight)}"
-					style="--value:{(leftToDose / coffee.weight) * 100}; --size:4.5rem; --thickness:0.25rem;"
-					aria-valuenow={leftToDose}
-					role="progressbar"
-				>
-					<div class="text-base-content flex flex-col items-center">
-						<span class="text-lg font-bold">{leftToDose}g</span>
-						<span class="text-base-content/60 text-xs">of {coffee.weight}g</span>
-					</div>
-				</div>
-			</div>
-		</div>
+		{@render WeightProgress('Remaining', remainingWeight, coffee.weight)}
+		{@render WeightProgress('Undosed', undosedWeight, coffee.weight)}
 	</div>
 {/snippet}
 
-<div class="w-full max-w-6xl space-y-8 flex flex-col items-center">
+<div class="flex w-full max-w-6xl flex-col items-center space-y-8">
 	{@render CoffeePanel()}
 	<div class="tabs tabs-lift tabs-xl">
 		<label class="tab">
 			<input type="radio" name="coffee-tab" checked={true} />
 			<div class="flex items-center space-x-2">
 				<span>Tubes</span>
-				<span class="badge badge-xs">{(await getDoses(coffeeId)).length}</span>
+				<span class="badge badge-xs">{(await tubesQuery).length}</span>
 			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">
@@ -207,18 +223,18 @@
 			<input type="radio" name="coffee-tab" />
 			<div class="flex items-center space-x-2">
 				<span>Bags</span>
-				<span class="badge badge-xs">{(await getFreeFormDoses(coffeeId)).length}</span>
+				<span class="badge badge-xs">{(await bagsQuery).length}</span>
 			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">
-			<FreeformDoseList {coffeeId} />
+			<BagList {coffeeId} />
 		</div>
 
 		<label class="tab">
 			<input type="radio" name="coffee-tab" />
 			<div class="flex items-center space-x-2">
 				<span>Brews</span>
-				<span class="badge badge-xs">{(await getBrews(coffeeId)).length}</span>
+				<span class="badge badge-xs">{(await brewsQuery).length}</span>
 			</div>
 		</label>
 		<div class="tab-content bg-base-100 border-base-300 p-6">

@@ -1,11 +1,5 @@
 import * as v from 'valibot';
-import {
-	coffeeSchema,
-	doseSchema,
-	doseUpdateSchema,
-	brewSchema,
-	freeFormDoseSchema
-} from '$lib/validation';
+import { coffeeSchema, doseSchema, doseUpdateSchema, brewSchema, bagSchema } from '$lib/validation';
 
 // ============================================================================
 // CONVERSION UTILITIES
@@ -137,19 +131,19 @@ export const brewSelectDbSchema = v.pipe(
 // export const brewUpdateDbSchema = v.pipe(brewUpdateSchema, v.transform(undefinedToNull));
 
 // ============================================================================
-// FREE FORM DOSE DATABASE SCHEMAS
+// BAG DATABASE SCHEMAS
 // ============================================================================
 
 /**
- * Free Form Dose Select DB Schema (Database → Domain)
+ * Bag Select DB Schema (Database → Domain)
  *
- * Converts Drizzle query results (with null) to domain objects (with undefined).
- * Pipeline: Drizzle result → nullToUndefined → freeFormDoseSchema validation
+ * Converts Drizzle query results to domain objects.
+ * Pipeline: Drizzle result → nullToUndefined → bagSchema validation
  *
- * Use this when reading free form dose data from the database.
+ * Use this when reading bag data from the database.
  */
-export const freeFormDoseSelectDbSchema = v.pipe(
+export const bagSelectDbSchema = v.pipe(
 	v.any(), // Accept any Drizzle output
 	v.transform(nullToUndefined),
-	freeFormDoseSchema
+	bagSchema
 );

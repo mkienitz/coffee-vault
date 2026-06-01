@@ -45,10 +45,10 @@
 	{@const clientValidator = () =>
 		manageForm.validate({ preflightOnly: true, includeUntouched: true })}
 	<form
-		{...manageForm.preflight(coffeeManagementSchema).enhance(async ({ form, submit }) => {
-			await submit();
-			if (mode === 'create') {
-				form.reset();
+		{...manageForm.preflight(coffeeManagementSchema).enhance(async (form) => {
+			const submitted = await form.submit();
+			if (submitted && mode === 'create') {
+				form.element.reset();
 			}
 		})}
 		id={`${cId}-manageForm`}

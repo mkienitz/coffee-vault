@@ -7,8 +7,8 @@ import {
 	coffeesRelations,
 	doses,
 	dosesRelations,
-	freeFormDoses,
-	freeFormDosesRelations
+	bags,
+	bagsRelations
 } from './schema';
 
 export const db = drizzle({
@@ -22,7 +22,7 @@ export const db = drizzle({
 		dosesRelations,
 		brews,
 		brewsRelations,
-		freeFormDoses,
-		freeFormDosesRelations
+		bags,
+		bagsRelations
 	}
 });

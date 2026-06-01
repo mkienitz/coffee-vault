@@ -1,8 +1,7 @@
 <script lang="ts">
 	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
 	import { getDose } from '$lib/data.remote';
-	// TODO: Fix after refactoring remote functions
-	import { consumeDose } from '../../coffees/[coffeeId]/data.remote';
+	import { consumeTube } from '$lib/tubes.remote';
 	import type { PageProps } from './$types';
 
 	const { params }: PageProps = $props();
@@ -12,7 +11,6 @@
 </script>
 
 {#snippet ConsumeButton()}
-	{@const formId = `consumeDoseForm-${dose.drawer}${dose.tubeNumber}`}
 	<button class="btn btn-primary" onclick={() => consumeDialog!.showModal()}
 		>Mark as Consumed</button
 	>
@@ -21,19 +19,13 @@
 			<h3>Are you sure?</h3>
 			<p class="py-4">Marking the coffee as consumed cannot be undone!</p>
 			<div class="modal-action">
-				<form
-					{...consumeDose.enhance(async ({ submit }) => {
-						await submit();
-					})}
-					hidden
-					id={formId}
-				>
-					<input {...consumeDose.fields.drawer.as('hidden', dose.drawer)} />
-					<input {...consumeDose.fields.tubeNumber.as('hidden', dose.tubeNumber)} />
-				</form>
 				<form method="dialog">
 					<button class="btn">Cancel</button>
-					<input type="submit" form={formId} value="Consume" class="btn btn-primary" />
+				</form>
+				<form {...consumeTube}>
+					<input {...consumeTube.fields.drawer.as('hidden', dose.drawer)} />
+					<input {...consumeTube.fields.tubeNumber.as('hidden', dose.tubeNumber)} />
+					<button class="btn btn-primary">Consume</button>
 				</form>
 			</div>
 		</div>
