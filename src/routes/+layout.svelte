@@ -61,11 +61,14 @@
 <!-- <Toaster /> -->
 
 {#snippet NavElem(name: string, path: string)}
-	<li>
-		<a href={path} class="text-lg {path === page.url.pathname ? 'font-bold underline' : ''}"
-			>{name}</a
-		>
-	</li>
+	{@const isActive = path === page.url.pathname}
+	<a
+		href={path}
+		aria-current={isActive ? 'page' : undefined}
+		class="inline-flex h-10 items-center border-b-2 px-1 text-sm font-medium transition-colors {isActive
+			? 'border-primary text-base-content'
+			: 'text-base-content/65 hover:text-base-content border-transparent'}">{name}</a
+	>
 {/snippet}
 
 {#snippet NavMenu()}
@@ -77,27 +80,31 @@
 
 <header>
 	<nav
-		class="navbar bg-base-100 fixed top-0 right-0 left-0 z-50 h-16 px-4 shadow-sm sm:px-6 lg:px-8"
+		class="bg-base-100/95 border-base-300 fixed top-0 right-0 left-0 z-50 border-b px-4 backdrop-blur sm:px-6 lg:px-8"
 	>
-		<div class="navbar-start">
-			<div class="dropdown">
-				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-					<Menu />
+		<div class="relative flex h-16 w-full items-center justify-between gap-4">
+			<div class="flex min-w-0 items-center gap-3">
+				<div class="dropdown">
+					<div tabindex="0" role="button" class="btn btn-ghost btn-sm lg:hidden">
+						<Menu />
+					</div>
+					<div
+						class="dropdown-content bg-base-100 border-base-300 rounded-box z-1 mt-3 flex w-48 flex-col gap-1 border p-3 shadow-lg"
+					>
+						{@render NavMenu()}
+					</div>
 				</div>
-				<ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-					{@render NavMenu()}
-				</ul>
+				<a
+					href={resolve('/')}
+					class="text-base-content truncate font-mono text-xl font-semibold tracking-tight no-underline sm:text-2xl"
+					>CoffeeVault</a
+				>
 			</div>
-			<a href={resolve('/')} class="btn btn-ghost font-mono text-xl no-underline sm:text-2xl"
-				>CoffeeVault</a
-			>
-		</div>
-		<div class="navbar-center hidden lg:flex">
-			<ul class="menu menu-horizontal px-1">
+
+			<div class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex">
 				{@render NavMenu()}
-			</ul>
-		</div>
-		<div class="navbar-end gap-2">
+			</div>
+
 			<div class="dropdown dropdown-end">
 				<div tabindex="0" role="button" class="btn btn-ghost btn-sm">
 					<Palette />
