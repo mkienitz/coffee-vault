@@ -6,7 +6,7 @@ import { getUndosedWeight, getRemainingWeight } from '$lib/inventory.remote';
 import { getBrews } from '$lib/brews.remote';
 import { getUndosedWeight as calculateUndosedWeight } from '$lib/server/inventory';
 import { doseSelectDbSchema } from '$lib/server/validation';
-import { getCurrentDateTime } from '$lib/utils';
+import { getCurrentDateTime, getTubeName } from '$lib/utils';
 import { doseManagementSchema, doseCreationSchema } from '$lib/validation';
 import { error, redirect } from '@sveltejs/kit';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
@@ -148,7 +148,7 @@ export const getFirstEmptyTubeId = query(async () => {
 	if (!tube) {
 		return null;
 	}
-	return `${tube.drawer}${tube.tubeNumber}`;
+	return getTubeName(tube);
 });
 
 export const getNextTube = query(v.number(), async (coffeeId) => {

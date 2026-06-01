@@ -2,12 +2,14 @@
 	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
 	import { getDose } from '$lib/data.remote';
 	import { consumeTube } from '$lib/tubes.remote';
+	import { getTubeName } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	const { params }: PageProps = $props();
 
 	let consumeDialog: HTMLDialogElement | undefined = $state(undefined);
 	const dose = $derived(await getDose(params.doseId));
+	const tubeName = $derived(getTubeName(dose));
 </script>
 
 {#snippet ConsumeButton()}
@@ -34,7 +36,7 @@
 
 <div class="flex flex-col items-center space-y-8">
 	{#if dose.coffeeId}
-		<CoffeeCard coffeeId={dose.coffeeId} overrideTube={params.doseId} />
+		<CoffeeCard coffeeId={dose.coffeeId} overrideTube={tubeName} />
 		<span>This tube holds {dose.weight!}g of coffee</span>
 		{@render ConsumeButton()}
 	{:else}

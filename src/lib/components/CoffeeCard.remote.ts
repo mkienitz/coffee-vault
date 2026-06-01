@@ -2,6 +2,7 @@ import { query } from '$app/server';
 import { db } from '$lib/server/db';
 import { coffees } from '$lib/server/db/schema';
 import { coffeeSelectDbSchema } from '$lib/server/validation';
+import { getTubeName } from '$lib/utils';
 import { error } from '@sveltejs/kit';
 import { inArray } from 'drizzle-orm';
 import { first } from 'radash';
@@ -46,7 +47,7 @@ export const getCoffeeCardData = query.batch(v.number(), async (coffeeIds) => {
 			coffee: v.parse(coffeeSelectDbSchema, coffee),
 			remainingDoses: doses.length,
 			dosesBrewed: brews.length,
-			nextTube: firstDose ? `${firstDose.drawer}${firstDose.tubeNumber}` : undefined
+			nextTube: firstDose ? getTubeName(firstDose) : undefined
 		};
 	});
 	const lookup = new Map(allResults.map((res) => [res.coffee.id, res]));

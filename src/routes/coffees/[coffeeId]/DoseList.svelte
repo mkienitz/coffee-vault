@@ -96,7 +96,7 @@
 	{:else}
 		{#each tubes as tube (tube.drawer + tube.tubeNumber)}
 			{@const tubeName = getTubeName(tube)}
-			{@const clearTubeForm = clearTube.for(`${tube.drawer}${tube.tubeNumber}`)}
+			{@const clearTubeForm = clearTube.for(tubeName)}
 			<li class="list-row items-center">
 				<a href="/doses/{tubeName}" class="shrink-0">
 					<div

@@ -58,7 +58,7 @@ export function formatRoastDate(isoDate: string | null): string {
 }
 
 export function getTubeName(dose: Pick<Dose, 'drawer' | 'tubeNumber'>) {
-	return `${dose.drawer}${dose.tubeNumber}`;
+	return `${dose.drawer.toUpperCase()}${dose.tubeNumber}`;
 }
 
 export function getCountryFlagEmoji(country: string | undefined) {

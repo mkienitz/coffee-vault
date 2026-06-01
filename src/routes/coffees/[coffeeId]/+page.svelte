@@ -1,6 +1,6 @@
 <script lang="ts">
 	import 'flag-icons/css/flag-icons.min.css';
-	import { getCountryFlag, getProcessBadgeClass } from '$lib/utils';
+	import { getCountryFlag, getProcessBadgeClass, getTubeName } from '$lib/utils';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';
 	import BagList from './BagList.svelte';
@@ -180,7 +180,7 @@
 			<div class="stat-title font-medium tracking-wide uppercase">Next Dose</div>
 			<div class="stat-value">
 				{#if nextTube}
-					{@const tubeName = `${nextTube.drawer}${nextTube.tubeNumber}`}
+					{@const tubeName = getTubeName(nextTube)}
 					<a href="/doses/{tubeName}" class="link">
 						<div
 							class="border-primary bg-base-200 flex h-20 w-20 items-center justify-center rounded-full border-[0.25rem]"

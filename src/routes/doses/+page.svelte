@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type Drawer } from '$lib/types';
+	import { getTubeName } from '$lib/utils';
 	import { getDoseOverviewData } from './data.remote';
 
 	const data = $derived(await getDoseOverviewData());
@@ -8,7 +9,7 @@
 {#snippet DrawerVis(drawer: Drawer)}
 	<div class="flex space-x-2 self-end border p-2">
 		{#each data.dosesByDrawer[drawer]! as dose}
-			{@const tubeName = `${dose.drawer}${dose.tubeNumber}`}
+			{@const tubeName = getTubeName(dose)}
 			<div
 				class="flex h-8 w-8 items-center justify-center rounded-full font-mono
 				{dose.coffeeId ? 'bg-success text-success-content' : 'bg-neutral text-neutral-content'}"
