@@ -10,3 +10,7 @@ result
 .claude
 TODO.md
 drizzle
+
+# Design studies and prototypes
+src/routes/design-studies
+src/lib/archive
