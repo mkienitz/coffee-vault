@@ -3,8 +3,8 @@ import { form } from '$app/server';
 import { db } from '#lib/server/db/index.js';
 import { coffees } from '#lib/server/db/schema.js';
 import { coffeeSelectDbSchema, coffeeUpdateDbSchema } from '#lib/server/validation.js';
-import { coffeeManagementSchema } from '#lib/validation/index.js';
-import { error, redirect } from '@sveltejs/kit';
+import { coffeeDeletionSchema, coffeeManagementSchema } from '#lib/validation/index.js';
+import { error, invalid, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as v from 'valibot';
 
@@ -29,53 +29,54 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 		// Convert null → undefined and validate with domain schema
 		const newCoffee = v.parse(coffeeSelectDbSchema, result);
 		redirect(303, resolve(`coffees/${newCoffee.id}`));
-	} else if (mode === 'delete' && coffee.id !== undefined) {
-		// Delete coffee
-		await db.transaction(async (tx) => {
-			const dbData = await tx.query.coffees.findFirst({
-				where: eq(coffees.id, coffee.id!),
-				columns: {
-					id: true
-				},
-				with: {
-					doses: {
-						columns: {
-							tubeNumber: true,
-							drawer: true
-						}
-					},
-					brews: {
-						columns: {
-							id: true
-						}
-					},
-					bags: {
-						columns: {
-							id: true
-						}
-					}
-				}
-			});
-
-			if (!dbData) {
-				error(404, 'Not found');
-			}
-			// Check dependent data
-			if (dbData.doses.length > 0) {
-				error(400, 'Coffee has active doses');
-			}
-			// TODO: on delete cascade?
-			if (dbData.brews.length > 0) {
-				error(400, 'Coffee has existing brews');
-			}
-			if (dbData.bags.length > 0) {
-				error(400, 'Coffee has active bags');
-			}
-			// Safe to delete
-			await tx.delete(coffees).where(eq(coffees.id, coffee.id!));
-		});
-		redirect(303, resolve('/'));
 	} else {
 		error(400, 'Bad request');
 	}
+});
+
+export const deleteCoffee = form(coffeeDeletionSchema, async ({ id }) => {
+	await db.transaction(async (tx) => {
+		const dbData = await tx.query.coffees.findFirst({
+			where: eq(coffees.id, id),
+			columns: {
+				id: true
+			},
+			with: {
+				doses: {
+					columns: {
+						tubeNumber: true,
+						drawer: true
+					}
+				},
+				brews: {
+					columns: {
+						id: true
+					}
+				},
+				bags: {
+					columns: {
+						id: true
+					}
+				}
+			}
+		});
+
+		if (!dbData) {
+			error(404, 'Not found');
+		}
+		// Check dependent data
+		if (dbData.doses.length > 0) {
+			invalid('Coffee has active doses');
+		}
+		// TODO: on delete cascade?
+		if (dbData.brews.length > 0) {
+			invalid('Coffee has existing brews');
+		}
+		if (dbData.bags.length > 0) {
+			invalid('Coffee has active bags');
+		}
+		// Safe to delete
+		await tx.delete(coffees).where(eq(coffees.id, id));
+	});
+	redirect(303, resolve('/'));
 });

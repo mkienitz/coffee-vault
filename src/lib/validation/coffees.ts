@@ -67,8 +67,10 @@ export const coffeeSchema = v.object({
 export const coffeeManagementSchema = v.object({
 	id: v.optional(v.number()),
 	...v.omit(coffeeSchema, ['id']).entries,
-	mode: v.optional(v.picklist(['create', 'update', 'delete']))
+	mode: v.optional(v.picklist(['create', 'update']))
 });
+
+export const coffeeDeletionSchema = v.pick(coffeeSchema, ['id']);
 
 // TODO: Comment
 export const coffeeFilterSchema = v.pick(coffeeSchema, coffeeFilterColumns);

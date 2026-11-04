@@ -4,7 +4,7 @@ import { bags, coffees } from '#lib/server/db/schema.js';
 import { getUndosedWeight } from '#lib/inventory.remote.js';
 import { bagSelectDbSchema } from '#lib/server/validation.js';
 import { bagCreationSchema, bagDeletionSchema, bagSchema } from '#lib/validation/index.js';
-import { error } from '@sveltejs/kit';
+import { error, invalid } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as v from 'valibot';
 
@@ -37,14 +37,14 @@ export const deleteBag = form(bagDeletionSchema, async ({ id }) => {
 	await getBags(coffeeId).refresh();
 });
 
-export const createBag = form(bagCreationSchema, async ({ weight, coffeeId }) => {
+export const createBag = form(bagCreationSchema, async ({ weight, coffeeId }, issue) => {
 	const coffee = await db.query.coffees.findFirst({ where: eq(coffees.id, coffeeId) });
 	if (!coffee) {
 		error(404, 'Not found');
 	}
 	const undosedWeight = await getUndosedWeight(coffeeId);
 	if (weight > undosedWeight) {
-		error(400, 'Not enough coffee left');
+		invalid(issue.weight('Not enough coffee left'));
 	}
 	await db.insert(bags).values({ weight, coffeeId });
 

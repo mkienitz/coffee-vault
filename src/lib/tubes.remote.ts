@@ -8,7 +8,7 @@ import { getUndosedWeight as calculateUndosedWeight } from '#lib/server/inventor
 import { doseSelectDbSchema } from '#lib/server/validation.js';
 import { getCurrentDateTime, getTubeName } from '#lib/utils.js';
 import { doseManagementSchema, doseCreationSchema } from '#lib/validation/index.js';
-import { error, redirect } from '@sveltejs/kit';
+import { error, invalid, redirect } from '@sveltejs/kit';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import * as v from 'valibot';
 
@@ -28,7 +28,7 @@ export const getTubes = query(v.number(), async (coffeeId) => {
 	return coffee.doses.map((tube) => v.parse(doseSelectDbSchema, tube));
 });
 
-export const createTube = form(doseCreationSchema, async ({ weight, coffeeId }) => {
+export const createTube = form(doseCreationSchema, async ({ weight, coffeeId }, issue) => {
 	const newUndosedWeight = await db.transaction(async (tx) => {
 		const coffee = await tx.query.coffees.findFirst({
 			where: eq(coffees.id, coffeeId),
@@ -53,14 +53,14 @@ export const createTube = form(doseCreationSchema, async ({ weight, coffeeId }) 
 			brews: coffee.brews
 		});
 		if (weight > undosedWeight) {
-			error(400, 'Not enough coffee left');
+			invalid(issue.weight('Not enough coffee left'));
 		}
 
 		const tube = await tx.query.doses.findFirst({
 			where: isNull(doses.coffeeId)
 		});
 		if (!tube) {
-			error(404, 'Not found');
+			invalid('No empty tubes available');
 		}
 
 		await tx
@@ -113,7 +113,7 @@ export const consumeTube = form(doseManagementSchema, async ({ drawer, tubeNumbe
 			error(404, 'Not found');
 		}
 		if (!tube.coffeeId || !tube.weight) {
-			error(400, 'Tube already empty');
+			invalid('Tube already empty');
 		}
 
 		await tx

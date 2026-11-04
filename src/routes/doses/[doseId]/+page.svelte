@@ -25,9 +25,12 @@
 					<button class="btn">Cancel</button>
 				</form>
 				<form {...consumeTube}>
+					{#each consumeTube.fields.allIssues() as issue}
+						<p class="text-error text-sm" role="alert">{issue.message}</p>
+					{/each}
 					<input {...consumeTube.fields.drawer.as('hidden', dose.drawer)} />
 					<input {...consumeTube.fields.tubeNumber.as('hidden', dose.tubeNumber)} />
-					<button class="btn btn-primary">Consume</button>
+					<button disabled={consumeTube.pending > 0} class="btn btn-primary">Consume</button>
 				</form>
 			</div>
 		</div>

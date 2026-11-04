@@ -19,10 +19,6 @@
 
 	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 	const weightValue = $derived(creationForm.fields.weight.value());
-	const weightIssues = $derived(creationForm.fields.weight.issues());
-	const canCreateBag = $derived(
-		weightValue !== undefined && weightIssues === undefined && weightValue <= undosedWeight
-	);
 	const isOverUndosedWeight = $derived(weightValue !== undefined && weightValue > undosedWeight);
 
 	const clientSideCreationSchema = $derived(
@@ -48,18 +44,29 @@
 			<div class="list-col-grow flex items-center gap-2">
 				<input {...creationForm.fields.coffeeId.as('hidden', coffeeId)} />
 				<label class="input has-[input[aria-invalid=true]]:input-error w-fit">
-					<input {...creationForm.fields.weight.as('number')} />
+					<input
+						{...creationForm.fields.weight.as('number')}
+						aria-label="Bag weight"
+						required
+						min="1"
+						max={undosedWeight}
+						step="any"
+					/>
 					<span class="label">g</span>
 				</label>
-				{#each creationForm.fields.weight.issues() as issue}
-					<span class="text-error text-sm">{issue.message}</span>
+				{#each creationForm.fields.allIssues() as issue}
+					<span class="text-error text-sm" role="alert">{issue.message}</span>
 				{:else}
 					<span class="text-sm {isOverUndosedWeight ? 'text-error' : 'text-base-content/60'}">
 						{undosedWeight}g undosed
 					</span>
 				{/each}
 			</div>
-			<button disabled={!canCreateBag} class="btn btn-circle btn-ghost btn-sm enabled:text-success">
+			<button
+				disabled={creationForm.pending > 0 || undosedWeight < 1}
+				aria-label="Create bag"
+				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
+			>
 				<Plus />
 			</button>
 		</form>
@@ -81,13 +88,21 @@
 					</div>
 				</div>
 				<form {...printForm}>
-					<input {...printForm.fields.id.as('hidden', bag.id)} />
-					<button class="btn btn-circle btn-ghost btn-sm" title="Print bag label">
+					{#each printForm.fields.allIssues() as issue}
+						<p class="text-error text-sm" role="alert">{issue.message}</p>
+					{/each}
+					<button
+						class="btn btn-circle btn-ghost btn-sm"
+						title="Print bag label"
+						disabled={printForm.pending > 0 || deleteForm.pending > 0}
+					>
 						<Printer />
 					</button>
 				</form>
 				<button
 					class="btn btn-circle btn-ghost text-error btn-sm"
+					aria-label="Delete bag"
+					disabled={deleteForm.pending > 0 || printForm.pending > 0}
 					onclick={() => deleteDialogs[bag.id]?.showModal()}
 				>
 					<Trash2 />
@@ -101,8 +116,13 @@
 								<button class="btn">Cancel</button>
 							</form>
 							<form {...deleteForm}>
-								<input {...deleteForm.fields.id.as('hidden', bag.id)} />
-								<button class="btn btn-error">Delete</button>
+								{#each deleteForm.fields.allIssues() as issue}
+									<p class="text-error text-sm" role="alert">{issue.message}</p>
+								{/each}
+								<button
+									disabled={deleteForm.pending > 0 || printForm.pending > 0}
+									class="btn btn-error">Delete</button
+								>
 							</form>
 						</div>
 					</div>

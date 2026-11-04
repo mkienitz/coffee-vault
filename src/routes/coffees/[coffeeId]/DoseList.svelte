@@ -19,13 +19,6 @@
 	const [tubes, firstEmptyTubeId, undosedWeight] = $derived(await tubeDataPromise);
 	const creationForm = $derived(createTube.for(coffeeId));
 	const weightValue = $derived(creationForm.fields.weight.value());
-	const weightIssues = $derived(creationForm.fields.weight.issues());
-	const canCreateTube = $derived(
-		weightValue !== undefined &&
-			weightIssues === undefined &&
-			weightValue <= undosedWeight &&
-			firstEmptyTubeId !== null
-	);
 	const isOverUndosedWeight = $derived(weightValue !== undefined && weightValue > undosedWeight);
 	const clientSideCreationSchema = $derived(
 		v.object({
@@ -59,16 +52,20 @@
 				<div>
 					<div class="flex items-center gap-2">
 						<label class="input has-[input[aria-invalid=true]]:input-error w-fit">
-							<input {...creationForm.fields.weight.as('number')} />
+							<input
+								{...creationForm.fields.weight.as('number')}
+								aria-label="Tube weight"
+								required
+								min="1"
+								max={Math.min(20, undosedWeight)}
+								step="any"
+							/>
 							<span class="label">g</span>
 						</label>
 						<span class="text-sm {isOverUndosedWeight ? 'text-error' : 'text-base-content/60'}">
 							{undosedWeight}g undosed
 						</span>
 					</div>
-					{#each creationForm.fields.weight.issues() as issue}
-						<span class="text-error text-sm">{issue.message}</span>
-					{/each}
 				</div>
 			{:else}
 				<div
@@ -80,8 +77,12 @@
 					<span class="text-error text-sm">No empty tubes available</span>
 				</div>
 			{/if}
+			{#each creationForm.fields.allIssues() as issue}
+				<p class="text-error text-sm" role="alert">{issue.message}</p>
+			{/each}
 			<button
-				disabled={!canCreateTube}
+				aria-label="Create tube"
+				disabled={creationForm.pending > 0 || undosedWeight < 1 || firstEmptyTubeId === null}
 				class="btn btn-circle btn-ghost btn-sm enabled:text-success"
 			>
 				<Plus />
@@ -110,6 +111,8 @@
 				</div>
 				<button
 					class="btn btn-circle btn-ghost text-error btn-sm"
+					aria-label="Clear tube"
+					disabled={clearTubeForm.pending > 0}
 					onclick={() => deleteDialogs[tubeName]?.showModal()}
 				>
 					<Trash2 />
@@ -123,9 +126,12 @@
 								<button class="btn">Cancel</button>
 							</form>
 							<form {...clearTubeForm}>
+								{#each clearTubeForm.fields.allIssues() as issue}
+									<p class="text-error text-sm" role="alert">{issue.message}</p>
+								{/each}
 								<input {...clearTubeForm.fields.drawer.as('hidden', tube.drawer)} />
 								<input {...clearTubeForm.fields.tubeNumber.as('hidden', tube.tubeNumber)} />
-								<button class="btn btn-error">Delete</button>
+								<button disabled={clearTubeForm.pending > 0} class="btn btn-error">Delete</button>
 							</form>
 						</div>
 					</div>
