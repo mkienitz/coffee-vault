@@ -78,9 +78,9 @@
             installPhase = ''
               runHook preInstall
               mkdir -p $out/bin $out/share
-              cp -R build node_modules $out/share/
+              cp -R build node_modules server.mjs $out/share/
               makeWrapper ${lib.getExe pkgs.nodejs_26} $out/bin/coffee-vault \
-                --add-flags $out/share/build
+                --add-flags $out/share/server.mjs
               runHook postInstall
             '';
             meta = {

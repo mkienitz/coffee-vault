@@ -20,10 +20,22 @@ Built on Svelte 5 + SvelteKit 3 (remote functions), Drizzle + SQLite, Tailwind 4
 
 ## Deployment
 
-Set `COFFEE_VAULT_DB_PATH` at runtime to the SQLite database path.
-For deployments behind a reverse proxy, set `COFFEE_VAULT_ORIGIN` to the public
-origin (for example, `https://coffee.example.com`) **when running `npm run build`**.
-This configures SvelteKit's `paths.origin`; adapter-node 6 no longer uses the
-runtime `ORIGIN` variable. The NixOS module supplies this build-time value from
-`services.coffee-vault.domain`. Without an explicit origin, SvelteKit derives it
-from the incoming request.
+Build with `npm run build`; no database path or deployment origin is needed.
+Start the production server with `npm start`, setting both variables at runtime:
+
+```sh
+COFFEE_VAULT_DB_PATH=/var/lib/coffee-vault/db.sqlite \
+COFFEE_VAULT_ORIGIN=https://coffee.example.com \
+npm start
+```
+
+`COFFEE_VAULT_ORIGIN` must be an HTTP(S) origin, without credentials, a path,
+query or fragment. The startup entry point (`server.mjs`) supplies this origin
+to adapter-node before SvelteKit checks form and remote-function requests.
+Use `npm start` or `node server.mjs` rather than `node build` so this runtime
+configuration is applied. Deploy `server.mjs` alongside `build` and `node_modules`.
+The adapter's `HOST`, `PORT`, socket activation and shutdown settings still apply.
+
+The NixOS module sets the origin from `services.coffee-vault.domain` in the
+service environment. Changing the domain requires a restart, not a package rebuild.
+Development with `npm run dev` continues to use the local request origin.

@@ -10,7 +10,6 @@ export default defineConfig({
 			preprocess: [vitePreprocess({})],
 			compilerOptions: { experimental: { async: true } },
 			adapter: adapter(),
-			paths: { origin: process.env.COFFEE_VAULT_ORIGIN },
 			experimental: { remoteFunctions: true }
 		}),
 		tailwindcss()

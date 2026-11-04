@@ -73,11 +73,7 @@
               ];
               wantedBy = [ "multi-user.target" ];
               serviceConfig = {
-                ExecStart = lib.getExe (
-                  cfg.package.overrideAttrs {
-                    COFFEE_VAULT_ORIGIN = "https://${cfg.domain}";
-                  }
-                );
+                ExecStart = lib.getExe cfg.package;
                 User = "coffee-vault";
                 Group = "coffee-vault";
                 DynamicUser = false;
@@ -90,6 +86,7 @@
                 HOST = cfg.address;
                 PORT = toString cfg.port;
                 COFFEE_VAULT_DB_PATH = "${cfg.workingDirectory}/db.sqlite";
+                COFFEE_VAULT_ORIGIN = "https://${cfg.domain}";
               };
             };
           };
