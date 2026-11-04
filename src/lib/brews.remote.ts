@@ -3,7 +3,7 @@ import { db } from '#lib/server/db/index.js';
 import { coffees } from '#lib/server/db/schema.js';
 import { brewSelectDbSchema } from '#lib/server/validation.js';
 import { error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import * as v from 'valibot';
 
 export const getBrews = query(v.number(), async (coffeeId) => {
@@ -19,7 +19,11 @@ export const getBrews = query(v.number(), async (coffeeId) => {
 					coffeeId: true,
 					weight: true,
 					consumptionDate: true
-				}
+				},
+				orderBy: (brews, { desc }) => [
+					desc(sql`julianday(${brews.consumptionDate})`),
+					desc(brews.id)
+				]
 			}
 		}
 	});
