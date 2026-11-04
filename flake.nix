@@ -6,8 +6,8 @@
       url = "github:numtide/devshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix";
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     treefmt-nix = {
@@ -24,7 +24,7 @@
       imports = [
         inputs.devshell.flakeModule
         inputs.flake-parts.flakeModules.easyOverlay
-        inputs.pre-commit-hooks.flakeModule
+        inputs.git-hooks.flakeModule
         inputs.treefmt-nix.flakeModule
         ./nix/module.nix
       ];
