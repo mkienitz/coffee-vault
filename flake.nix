@@ -73,7 +73,7 @@
             pname = "coffee-vault";
             inherit ((lib.importJSON ./package.json)) version;
             src = ./.;
-            npmDepsHash = "sha256-JF48EJghHMDJCVFzNNChaEc9rrQxME4JpZ2uYO8NtaI=";
+            npmDepsHash = "sha256-CwAeAyr2FYAogqwQ6li19Zk648wMBdEoCE8SppnXY+U=";
             nativeBuildInputs = [ pkgs.makeWrapper ];
             installPhase = ''
               runHook preInstall
