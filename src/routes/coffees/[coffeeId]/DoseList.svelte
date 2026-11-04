@@ -39,7 +39,10 @@
 	<li class="list-row items-center">
 		<form
 			class="contents"
-			{...creationForm.preflight(clientSideCreationSchema)}
+			{...creationForm.preflight(clientSideCreationSchema).enhance(async (form) => {
+				// Keep the weight for filling more tubes with the same dose.
+				await form.submit();
+			})}
 			oninput={validateCreationForm}
 		>
 			<input {...creationForm.fields.coffeeId.as('hidden', coffeeId)} />
