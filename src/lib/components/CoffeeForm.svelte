@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { manageCoffee } from './CoffeeForm.remote';
-	import { getCoffee } from '$lib/data.remote';
-	import { countryValues, processValues } from '$lib/constants';
+	import { getCoffee } from '#lib/data.remote.js';
+	import { countryValues, processValues } from '#lib/constants.js';
 	import FormDebug from './FormDebug.svelte';
-	import { coffeeManagementSchema } from '$lib/validation';
-	import { getCountryFlagEmoji } from '$lib/utils';
+	import { coffeeManagementSchema } from '#lib/validation/index.js';
+	import { getCountryFlagEmoji } from '#lib/utils.js';
 
 	interface Props {
 		mode: 'update' | 'create';
@@ -42,8 +42,7 @@
 
 {#snippet Form()}
 	{@const manageForm = await manageFormPromise}
-	{@const clientValidator = () =>
-		manageForm.validate({ preflightOnly: true, includeUntouched: true })}
+	{@const clientValidator = () => manageForm.validate({ preflightOnly: true, all: true })}
 	<form
 		{...manageForm.preflight(coffeeManagementSchema).enhance(async (form) => {
 			const submitted = await form.submit();

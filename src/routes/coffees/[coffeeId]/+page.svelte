@@ -1,16 +1,16 @@
 <script lang="ts">
 	import 'flag-icons/css/flag-icons.min.css';
-	import { getCountryFlag, getProcessBadgeClass, getTubeName } from '$lib/utils';
+	import { getCountryFlag, getProcessBadgeClass, getTubeName } from '#lib/utils.js';
 	import DoseList from './DoseList.svelte';
 	import BrewTable from './BrewTable.svelte';
 	import BagList from './BagList.svelte';
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import type { PageProps } from './$types';
-	import { getCoffee } from '$lib/data.remote';
-	import { getBrews } from '$lib/brews.remote';
-	import { getRemainingWeight, getUndosedWeight } from '$lib/inventory.remote';
-	import { getBags } from '$lib/bags.remote';
-	import { getNextTube, getTubes } from '$lib/tubes.remote';
+	import { getCoffee } from '#lib/data.remote.js';
+	import { getBrews } from '#lib/brews.remote.js';
+	import { getRemainingWeight, getUndosedWeight } from '#lib/inventory.remote.js';
+	import { getBags } from '#lib/bags.remote.js';
+	import { getNextTube, getTubes } from '#lib/tubes.remote.js';
 
 	let { params }: PageProps = $props();
 	const coffeeId = $derived(Number(params.coffeeId));

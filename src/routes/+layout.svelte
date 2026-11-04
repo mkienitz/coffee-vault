@@ -7,7 +7,7 @@
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import Menu from 'lucide-svelte/icons/menu';
 	import Palette from 'lucide-svelte/icons/palette';
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 
@@ -73,9 +73,9 @@
 
 {#snippet NavMenu()}
 	{@render NavElem('Coffees', resolve('/'))}
-	{@render NavElem('Table', resolve('/coffees'))}
-	{@render NavElem('Doses', resolve('/doses'))}
-	{@render NavElem('Brews', resolve('/brews'))}
+	{@render NavElem('Table', resolve('coffees'))}
+	{@render NavElem('Doses', resolve('doses'))}
+	{@render NavElem('Brews', resolve('brews'))}
 {/snippet}
 
 <header>
@@ -85,9 +85,8 @@
 		<div class="relative flex h-16 w-full items-center justify-between gap-4">
 			<div class="flex min-w-0 items-center gap-3">
 				<div class="dropdown">
-					<div tabindex="0" role="button" class="btn btn-ghost btn-sm lg:hidden">
-						<Menu />
-					</div>
+					<div tabindex="0" role="button" class="btn btn-ghost btn-sm lg:hidden"><Menu /></div>
+
 					<div
 						class="dropdown-content bg-base-100 border-base-300 rounded-box z-1 mt-3 flex w-48 flex-col gap-1 border p-3 shadow-lg"
 					>

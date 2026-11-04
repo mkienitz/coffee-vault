@@ -1,13 +1,13 @@
 import { resolve } from '$app/paths';
 import { form, query } from '$app/server';
-import { db } from '$lib/server/db';
-import { brews, coffees, doses } from '$lib/server/db/schema';
-import { getUndosedWeight, getRemainingWeight } from '$lib/inventory.remote';
-import { getBrews } from '$lib/brews.remote';
-import { getUndosedWeight as calculateUndosedWeight } from '$lib/server/inventory';
-import { doseSelectDbSchema } from '$lib/server/validation';
-import { getCurrentDateTime, getTubeName } from '$lib/utils';
-import { doseManagementSchema, doseCreationSchema } from '$lib/validation';
+import { db } from '#lib/server/db/index.js';
+import { brews, coffees, doses } from '#lib/server/db/schema.js';
+import { getUndosedWeight, getRemainingWeight } from '#lib/inventory.remote.js';
+import { getBrews } from '#lib/brews.remote.js';
+import { getUndosedWeight as calculateUndosedWeight } from '#lib/server/inventory.js';
+import { doseSelectDbSchema } from '#lib/server/validation.js';
+import { getCurrentDateTime, getTubeName } from '#lib/utils.js';
+import { doseManagementSchema, doseCreationSchema } from '#lib/validation/index.js';
 import { error, redirect } from '@sveltejs/kit';
 import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import * as v from 'valibot';
@@ -134,7 +134,7 @@ export const consumeTube = form(doseManagementSchema, async ({ drawer, tubeNumbe
 	await getFirstEmptyTubeId().refresh();
 	await getNextTube(affectedCoffeeId).refresh();
 	await getBrews(affectedCoffeeId).refresh();
-	redirect(303, resolve(`/coffees/${affectedCoffeeId}`));
+	redirect(303, resolve(`coffees/${affectedCoffeeId}`));
 });
 
 export const getFirstEmptyTubeId = query(async () => {

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
-	import { getDose } from '$lib/data.remote';
-	import { consumeTube } from '$lib/tubes.remote';
-	import { getTubeName } from '$lib/utils';
+	import CoffeeCard from '#lib/components/CoffeeCard.svelte';
+	import { getDose } from '#lib/data.remote.js';
+	import { consumeTube } from '#lib/tubes.remote.js';
+	import { getTubeName } from '#lib/utils.js';
 	import type { PageProps } from './$types';
 
 	const { params }: PageProps = $props();

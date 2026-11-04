@@ -1,7 +1,7 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees } from '$lib/server/db/schema';
-import { coffeeFilterSchema } from '$lib/validation';
+import { db } from '#lib/server/db/index.js';
+import { coffees } from '#lib/server/db/schema.js';
+import { coffeeFilterSchema } from '#lib/validation/index.js';
 import { and, eq } from 'drizzle-orm';
 import { unique } from 'radash';
 

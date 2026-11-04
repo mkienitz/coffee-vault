@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Plus from 'lucide-svelte/icons/plus';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
-	import { getTubeName, formatDateTime } from '$lib/utils';
-	import { clearTube, createTube, getFirstEmptyTubeId, getTubes } from '$lib/tubes.remote';
-	import { getUndosedWeight } from '$lib/inventory.remote';
-	import { doseCreationSchema } from '$lib/validation';
+	import { getTubeName, formatDateTime } from '#lib/utils.js';
+	import { clearTube, createTube, getFirstEmptyTubeId, getTubes } from '#lib/tubes.remote.js';
+	import { getUndosedWeight } from '#lib/inventory.remote.js';
+	import { doseCreationSchema } from '#lib/validation/index.js';
 	import * as v from 'valibot';
 
 	interface Props {
@@ -37,8 +37,7 @@
 		})
 	);
 
-	const validateCreationForm = () =>
-		creationForm.validate({ preflightOnly: true, includeUntouched: true });
+	const validateCreationForm = () => creationForm.validate({ preflightOnly: true, all: true });
 
 	let deleteDialogs: Record<string, HTMLDialogElement> = $state({});
 </script>

@@ -1,6 +1,5 @@
 <script lang="ts" generics="T extends RemoteFormInput">
-	import type { RemoteFormFields, RemoteFormInput } from '@sveltejs/kit';
-	import type { RemoteForm } from '@sveltejs/kit';
+	import type { RemoteFormFields, RemoteFormInput, RemoteForm } from '$app/server';
 
 	const { form }: { form: RemoteForm<T, void> | Omit<RemoteForm<T, void>, 'for'> } = $props();
 

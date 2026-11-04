@@ -49,7 +49,7 @@
             packages = [
               pkgs.nil
               pkgs.sqlite
-              pkgs.nodejs_24
+              pkgs.nodejs_26
               pkgs.tailwindcss-language-server
               pkgs.tailwindcss
               pkgs.typescript-language-server
@@ -79,7 +79,7 @@
               runHook preInstall
               mkdir -p $out/bin $out/share
               cp -R build node_modules $out/share/
-              makeWrapper ${lib.getExe pkgs.nodejs_24} $out/bin/coffee-vault \
+              makeWrapper ${lib.getExe pkgs.nodejs_26} $out/bin/coffee-vault \
                 --add-flags $out/share/build
               runHook postInstall
             '';

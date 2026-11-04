@@ -1,5 +1,5 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
+import { db } from '#lib/server/db/index.js';
 import { sum, unique } from 'radash';
 
 export const getBrewPageData = query(async () => {

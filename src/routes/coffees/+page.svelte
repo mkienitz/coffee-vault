@@ -4,7 +4,7 @@
 	import ArrowUpAZ from 'lucide-svelte/icons/arrow-up-a-z';
 	import Plus from 'lucide-svelte/icons/plus';
 	import X from 'lucide-svelte/icons/x';
-	import { getProcessBadgeClass, formatDate, getCountryFlag } from '$lib/utils';
+	import { getProcessBadgeClass, formatDate, getCountryFlag } from '#lib/utils.js';
 	import { getData } from './data.remote';
 
 	const tableEntries = await getData();

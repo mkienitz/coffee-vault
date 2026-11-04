@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { type Drawer } from '$lib/types';
-	import { getTubeName } from '$lib/utils';
+	import { type Drawer } from '#lib/types.js';
+	import { getTubeName } from '#lib/utils.js';
 	import { getDoseOverviewData } from './data.remote';
 
 	const data = $derived(await getDoseOverviewData());

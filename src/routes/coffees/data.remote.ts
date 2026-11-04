@@ -1,5 +1,5 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
+import { db } from '#lib/server/db/index.js';
 
 export const getData = query(async () => {
 	const tableEntries = (

@@ -1,10 +1,10 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { coffees } from '#lib/server/db/schema.js';
 import {
 	getRemainingWeight as calculateRemainingWeight,
 	getUndosedWeight as calculateUndosedWeight
-} from '$lib/server/inventory';
+} from '#lib/server/inventory.js';
 import { error } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm';
 import * as v from 'valibot';

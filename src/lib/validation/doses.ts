@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { drawerLetters, tubeNumbers } from '$lib/constants';
+import { drawerLetters, tubeNumbers } from '#lib/constants.js';
 
 // ============================================================================
 // DOSE SCHEMAS

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CoffeeForm from '$lib/components/CoffeeForm.svelte';
+	import CoffeeForm from '#lib/components/CoffeeForm.svelte';
 	import type { PageProps } from './$types';
 
 	let { params }: PageProps = $props();

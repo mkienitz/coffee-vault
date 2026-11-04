@@ -1,9 +1,9 @@
 import { resolve } from '$app/paths';
 import { form } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees } from '$lib/server/db/schema';
-import { coffeeSelectDbSchema, coffeeUpdateDbSchema } from '$lib/server/validation';
-import { coffeeManagementSchema } from '$lib/validation';
+import { db } from '#lib/server/db/index.js';
+import { coffees } from '#lib/server/db/schema.js';
+import { coffeeSelectDbSchema, coffeeUpdateDbSchema } from '#lib/server/validation.js';
+import { coffeeManagementSchema } from '#lib/validation/index.js';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as v from 'valibot';
@@ -28,7 +28,7 @@ export const manageCoffee = form(coffeeManagementSchema, async ({ mode, ...coffe
 		}
 		// Convert null → undefined and validate with domain schema
 		const newCoffee = v.parse(coffeeSelectDbSchema, result);
-		redirect(303, resolve(`/coffees/${newCoffee.id}`));
+		redirect(303, resolve(`coffees/${newCoffee.id}`));
 	} else if (mode === 'delete' && coffee.id !== undefined) {
 		// Delete coffee
 		await db.transaction(async (tx) => {

@@ -1,13 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees, doses } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { coffees, doses } from '#lib/server/db/schema.js';
 import { and, eq } from 'drizzle-orm';
 
 import * as v from 'valibot';
-import { coffeeSelectDbSchema } from '$lib/server/validation';
-import { drawerLetters, tubeNumbers } from '$lib/constants';
-import { type Drawer, type TubeNumber } from '$lib/types';
+import { coffeeSelectDbSchema } from '#lib/server/validation.js';
+import { drawerLetters, tubeNumbers } from '#lib/constants.js';
+import { type Drawer, type TubeNumber } from '#lib/types.js';
 
 // DOSES
 export const getDose = query(v.string(), async (doseSlug) => {

@@ -1,5 +1,11 @@
 import * as v from 'valibot';
-import { coffeeSchema, doseSchema, doseUpdateSchema, brewSchema, bagSchema } from '$lib/validation';
+import {
+	coffeeSchema,
+	doseSchema,
+	doseUpdateSchema,
+	brewSchema,
+	bagSchema
+} from '#lib/validation/index.js';
 
 // ============================================================================
 // CONVERSION UTILITIES

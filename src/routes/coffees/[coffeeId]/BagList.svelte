@@ -2,10 +2,10 @@
 	import Printer from 'lucide-svelte/icons/printer';
 	import Plus from 'lucide-svelte/icons/plus';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
-	import { createBag, deleteBag, getBags, printBag } from '$lib/bags.remote';
-	import { getUndosedWeight } from '$lib/inventory.remote';
-	import { formatDateTime } from '$lib/utils';
-	import { bagCreationSchema } from '$lib/validation';
+	import { createBag, deleteBag, getBags, printBag } from '#lib/bags.remote.js';
+	import { getUndosedWeight } from '#lib/inventory.remote.js';
+	import { formatDateTime } from '#lib/utils.js';
+	import { bagCreationSchema } from '#lib/validation/index.js';
 	import * as v from 'valibot';
 
 	interface Props {
@@ -35,8 +35,7 @@
 		})
 	);
 
-	const validateCreationForm = () =>
-		creationForm.validate({ preflightOnly: true, includeUntouched: true });
+	const validateCreationForm = () => creationForm.validate({ preflightOnly: true, all: true });
 </script>
 
 <ul class="list bg-base-100 rounded-box shadow-sm">

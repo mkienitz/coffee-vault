@@ -1,8 +1,8 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees } from '$lib/server/db/schema';
-import { coffeeSelectDbSchema } from '$lib/server/validation';
-import { getTubeName } from '$lib/utils';
+import { db } from '#lib/server/db/index.js';
+import { coffees } from '#lib/server/db/schema.js';
+import { coffeeSelectDbSchema } from '#lib/server/validation.js';
+import { getTubeName } from '#lib/utils.js';
 import { error } from '@sveltejs/kit';
 import { inArray } from 'drizzle-orm';
 import { first } from 'radash';

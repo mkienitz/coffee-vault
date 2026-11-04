@@ -1,5 +1,5 @@
-import { building } from '$app/environment';
-import { env } from '$env/dynamic/private';
+import { building } from '$app/env';
+import { COFFEE_VAULT_DB_PATH } from '$app/env/private';
 import { drizzle } from 'drizzle-orm/libsql';
 import {
 	brews,
@@ -24,7 +24,7 @@ const schema = {
 };
 
 function createDb() {
-	const dbPath = env.COFFEE_VAULT_DB_PATH;
+	const dbPath = COFFEE_VAULT_DB_PATH;
 
 	if (!dbPath) {
 		throw new Error('COFFEE_VAULT_DB_PATH must be set before using the database');

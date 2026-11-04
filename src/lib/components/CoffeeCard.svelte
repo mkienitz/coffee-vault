@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { formatRoastDate, getCountryFlag, getProcessBadgeClass } from '$lib/utils';
+	import { formatRoastDate, getCountryFlag, getProcessBadgeClass } from '#lib/utils.js';
 	import { getCoffeeCardData } from './CoffeeCard.remote';
-	import { getRemainingWeight } from '$lib/inventory.remote';
-	import type { Process } from '$lib/types';
+	import { getRemainingWeight } from '#lib/inventory.remote.js';
+	import type { Process } from '#lib/types.js';
 	import 'flag-icons/css/flag-icons.min.css';
 
 	interface Props {

@@ -1,9 +1,9 @@
 import { form, query } from '$app/server';
-import { db } from '$lib/server/db';
-import { bags, coffees } from '$lib/server/db/schema';
-import { getUndosedWeight } from '$lib/inventory.remote';
-import { bagSelectDbSchema } from '$lib/server/validation';
-import { bagCreationSchema, bagDeletionSchema, bagSchema } from '$lib/validation';
+import { db } from '#lib/server/db/index.js';
+import { bags, coffees } from '#lib/server/db/schema.js';
+import { getUndosedWeight } from '#lib/inventory.remote.js';
+import { bagSelectDbSchema } from '#lib/server/validation.js';
+import { bagCreationSchema, bagDeletionSchema, bagSchema } from '#lib/validation/index.js';
 import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as v from 'valibot';

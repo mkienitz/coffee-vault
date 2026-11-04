@@ -16,4 +16,14 @@ Data entry on a full keyboard and a careful subset of metadata I want to actuall
 - QR code labels for managing free-form (usually vacuum-sealed) one-off doses
 - Dark mode, toasts, some visual candy
 
-Built on Svelte 5 + SvelteKit (remote functions), Drizzle + SQLite, Tailwind 4 + DaisyUI, Valibot.
+Built on Svelte 5 + SvelteKit 3 (remote functions), Drizzle + SQLite, Tailwind 4 + DaisyUI, Valibot.
+
+## Deployment
+
+Set `COFFEE_VAULT_DB_PATH` at runtime to the SQLite database path.
+For deployments behind a reverse proxy, set `COFFEE_VAULT_ORIGIN` to the public
+origin (for example, `https://coffee.example.com`) **when running `npm run build`**.
+This configures SvelteKit's `paths.origin`; adapter-node 6 no longer uses the
+runtime `ORIGIN` variable. The NixOS module supplies this build-time value from
+`services.coffee-vault.domain`. Without an explicit origin, SvelteKit derives it
+from the incoming request.

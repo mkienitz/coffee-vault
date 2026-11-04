@@ -1,14 +1,14 @@
 <script lang="ts">
 	import Plus from 'lucide-svelte/icons/plus';
 	import { getFilteredIdsAndData } from './data.remote';
-	import CoffeeCard from '$lib/components/CoffeeCard.svelte';
+	import CoffeeCard from '#lib/components/CoffeeCard.svelte';
 	import Funnel from 'lucide-svelte/icons/funnel';
 	import Coffee from 'lucide-svelte/icons/coffee';
 	import ArrowDownUp from 'lucide-svelte/icons/arrow-down-up';
 	import X from 'lucide-svelte/icons/x';
-	import { coffeeFilterSchema } from '$lib/validation';
+	import { coffeeFilterSchema } from '#lib/validation/index.js';
 	import * as v from 'valibot';
-	import { coffeeFilterColumns } from '$lib/constants';
+	import { coffeeFilterColumns } from '#lib/constants.js';
 
 	// Filter
 	let filterDialog: HTMLDialogElement | undefined = $state(undefined);

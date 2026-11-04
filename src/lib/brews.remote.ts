@@ -1,7 +1,7 @@
 import { query } from '$app/server';
-import { db } from '$lib/server/db';
-import { coffees } from '$lib/server/db/schema';
-import { brewSelectDbSchema } from '$lib/server/validation';
+import { db } from '#lib/server/db/index.js';
+import { coffees } from '#lib/server/db/schema.js';
+import { brewSelectDbSchema } from '#lib/server/validation.js';
 import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as v from 'valibot';

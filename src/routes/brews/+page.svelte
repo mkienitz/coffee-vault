@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatDateTime, getCountryFlag } from '$lib/utils';
+	import { formatDateTime, getCountryFlag } from '#lib/utils.js';
 	import { getBrewPageData } from './data.remote';
 	import 'flag-icons/css/flag-icons.min.css';
 

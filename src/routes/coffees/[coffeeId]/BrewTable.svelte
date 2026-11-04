@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getBrews } from '$lib/brews.remote';
-	import { formatDateTime } from '$lib/utils';
+	import { getBrews } from '#lib/brews.remote.js';
+	import { formatDateTime } from '#lib/utils.js';
 
 	interface Props {
 		coffeeId: number;

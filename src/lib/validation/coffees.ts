@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { coffeeFilterColumns, countryValues, processValues } from '$lib/constants';
+import { coffeeFilterColumns, countryValues, processValues } from '#lib/constants.js';
 
 // ============================================================================
 // HELPERS
