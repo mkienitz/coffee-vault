@@ -7,7 +7,6 @@
 	import Pencil from 'lucide-svelte/icons/pencil';
 	import type { PageProps } from './$types';
 	import { getCoffee } from '#lib/data.remote.js';
-	import { getBrews } from '#lib/brews.remote.js';
 	import { getRemainingWeight, getUndosedWeight } from '#lib/inventory.remote.js';
 	import { getBags } from '#lib/bags.remote.js';
 	import { getNextTube, getTubes } from '#lib/tubes.remote.js';
@@ -20,28 +19,11 @@
 	const nextTubeQuery = $derived(getNextTube(coffeeId));
 	const tubesQuery = $derived(getTubes(coffeeId));
 	const bagsQuery = $derived(getBags(coffeeId));
-	const brewsQuery = $derived(getBrews(coffeeId));
-
-	function clamp(value: number, min: number, max: number) {
-		return Math.min(Math.max(value, min), max);
-	}
+	const tabGroup = $props.id();
 
 	function progressValue(weight: number, totalWeight: number) {
-		if (!Number.isFinite(weight) || !Number.isFinite(totalWeight) || totalWeight <= 0) {
-			return 0;
-		}
-		return clamp((weight / totalWeight) * 100, 0, 100);
-	}
-
-	function progressBarColor(weight: number, totalWeight: number) {
-		if (weight < 7) return 'text-error';
-		if (weight < 20) return 'text-warning';
-		if (weight < 0.3 * totalWeight) return 'text-warning';
-		return 'text-success';
-	}
-
-	function progressBackground(value: number) {
-		return `conic-gradient(currentColor ${value}%, color-mix(in oklab, currentColor 15%, transparent) 0)`;
+		if (!Number.isFinite(weight) || !Number.isFinite(totalWeight) || totalWeight <= 0) return 0;
+		return Math.min(Math.max((weight / totalWeight) * 100, 0), 100);
 	}
 
 	function formatWeight(weight: number) {
@@ -49,196 +31,206 @@
 	}
 </script>
 
-{#snippet CoffeePanel()}
+{#snippet Detail(label: string, value: string | undefined)}
+	{#if value}
+		<div class="space-y-1">
+			<dt class="text-base-content/60 text-sm">{label}</dt>
+			<dd class="text-sm leading-relaxed break-words">{value}</dd>
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet CoffeePage()}
 	{@const coffee = await coffeeQuery}
 	{@const remainingWeight = await remainingWeightQuery}
 	{@const undosedWeight = await undosedWeightQuery}
 	{@const nextTube = await nextTubeQuery}
-	{@const originInfo = [coffee.farm, coffee.region, coffee.country]
-		.filter((v) => v && v !== '')
-		.join(', ')}
-
-	<!-- Title Bar -->
-	<div class="min-w-0 flex-1 space-y-1">
-		<h1 class="flex items-center space-x-3 text-2xl font-bold sm:text-3xl">
-			{#if coffee.country}
-				<span class="fi fi-{getCountryFlag(coffee.country)}"></span>
-			{/if}
-			<span>{coffee.name}</span>
-			<a href="/coffees/{coffee.id}/edit"><Pencil class="text-base-content/60" /></a>
-		</h1>
-		<div class="text-base-content/60 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-			<span>{coffee.roaster ?? 'Unknown Roaster'}</span>
-			{#if coffee.roastingDate}
-				<span class="hidden sm:inline">•</span>
-				<span>{coffee.roastingDate}</span>
-			{/if}
-		</div>
-	</div>
-
-	<!-- Stats Grid -->
-	{#snippet InfoCard(label: string, value: string)}
-		<div class="card bg-base-100">
-			<div class="card-body gap-1 p-4">
-				<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">{label}</h3>
-				<p class="text-sm font-medium">{value}</p>
-			</div>
-		</div>
-	{/snippet}
-
-	<div class="grid grid-cols-2 gap-4">
-		<div
-			class="col-span-full grid grid-cols-2 gap-4 {nextTube ? 'sm:col-span-2' : 'sm:col-span-3'}"
-		>
-			{#if coffee.varietals}
-				{@render InfoCard('Varietals', coffee.varietals)}
-			{/if}
-			<div class="card bg-base-100">
-				<div class="card-body gap-1 p-4">
-					<div class="flex items-center gap-2">
-						<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
-							Process
-						</h3>
-						{#if coffee.process}
-							<div class="badge badge-sm badge-soft {getProcessBadgeClass(coffee.process)}">
-								{coffee.process}
-							</div>
+	{@const tubeCount = (await tubesQuery).length}
+	{@const bagCount = (await bagsQuery).length}
+	<div class="w-full max-w-5xl space-y-8 py-4 sm:py-6">
+		<header class="flex items-start justify-between gap-4">
+			<div class="min-w-0 space-y-3">
+				{#if coffee.roaster || coffee.roastingDate}
+					<p class="text-base-content/65 text-sm font-medium">
+						{coffee.roaster ?? ''}
+						{#if coffee.roastingDate}
+							<span
+								class="text-base-content/50 font-normal whitespace-nowrap"
+								title="Roasted {coffee.roastingDate}"
+							>
+								<span class="sr-only">Roasted </span>(<time datetime={coffee.roastingDate}
+									>{coffee.roastingDate.slice(2, 10).replaceAll('-', '/')}</time
+								>)
+							</span>
 						{/if}
-					</div>
-					<p class="text-sm font-medium">{coffee.processDetails ?? 'Unknown'}</p>
+					</p>
+				{/if}
+				<h1 class="text-3xl leading-tight font-semibold tracking-tight break-words sm:text-4xl">
+					{coffee.name}
+				</h1>
+				<div class="text-base-content/65 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+					{#if coffee.country}
+						<span class="inline-flex items-center gap-2">
+							<span class="fi fi-{getCountryFlag(coffee.country)} rounded-xs" aria-hidden="true"
+							></span>
+							{coffee.country}
+						</span>
+					{/if}
+					{#if coffee.process}
+						<span class="badge badge-soft badge-sm {getProcessBadgeClass(coffee.process)}"
+							>{coffee.process}</span
+						>
+					{/if}
+					{#if coffee.varietals}
+						<span class="min-w-0 break-words"
+							><span class="sr-only">Varietals: </span>{coffee.varietals}</span
+						>
+					{/if}
 				</div>
 			</div>
-			{#if originInfo !== ''}
-				{@render InfoCard('Origin', originInfo)}
-			{/if}
-			{#if coffee.flavorProfile}
-				{@render InfoCard('Flavor', coffee.flavorProfile)}
-			{/if}
-			{#if coffee.producer}
-				{@render InfoCard('Producer', coffee.producer)}
-			{/if}
-		</div>
-	</div>
-
-	{#if coffee.description || coffee.notes}
-		{#snippet CollapsibleSection(title: string, content: string, fullWidth: boolean = false)}
-			<div
-				class="bg-base-100 sm:collapse-open collapse-arrow collapse sm:[&_.collapse-title]:after:hidden {fullWidth
-					? 'sm:col-span-2'
-					: ''}"
+			<a
+				href="/coffees/{coffee.id}/edit"
+				class="btn btn-ghost btn-sm shrink-0"
+				aria-label="Edit coffee"
 			>
-				<input type="checkbox" class="peer sm:hidden" />
-				<div class="collapse-title p-4 pb-2 sm:cursor-auto!">
-					<h3 class="text-base-content/60 text-xs font-medium tracking-wide uppercase">
-						{title}
-					</h3>
-				</div>
-				<div class="collapse-content px-4 pt-0">
-					<p class="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
-				</div>
-			</div>
-		{/snippet}
+				<Pencil size={16} /> Edit
+			</a>
+		</header>
 
-		<div class="grid gap-4 sm:grid-cols-2">
+		<section class="space-y-6" aria-label="About this coffee">
+			{#if coffee.flavorProfile}
+				<div class="space-y-1.5">
+					<h2 class="text-base-content/60 text-sm">Tasting notes</h2>
+					<p class="text-xl leading-relaxed break-words">{coffee.flavorProfile}</p>
+				</div>
+			{/if}
+			<dl class="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+				{@render Detail('Region', coffee.region)}
+				{@render Detail('Farm', coffee.farm)}
+				{@render Detail('Producer', coffee.producer)}
+				{@render Detail('Process', coffee.processDetails)}
+				{@render Detail('Elevation', coffee.elevation)}
+			</dl>
 			{#if coffee.description}
-				{@render CollapsibleSection('Description', coffee.description, !coffee.notes)}
+				<p class="max-w-prose text-base leading-relaxed break-words whitespace-pre-wrap">
+					{coffee.description}
+				</p>
+			{/if}
+			{#if !coffee.region && !coffee.farm && !coffee.producer && !coffee.processDetails && !coffee.elevation && !coffee.flavorProfile && !coffee.description && !coffee.notes}
+				<p class="text-base-content/60 text-sm">No additional details yet.</p>
 			{/if}
 			{#if coffee.notes}
-				{@render CollapsibleSection('Notes', coffee.notes, !coffee.description)}
-			{/if}
-		</div>
-	{/if}
-
-	{#snippet WeightProgress(label: string, weight: number, totalWeight: number)}
-		{@const value = progressValue(weight, totalWeight)}
-		<div class="stat place-items-center">
-			<div class="stat-title font-medium tracking-wide uppercase">{label}</div>
-			<div class="stat-value">
-				<div
-					class="relative grid size-18 shrink-0 place-items-center rounded-full {progressBarColor(
-						weight,
-						totalWeight
-					)}"
-					style:background={progressBackground(value)}
-					aria-valuemin="0"
-					aria-valuemax={totalWeight}
-					aria-valuenow={weight}
-					role="progressbar"
-				>
-					<div class="bg-base-100 absolute inset-1 rounded-full"></div>
-					<div class="text-base-content relative flex flex-col items-center">
-						<span class="text-lg font-bold">{formatWeight(weight)}g</span>
-						<span class="text-base-content/60 text-xs">of {formatWeight(totalWeight)}g</span>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/snippet}
-
-	<div class="stats w-full shadow">
-		<div class="stat place-items-center">
-			<div class="stat-title font-medium tracking-wide uppercase">Next Dose</div>
-			<div class="stat-value">
-				{#if nextTube}
-					{@const tubeName = getTubeName(nextTube)}
-					<a href="/doses/{tubeName}" class="link">
-						<div
-							class="border-primary bg-base-200 flex h-20 w-20 items-center justify-center rounded-full border-[0.25rem]"
-						>
-							<span class="font-mono text-xl font-bold">{tubeName}</span>
-						</div>
-					</a>
-				{:else}
-					<div
-						class="border-base-content/20 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-[0.25rem] font-mono text-lg font-bold"
+				<details class="collapse-arrow border-base-300 collapse rounded-none border-t">
+					<summary class="collapse-title min-h-0 py-3 pl-0 text-sm font-medium after:end-1"
+						>Personal notes</summary
 					>
-						--
+					<div
+						class="collapse-content max-w-prose px-0 text-sm leading-relaxed break-words whitespace-pre-wrap"
+					>
+						{coffee.notes}
 					</div>
-				{/if}
-				<!-- TODO: add alternative placeholder if there is no next dose -->
-			</div>
-			<!-- <div class="stat-desc">Jan 1st - Feb 1st</div> -->
-		</div>
+				</details>
+			{/if}
+		</section>
 
-		{@render WeightProgress('Remaining', remainingWeight, coffee.weight)}
-		{@render WeightProgress('Undosed', undosedWeight, coffee.weight)}
+		<section
+			class="border-base-300 rounded-box overflow-hidden border"
+			aria-labelledby="stock-heading"
+		>
+			<h2 id="stock-heading" class="px-5 pt-5 text-lg font-semibold tracking-tight sm:px-6 sm:pt-6">
+				Stock &amp; doses
+			</h2>
+			<dl
+				class="grid grid-cols-2 items-start gap-6 p-5 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-center sm:gap-8 sm:p-6"
+			>
+				<div class="min-w-0 space-y-2 sm:order-1">
+					<dt class="text-base-content/65 text-sm">Ready to brew</dt>
+					<dd class="text-3xl font-semibold tracking-tight tabular-nums">
+						{tubeCount}
+						<span class="text-base font-normal">{tubeCount === 1 ? 'tube' : 'tubes'}</span>
+					</dd>
+					<dd class="text-base-content/60 text-sm tabular-nums">
+						{bagCount}
+						{bagCount === 1 ? 'bag' : 'bags'}
+					</dd>
+				</div>
+				<div class="space-y-2 justify-self-end text-center sm:order-4">
+					<dt class="text-base-content/65 text-sm">Next dose</dt>
+					<dd>
+						{#if nextTube}
+							{@const tubeName = getTubeName(nextTube)}
+							<a
+								href="/doses/{tubeName}"
+								class="btn btn-circle btn-outline btn-primary size-20 border-2 font-mono text-xl"
+								aria-label="Open tube {tubeName}">{tubeName}</a
+							>
+						{:else}
+							<span
+								class="border-base-300 text-base-content/40 flex size-20 items-center justify-center rounded-full border-2 font-mono text-xl"
+								role="img"
+								aria-label="No filled tubes">—</span
+							>
+						{/if}
+					</dd>
+				</div>
+				<div class="min-w-0 space-y-2 sm:order-2">
+					<dt class="text-base-content/65 text-sm">Remaining</dt>
+					<dd class="text-xl font-semibold tracking-tight tabular-nums">
+						{formatWeight(remainingWeight)}<span class="ml-1 text-sm font-normal">g</span>
+					</dd>
+					<dd class="space-y-2">
+						<progress
+							class="progress progress-primary block h-1.5 w-full"
+							value={progressValue(remainingWeight, coffee.weight)}
+							max="100"
+							aria-label="Remaining coffee"
+						></progress>
+						<span class="text-base-content/60 block text-xs"
+							>of {formatWeight(coffee.weight)} g total</span
+						>
+					</dd>
+				</div>
+				<div class="min-w-0 space-y-2 sm:order-3">
+					<dt class="text-base-content/65 text-sm">Undosed</dt>
+					<dd class="text-xl font-semibold tracking-tight tabular-nums">
+						{formatWeight(undosedWeight)}<span class="ml-1 text-sm font-normal">g</span>
+					</dd>
+					<dd class="space-y-2">
+						<progress
+							class="progress block h-1.5 w-full"
+							value={progressValue(undosedWeight, coffee.weight)}
+							max="100"
+							aria-label="Undosed coffee"
+						></progress>
+						<span class="text-base-content/60 block text-xs">Available to portion</span>
+					</dd>
+				</div>
+			</dl>
+			{#key coffeeId}
+				<details class="collapse-arrow border-base-300 collapse rounded-none border-t">
+					<summary class="collapse-title min-h-0 py-4 pl-5 text-sm font-medium sm:pl-6"
+						>Manage tubes &amp; bags</summary
+					>
+					<div class="collapse-content px-4 sm:px-6">
+						<div class="tabs tabs-border w-full min-w-0">
+							<label class="tab gap-2 px-3 sm:px-4">
+								<input type="radio" name={tabGroup} checked={true} aria-label="Tubes" />
+								Tubes <span class="badge badge-ghost badge-sm tabular-nums">{tubeCount}</span>
+							</label>
+							<div class="tab-content min-w-0 pt-4"><DoseList {coffeeId} /></div>
+							<label class="tab gap-2 px-3 sm:px-4">
+								<input type="radio" name={tabGroup} aria-label="Bags" />
+								Bags <span class="badge badge-ghost badge-sm tabular-nums">{bagCount}</span>
+							</label>
+							<div class="tab-content min-w-0 pt-4"><BagList {coffeeId} /></div>
+						</div>
+					</div>
+				</details>
+			{/key}
+		</section>
+
+		<BrewTable {coffeeId} />
 	</div>
 {/snippet}
 
-<div class="flex w-full max-w-6xl flex-col items-center space-y-8">
-	{@render CoffeePanel()}
-	<div class="tabs tabs-lift tabs-xl">
-		<label class="tab">
-			<input type="radio" name="coffee-tab" checked={true} />
-			<div class="flex items-center space-x-2">
-				<span>Tubes</span>
-				<span class="badge badge-xs">{(await tubesQuery).length}</span>
-			</div>
-		</label>
-		<div class="tab-content bg-base-100 border-base-300 p-6">
-			<DoseList {coffeeId} />
-		</div>
-
-		<label class="tab">
-			<input type="radio" name="coffee-tab" />
-			<div class="flex items-center space-x-2">
-				<span>Bags</span>
-				<span class="badge badge-xs">{(await bagsQuery).length}</span>
-			</div>
-		</label>
-		<div class="tab-content bg-base-100 border-base-300 p-6">
-			<BagList {coffeeId} />
-		</div>
-
-		<label class="tab">
-			<input type="radio" name="coffee-tab" />
-			<div class="flex items-center space-x-2">
-				<span>Brews</span>
-				<span class="badge badge-xs">{(await brewsQuery).length}</span>
-			</div>
-		</label>
-		<div class="tab-content bg-base-100 border-base-300 p-6">
-			<BrewTable {coffeeId} />
-		</div>
-	</div>
-</div>
+{@render CoffeePage()}
